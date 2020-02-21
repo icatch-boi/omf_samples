@@ -39,6 +39,12 @@ static bool MessageProcess(const char* msg0){
 			dbgNotePSL("error");
 			_exit=true;
 			break;
+		case Hash("recordStart"):
+			dbgNotePSL("recordStart");
+			break;
+		case Hash("recordStop"):
+			dbgNotePSL("recordStop");
+			break;
 		default:
 			dbgTestPSL("unknow message:"<<msg);
 			break;
@@ -48,7 +54,7 @@ static bool MessageProcess(const char* msg0){
 static bool Process(bool _dbg){
 	auto layout = (std::string)
 		"type=RecordEventService,layout={"
-			"type=EventSharedMemoryObject,name=shm,free=false"
+			"type=EventSharedMemoryObject,name=ShmEventTrigger,free=false"
 		"}"
 	;
 	dbgTestPSL(layout);

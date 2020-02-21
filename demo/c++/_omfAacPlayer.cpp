@@ -64,6 +64,7 @@ static bool Process(bool _dbg){
 	returnIfErrC(false,!obj);
 	returnIfErrC(false,!obj.Register(&MessageProcess));
 	returnIfErrC(false,!obj.StatusUp("play"));
+	dbgNotePSL("playing ......");
 	///
 	while(!_exit){
 		std::this_thread::sleep_for(100_ms);////wait 1s

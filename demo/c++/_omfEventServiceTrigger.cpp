@@ -25,16 +25,16 @@ static int _recordPostSeconds=7;
 static bool _exit = false;
 ////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
-	{"appEventServiceTrigger(...): \n"
+	{"omfEventServiceTrigger(...): \n"
 	 "send one tigger signal(with params) to the event service . eg..\n"
-	 "> omfWavRecord -n test.mp4 -i 30 -f 3 -b 7\n"
-	 "> omfWavRecord -R EVT%04u%02u%02u%02u%02u%02u.mp4 -c 10 -i 30 -f 3 -b 7\n"
-	 "> omfWavRecord -I EVT%05u.mp4 -c 10 -i 30 -f 3 -b 7\n"
-	 "> omfWavRecord -c 10 -i 30 -f 3 -b 7\n"
+	 "> omfEventServiceTrigger -n test.mp4 -i 30 -f 3 -b 7\n"
+	 "> omfEventServiceTrigger -R EVT%04u%02u%02u%02u%02u%02u.mp4 -c 10 -i 30 -f 3 -b 7\n"
+	 "> omfEventServiceTrigger -I EVT%05u.mp4 -c 10 -i 30 -f 3 -b 7\n"
+	 "> omfEventServiceTrigger -c 10 -i 30 -f 3 -b 7\n"
 	},
 	{"fname"		,'n',_fname					,"set the file name for record."},
 	{"frtc"			,'R',_fpattern				,"set the file name pattern(rtc) for record."},
-	{"findex"		,'I',_fpattern				,"set the file name pattern(index) for record."},
+	{"findex"		,'I',_findex				,"set the file name pattern(index) for record."},
 	{"count"		,'c',_triggerCount			,"set the count of trigger."},
 	{"interval"		,'i',_recordIntervalSeconds	,"set the interval(seconds) per trigger."},
 	{"pre"			,'f',_recordPreSeconds		,"set the record duration(seconds) before trigger."},
@@ -100,7 +100,7 @@ static bool Trigger(OmfObject&obj){
 static bool Process(bool _dbg){
 	///"type=SharedMemory,name=shm,BufferName=evt,size=4096,free=true"
 	auto layout =(std::string)
-		"type=EventSharedMemoryObject,name=shm,free=false";
+		"type=EventSharedMemoryObject,name=ShmEventTrigger,free=false";
 	OmfObject obj(layout);
 	returnIfErrC(false,!obj);
 	///

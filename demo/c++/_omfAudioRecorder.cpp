@@ -14,18 +14,26 @@ using namespace omf;
 using namespace omf::api;
 using namespace omf::chrono;
 ////////////////////////////////////////////
-static const char* _fname="test.wav";
+static const char* _fname=0;
 static int _seconds=30;
+static int _rate=0;
+static int _channels=0;
 ////////////////////////////////////////////
 static bool _exit = false;
+std::string _muxer;
+std::string _encoder;
 ////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
-	{"omfWavRecord(...): \n"
-	 "record the sounds to wave file(*.wav). eg..\n"
-	 "> omfWavRecord -n test.wav -d10\n"
+	{"omfTapeRecorder(...): \n"
+	 "record the sounds to a file(*.wav/*.pcm/*.aac). eg..\n"
+	 "> omfTapeRecorder -n test.wav -d10\n"
+	 "> omfTapeRecorder -n test.aac -d10\n"
+	 "> omfTapeRecorder -n test.pcm -r 16000 -c 1 -d10\n"
 	},
-	{"fname"	,'n', _fname 		,"set the wav file name."},
-	{"duration",'d', _seconds	,"set the wav record duration(*s)."},
+	{"fname"	,'n', _fname 		,"set the file name."},
+	{"duration",'d', _seconds		,"set the record duration(*s)."},
+	{"rate",'r', _rate				,"set the sample rate of audio."},
+	{"ch",'c', _channels			,"set the channels of audio."},
 	{},
 };
 ////////////////////////////////////////////
@@ -53,16 +61,18 @@ static bool MessageProcess(const char* msg0){
 }
 static bool Process(bool _dbg){
 	auto layout = (std::string)
-		"type=Application,name=appWavRec,layout={"
-			"type=Pipeline,name=pl_wav_rec,layout={"
+		"type=Application,layout={"
+			"type=Pipeline,layout={"
 				"ShmSource:connect={"
-					"type=pipeline,name=plPcmSource,layout={"
+					"type=pipeline,name=plPcmSrc,layout={"
 						"mic:name=mic"
 						"+RingSink:name=asink,max=16"
 					"}"
 				"}"
 				"+RecordControler:name=rc,duration="+_seconds+"s"
-				"+WavMuxer:name=wavmux,url=file://"+_fname+",dbg="+_dbg+
+				"+PcmFilter:ch="+_channels+",rate="+_rate+
+				_encoder+
+				"+"+_muxer+":name=muxer,url=file://"+_fname+",dbg="+_dbg+
 			"}"
 		"}"
 	;
@@ -72,19 +82,45 @@ static bool Process(bool _dbg){
 	returnIfErrC(false,!obj.Register(&MessageProcess));
 	returnIfErrC(false,!obj.StatusUp("play"));
 	///
-	std::cout<<"Recording";
 	while(!_exit){
-		std::this_thread::sleep_for(1000_ms);////wait 1s
-		std::cout<<'.';
+		std::this_thread::sleep_for(100_ms);////wait 1s
 	}
-	std::cout<<std::endl;
 	///
 	returnIfErrC(false,!obj.StatusUp("null"));
 	return true;
 }
+static bool CheckParamers(){
+	returnIfErrC(0,!_fname);
+	///
+	auto url = std::string("file://")+_fname;
+	OmfAttrSet ap(url);
+	returnIfErrC(false,!ap);
+	auto ext = ap.Get("ext");
+	returnIfErrC(false,!ext);
+	///
+	switch(::Hash(ext)){
+		case ::Hash("wav"):
+			_muxer = "wav-muxer";
+			_encoder = "";
+			break;
+		case ::Hash("pcm"):
+			_muxer = "IOSink";
+			_encoder = "";
+			break;
+		case ::Hash("aac"):
+			_muxer = "IOSink";
+			_encoder = "+aac-encoder";
+			break;
+		default:
+			dbgErrPSL("unkonw audio file format:"<< _fname);
+			return false;
+	}
+	returnIfErrC(false,_muxer.empty());
+	return true;
+}
 ////////////////////////////////
 int main(int argc,char* argv[]){
-	dbgNotePSL("omfWavRecord(...)\n");
+	dbgNotePSL("omfTapeRecorder(...)\n");
 	///parse the input params
 	OmfHelper helper(_options0,argc,argv);
 	///--help
