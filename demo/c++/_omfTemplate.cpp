@@ -25,10 +25,10 @@ static bool _exit = false;
 ////////////////////////////////////////////
 ///input parameters parser table
 static OmfHelper::Item _options0[]{
-	{"omfAppTemplate(...): \n"
-	 "this demo is to start the QRCode service to scan the pv streaming"
-	 ", and post the result message when it recognizes the QR code in the field of view. eg..\n"
-	 "> omfQRCode -w 640 -h 360 -f 1 -d 3600\n"
+	{"omfTemplate(...): \n"
+	 "this demo is to start the fake yuv source"
+	 ", and post the result message \n"
+	 "> omfTemplate -w 640 -h 360 -f 1 -d 3600\n"
 	},
 	{"width"	,'w',_width		,"set the image width."},
 	{"height"	,'h',_height	,"set the image height."},
@@ -71,11 +71,11 @@ static bool Process(bool _dbg){
 	///the Applicaion Layout string
 	auto layout =(std::string)
 		"type=ShmService,index=1,partner={"
-			"type=Application,name=appQrCode,layout={"
-				"type=Pipeline,name=plQrCode,layout={"
+			"type=Application,layout={"
+				"type=Pipeline,layout={"
 					"pv-yuv-src:w="+_width+",h="+_height+
 					"+FrameRateCtrl:fr="+_fr+
-					"+ZBarSink:dbg="+_dbg+
+					"+FakeSink:dbg="+_dbg+
 				"}"
 			"}"
 		"}"

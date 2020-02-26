@@ -1,8 +1,6 @@
 ALL =
-ALL+=omfTemplate_
-ALL+=omfRecord_
-ALL+=omfAudioRecorder_
-ALL+=omfAudioPlayer_
+ALL+=omfWavRecord_
+ALL+=omfWavPlayer_
 
 ###
 all:$(ALL)
