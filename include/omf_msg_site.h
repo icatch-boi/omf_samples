@@ -67,7 +67,7 @@ typedef int(*OmfMsgSiteFuncProc)(void* hd, const void *data, int size, int sende
  * @param hd [in]:the private data handle, send to OmfMsgSiteFuncProc.
  * @return true/false
  */
-EXTERNC bool omfMsgSiteReceive(void*site, OmfMsgSiteFuncProc cb, void*hd);
+EXTERNC int omfMsgSiteReceive(void*site, OmfMsgSiteFuncProc cb, void*hd);
 /**
  * receive message with specified ID.
  * @param site [in]:the site handle.
@@ -76,7 +76,7 @@ EXTERNC bool omfMsgSiteReceive(void*site, OmfMsgSiteFuncProc cb, void*hd);
  * @param hd [in]:the private data handle, send to OmfMsgSiteFuncProc.
  * @return true/false
  */
-EXTERNC bool omfMsgSiteReceive1(void*site, int target, OmfMsgSiteFuncProc cb, void*hd);
+EXTERNC int omfMsgSiteReceive1(void*site, int target, OmfMsgSiteFuncProc cb, void*hd);
 /**
  * receive message specified in the ID list.
  * @param site [in]:the site handle.
@@ -85,7 +85,7 @@ EXTERNC bool omfMsgSiteReceive1(void*site, int target, OmfMsgSiteFuncProc cb, vo
  * @param hd [in]:the private data handle, send to OmfMsgSiteFuncProc.
  * @return true/false
  */
-EXTERNC bool omfMsgSiteReceive2(void*site, int* targets, OmfMsgSiteFuncProc cb, void*hd);
+EXTERNC int omfMsgSiteReceive2(void*site, int* targets, OmfMsgSiteFuncProc cb, void*hd);
 ///register,
 /**
  * register the callback to receive message with the site ID automatically.
@@ -94,7 +94,7 @@ EXTERNC bool omfMsgSiteReceive2(void*site, int* targets, OmfMsgSiteFuncProc cb, 
  * @param hd [in]:the private data handle, send to OmfMsgSiteFuncProc.
  * @return true/false
  */
-EXTERNC bool omfMsgSiteRegister(void*site, OmfMsgSiteFuncProc cb, void*hd);
+EXTERNC int omfMsgSiteRegister(void*site, OmfMsgSiteFuncProc cb, void*hd);
 /**
  * register the callback to receive message with the specified ID automatically.
  * @param site [in]:the site handle.
@@ -103,7 +103,7 @@ EXTERNC bool omfMsgSiteRegister(void*site, OmfMsgSiteFuncProc cb, void*hd);
  * @param hd [in]:the private data handle, send to OmfMsgSiteFuncProc.
  * @return true/false
  */
-EXTERNC bool omfMsgSiteRegister1(void*site, int id, OmfMsgSiteFuncProc cb, void*hd);
+EXTERNC int omfMsgSiteRegister1(void*site, int id, OmfMsgSiteFuncProc cb, void*hd);
 /**
  * register the callback to receive message specified in the ID list.
  * @param site [in]:the site handle.
@@ -112,7 +112,7 @@ EXTERNC bool omfMsgSiteRegister1(void*site, int id, OmfMsgSiteFuncProc cb, void*
  * @param hd [in]:the private data handle, send to OmfMsgSiteFuncProc.
  * @return true/false
  */
-EXTERNC bool omfMsgSiteRegister2(void*site, int* targets, OmfMsgSiteFuncProc cb, void*hd);
+EXTERNC int omfMsgSiteRegister2(void*site, int* targets, OmfMsgSiteFuncProc cb, void*hd);
 
 
 #endif //STREAM_OMF_MSG_SITE_H
