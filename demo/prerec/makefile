@@ -1,6 +1,6 @@
 ALL =
-ALL+=omfWavRecord_
-ALL+=omfWavPlayer_
+ALL+=omfEventService_
+ALL+=omfEventServiceTrigger_
 
 ###
 all:$(ALL)
@@ -36,6 +36,7 @@ LIBS += -lpluginwav
 LIBS += -lpluginmp4
 LIBS += -lpluginav
 LIBS += -lpluginpcm
+LIBS += -lpluginprerec
 ###
 LIBS += -lomfapi
 LIBS += -lomfapicxx

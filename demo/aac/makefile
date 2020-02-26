@@ -1,6 +1,5 @@
 ALL =
-ALL+=omfWavRecord_
-ALL+=omfWavPlayer_
+ALL+=omfAacPlayer_
 
 ###
 all:$(ALL)
@@ -32,15 +31,15 @@ LIBS =
 LIBS += -L${LIBS_PATH}
 ###
 LIBS += -lpluginiofile
-LIBS += -lpluginwav
-LIBS += -lpluginmp4
-LIBS += -lpluginav
+#LIBS += -lpluginwav
+#LIBS += -lpluginmp4
+#LIBS += -lpluginav
 LIBS += -lpluginpcm
 ###
 LIBS += -lomfapi
 LIBS += -lomfapicxx
-LIBS += -lomfapistreaming
-LIBS += -lpluginapistreaming
+#LIBS += -lomfapistreaming
+#LIBS += -lpluginapistreaming
 ###
 LIBS += -lshm
 LIBS += -lpluginshm

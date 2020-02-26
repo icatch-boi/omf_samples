@@ -1,6 +1,5 @@
 ALL =
-ALL+=omfWavRecord_
-ALL+=omfWavPlayer_
+ALL+=omfZonesSet_
 
 ###
 all:$(ALL)

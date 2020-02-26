@@ -13,6 +13,7 @@
 #define dbgTestPVL0(v) printf("%s/%d:%s#%s=%s\n",__FILE__,__LINE__,__FUNCTION__,#v,v)
 #define dbgTestPVL(v) printf("%s/%d:%s#%s=%d\n",__FILE__,__LINE__,__FUNCTION__,#v,v)
 #define returnIfErrC(v,c) if(c){dbgTestPSL(#c);return v;}
+#define bool int
 #define false 0
 #define true 1
 /////////////////////////////////////////////
@@ -103,10 +104,6 @@ static int OptionParse(int argc,char **argv){
 ////////////////////////////////////////////
 static int cbReceive(void*hd,const void *data, int size, int sender, int target, unsigned flags){
 	dbgTestPVL(_id);
-	//dbgTestPVL(data);
-	//dbgTestPVL(size);
-	//dbgTestPVL(Now());
-	//dbgTestDL(data,size);
 	dbgTestPVL((unsigned)data);
 	dbgTestPVL(size);
 	dbgTestPVL(sender);
@@ -119,22 +116,25 @@ static int cbReceive(void*hd,const void *data, int size, int sender, int target,
 }
 static int Process(){
 	void* site=omfMsgSite0Get();
-	returnIfErrC(0,!site);
-	returnIfErrC(0,!omfMsgSiteIsWorking(site));
+	returnIfErrC(false,!site);
+	returnIfErrC(false,!omfMsgSiteIsWorking(site));
 	dbgTestPVL(omfMsgSiteGetID(site));
-	if(_send){printf("send message[%08x]%d->%d:%s\n",_flags,_id,_target,_msg);
+	if(_send){
+		printf("send message[%08x]%d->%d:%s\n",_flags,_id,_target,_msg);
 		int len = _msg?(strlen(_msg)+1):0;
 		returnIfErrC(false,!omfMsgSiteSend1(site,_id,_target,_msg,len,_flags));
-	}else if(_cb){printf("receive %d # message by register cb\n",_id);
+	}else if(_cb){
+		printf("receive %d # message by register cb\n",_id);
 		returnIfErrC(false,!omfMsgSiteRegister1(site,_id,&cbReceive,0));
 		while(1)usleep(1000000u);
-	}else{printf("receive %d# message\n",_id);
+	}else{
+		printf("receive %d# message\n",_id);
 		while(1){
 			returnIfErrC(false,!omfMsgSiteReceive1(site,_id,&cbReceive,0));
 			usleep(100000u);
 		}
 	}
-	return 1;
+	return true;
 }
 static int Print(){
 	dbgTestPVL(_id);

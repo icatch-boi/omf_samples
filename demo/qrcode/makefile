@@ -1,6 +1,5 @@
 ALL =
-ALL+=omfWavRecord_
-ALL+=omfWavPlayer_
+ALL+=omfQRCode_
 
 ###
 all:$(ALL)
@@ -31,11 +30,11 @@ INCS += -I${INCS_PATH}/c++
 LIBS =
 LIBS += -L${LIBS_PATH}
 ###
-LIBS += -lpluginiofile
-LIBS += -lpluginwav
-LIBS += -lpluginmp4
-LIBS += -lpluginav
-LIBS += -lpluginpcm
+#LIBS += -lpluginiofile
+#LIBS += -lpluginwav
+#LIBS += -lpluginmp4
+#LIBS += -lpluginav
+#LIBS += -lpluginpcm
 ###
 LIBS += -lomfapi
 LIBS += -lomfapicxx

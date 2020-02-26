@@ -1,6 +1,7 @@
 ALL =
-ALL+=omfWavRecord_
-ALL+=omfWavPlayer_
+ALL+=omfStampService_
+ALL+=omfStampSet_
+
 
 ###
 all:$(ALL)
