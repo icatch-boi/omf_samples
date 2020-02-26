@@ -86,15 +86,15 @@ static bool MessageProcess(const char* msg0){
 	}
 	return true;
 }
-static bool ProcessPull(IH264Source*src,FILE*fd){
+static bool ProcessPull(IH264Source*src,FILE*fd){dbgTestPL();
 	//start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
 	//streaming....
 	auto end = Now()+Seconds(_seconds);
-	while(_exit && Now()<end) {
+	while(!_exit && Now()<end) {
 		std::shared_ptr<frame_t> frm;
 		returnIfErrCS(false, !src->PullFrame(frm), "pull frame fail!");
-		if(!frm->data || frm->size)
+		if(!frm->data || !frm->size)
 			continue;
 		///
 		dbgTestPSL(frm->index
@@ -103,7 +103,7 @@ static bool ProcessPull(IH264Source*src,FILE*fd){
 						   <<','<<frm->iskeyframe
 						   <<','<<frm->pts
 		);
-		dbgTestDump(frm->data,16);
+		dbgTestDL(frm->data,16);
 		///write to file
 		if(fd)fwrite(frm->data,1,frm->size,fd);
 		///sleep & trigger
@@ -118,7 +118,7 @@ static bool ProcessPull(IH264Source*src,FILE*fd){
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
-static bool ProcessPush(IH264Source*src,FILE*fd){
+static bool ProcessPush(IH264Source*src,FILE*fd){dbgTestPL();
 	//set push callback
 	src->RegisterOutputCallback([&fd](std::shared_ptr<IH264Source::frame_t>&frm){
 		dbgTestPSL(frm->index
@@ -127,7 +127,7 @@ static bool ProcessPush(IH264Source*src,FILE*fd){
 						   <<','<<frm->iskeyframe
 						   <<','<<frm->pts
 		);
-		dbgTestDump(frm->data,16);
+		dbgTestDL(frm->data,16);
 		///
 		if(fd)fwrite(frm->data,1,frm->size,fd);
 		return true;
@@ -136,7 +136,7 @@ static bool ProcessPush(IH264Source*src,FILE*fd){
 	returnIfErrC(false,!src->ChangeUp(State::play));
 	//streaming...
 	auto end = Now()+Seconds(_seconds);
-	while(_exit && Now()<end) {
+	while(!_exit && Now()<end) {
 		///sleep & trigger
 		auto interval = 10_ms;
 		if(src->IsSupportSingleFrameTrigger()) {
@@ -182,8 +182,10 @@ static bool Process(bool _dbg){
 	dbgTestPVL(info.iframe.ppsLenght);
 	dbgTestPVL(info.iframe.dataOffset);
 	dbgTestPVL(info.pframe.dataOffset);
+	dbgTestPVL((void*)info.extraData);
 	dbgTestPVL(info.extraSize);
-	dbgDump(info.extraData,info.extraSize);
+	dbgTestDL(info.extraData,info.extraSize);
+	dbgTestPL();
 	///////////////////////////////////////
 	FILE* fd=fopen(_fname,"wb");
 	if(!fd){

@@ -6,21 +6,9 @@
 
 #include <functional>
 namespace omf {
-	class IMsgSite {
-	public:
-		virtual ~IMsgSite();
-	public:
-		/**
-		 * start the Message site with the site ID.
-		 * @param id [in]:set the site ID.
-		 * @return true/false
-		 */
-		virtual bool Start(int id)=0;
-		/**
-		 * stop the Message site flow.
-		 * @return true/fasle
-		 */
-		virtual bool Stop()=0;
+	class OmfMsgSite {
+	protected:
+		virtual ~OmfMsgSite(){}
 	public:
 		/**
 		 * Get the Site ID.
@@ -105,7 +93,7 @@ namespace omf {
 		 */
 		virtual bool Register(std::initializer_list<int> ids, const FuncProc &cb)=0;
 	public:
-		static IMsgSite& Globle();
+		static OmfMsgSite* Globle();
 	};
 }
 #if 0

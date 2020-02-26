@@ -81,6 +81,7 @@ namespace omf {
 	protected:
 		using FuncPrint=std::function<void()>;
 		using FuncProcess=std::function<void(char*)>;
+		using FuncVoid=std::function<void()>;
 		FuncProcess FindProcess(char key);
 
 	public:
@@ -121,7 +122,7 @@ namespace omf {
 			 * @param description [in]:the paramer description.
 			 */
 			Item(const char*longname,char shortname
-					,FuncProcess process
+					,FuncVoid process
 					,const char* description = 0
 			);
 			/**

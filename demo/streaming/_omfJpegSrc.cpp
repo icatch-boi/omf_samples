@@ -80,10 +80,10 @@ static bool ProcessPull(IJpegSource*src,FILE*fd){
 	returnIfErrC(false,!src->ChangeUp(State::play));
 	//streaming....
 	auto end = Now()+Seconds(_seconds);
-	while(_exit && Now()<end) {
+	while(!_exit && Now()<end) {
 		std::shared_ptr<frame_t> frm;
 		returnIfErrCS(false, !src->PullFrame(frm), "pull frame fail!");
-		if(!frm->data || frm->size)
+		if(!frm->data || !frm->size)
 			continue;
 		///
 		dbgTestPSL(frm->index
@@ -92,7 +92,7 @@ static bool ProcessPull(IJpegSource*src,FILE*fd){
 						   <<','<<frm->iskeyframe
 						   <<','<<frm->pts
 		);
-		dbgTestDump(frm->data,16);
+		dbgTestDL(frm->data,16);
 		///write to file
 		if(fd)fwrite(frm->data,1,frm->size,fd);
 		///sleep & trigger
@@ -116,7 +116,7 @@ static bool ProcessPush(IJpegSource*src,FILE*fd){
 						   <<','<<frm->iskeyframe
 						   <<','<<frm->pts
 		);
-		dbgTestDump(frm->data,16);
+		dbgTestDL(frm->data,16);
 		///
 		if(fd)fwrite(frm->data,1,frm->size,fd);
 		return true;
@@ -125,7 +125,7 @@ static bool ProcessPush(IJpegSource*src,FILE*fd){
 	returnIfErrC(false,!src->ChangeUp(State::play));
 	//streaming...
 	auto end = Now()+Seconds(_seconds);
-	while(_exit && Now()<end) {
+	while(!_exit && Now()<end) {
 		///sleep & trigger
 		auto interval = 10_ms;
 		if(src->IsSupportSingleFrameTrigger()) {

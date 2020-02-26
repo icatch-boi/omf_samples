@@ -7,51 +7,56 @@
 #include <cstring>
 #include <iostream>
 #include "_dbg_color.h"
-namespace omf {
-	namespace dbg {
-		extern std::ostream *pcout;
-		extern void dbgDump0(void* ptr0,int size);
-	}
-}
+#include "_dump.h"
+#include "_hex.h"
+#include "_dbg_api_def.h"
+#include "_dbg_cfg_switch.h"
+#include "_dbg_cfg_base.h"
+#include "_dbg_cout_std.h"
+#include "_dbg_cfg_cout.h"
 ///
 #define CVAL(v) #v<<'='<<v
+#define ENDL() std::endl
 #define POSTION strrchr(__FILE__,'/')<<'/'<<__LINE__<<':'<<__FUNCTION__<<"()"
 ///
-#define dbgEntryNormal(s) *omf::dbg::pcout<<s
+#define dbgTestS(s) dbgEntryTest(s)
 ///
-#define dbgEntrySky(s) dbgEntryNormal(DBGSky(s))
-#define dbgEntryBlue(s) dbgEntryNormal(DBGBlue(s))
-#define dbgEntryGreen(s) dbgEntryNormal(DBGGreen(s))
-#define dbgEntryPink(s) dbgEntryNormal(DBGPink(s))
-#define dbgEntryRed(s) dbgEntryNormal(DBGRed(s))
-#define dbgEntryYellow(s) dbgEntryNormal(DBGYellow(s))
-///
-#define dbgEntryNote(s) dbgEntryGreen(s)
-#define dbgEntryTest(s) dbgEntryNormal(s)
-#define dbgEntryErr(s) dbgEntryRed(s)
-///
-#define dbgDump(ptr,len) omf::dbg::dbgDump0(ptr,len)
-///
-#define dbgTestDump(ptr,len) dbgDump(ptr,len)
-#define dbgTestSL(s) dbgEntryTest(s<<std::endl)
+#define dbgTestSL(s) dbgTestS(s<<ENDL())
 #define dbgTestVL(s) dbgTestSL(CVAL(s))
 #define dbgTestPL(s) dbgTestSL(POSTION)
+#define dbgTestPS(s) dbgTestS(POSTION<<'#'<<s)
 #define dbgTestPSL(s) dbgTestSL(POSTION<<'#'<<s)
 #define dbgTestPVL(s) dbgTestPSL(CVAL(s))
+#define dbgTestD(ptr,len) dbgTestS(dbgEntryDump(ptr,len))
+#define dbgTestDL(ptr,len) dbgTestSL(dbgEntryDump(ptr,len))
+#define dbgTestPD(ptr,len) dbgTestPS(dbgEntryDump(ptr,len))
+#define dbgTestPDL(ptr,len) dbgTestPSL(dbgEntryDump(ptr,len))
 ///
-#define dbgNoteDump(ptr,len) dbgDump(ptr,len)
-#define dbgNoteSL(s) dbgEntryNote(s<<std::endl)
+#define dbgNoteS(s) dbgEntryNote(s)
+///
+#define dbgNoteSL(s) dbgNoteS(s<<ENDL())
 #define dbgNoteVL(s) dbgNoteSL(CVAL(s))
 #define dbgNotePL(s) dbgNoteSL(POSTION)
+#define dbgNotePS(s) dbgNoteS(POSTION<<'#'<<s)
 #define dbgNotePSL(s) dbgNoteSL(POSTION<<'#'<<s)
 #define dbgNotePVL(s) dbgNotePSL(CVAL(s))
+#define dbgNoteD(ptr,len) 	dbgNoteS(dbgEntryDump(ptr,len))
+#define dbgNoteDL(ptr,len) 	dbgNoteSL(dbgEntryDump(ptr,len))
+#define dbgNotePD(ptr,len) 	dbgNotePS(dbgEntryDump(ptr,len))
+#define dbgNotePDL(ptr,len) dbgNotePSL(dbgEntryDump(ptr,len))
 ///
-#define dbgErrDump(ptr,len) dbgDump(ptr,len)
-#define dbgErrSL(s) dbgEntryErr(s<<std::endl)
+#define dbgErrS(s) dbgEntryErr(s)
+///
+#define dbgErrSL(s) dbgErrS(s<<ENDL())
 #define dbgErrVL(s) dbgErrSL(CVAL(s))
 #define dbgErrPL(s) dbgErrSL(POSTION)
+#define dbgErrPS(s) dbgErrS(POSTION<<'#'<<s)
 #define dbgErrPSL(s) dbgErrSL(POSTION<<'#'<<s)
 #define dbgErrPVL(s) dbgErrPSL(CVAL(s))
+#define dbgErrD(ptr,len) 	dbgErrS(dbgEntryDump(ptr,len))
+#define dbgErrDL(ptr,len) 	dbgErrSL(dbgEntryDump(ptr,len))
+#define dbgErrPD(ptr,len) 	dbgErrPS(dbgEntryDump(ptr,len))
+#define dbgErrPDL(ptr,len) 	dbgErrPSL(dbgEntryDump(ptr,len))
 ///
 #define returnIfErrC(v,c) 		if(c){dbgErrPSL(#c);return v;}
 #define returnIfErrC0(c)		if(c){dbgErrPSL(#c);return;}
