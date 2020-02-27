@@ -1,5 +1,7 @@
 ALL =
-ALL+=omfTemplate_
+ALL+=omfRecord_
+ALL+=omfAudioRecorder_
+ALL+=omfAudioPlayer_
 ##
 INCS +=
 ###
