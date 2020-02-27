@@ -22,34 +22,34 @@ namespace omf {
 		virtual operator bool()const = 0;
 	public:///send
 		/**
-		 * send msg to target using default userID(set by Start(id))
-		 * @param target [in]:the msg receiver id
+		 * send msg using siteID
+		 * @param msgID [in]:the msg id
 		 * @param data [in]:the msg body
 		 * @param size [in]:the msg body size
 		 * @param flags [in]:the msg flags
 		 * @return true/false
 		 */
-		virtual bool Send(int target, const void *data, int size, unsigned flags = 0)=0;
+		virtual bool Send(int msgID, const void *data, int size, unsigned flags = 0)=0;
 		/**
-		 * send msg from sender to target
-		 * @param sender [in]:the msg sender id
-		 * @param target [in]:the msg receiver id
+		 * send msg use sourceID
+		 * @param sourceID [in]:the msg source id
+		 * @param msgID [in]:the msg id
 		 * @param data [in]:the msg body
 		 * @param size [in]:the msg body size
 		 * @param flags [in]:the msg flags
 		 * @return true/false
 		 */
-		virtual bool Send(int sender,int target, const void *data, int size, unsigned flags = 0)=0;
+		virtual bool Send(int sourceID,int msgID, const void *data, int size, unsigned flags = 0)=0;
 	public:
 		/**
 		 * the receive callback
-		 * @param sender [in]:the msg sender id
-		 * @param target [in]:the msg receiver id
+		 * @param sender [in]:the msg id
+		 * @param target [in]:the msg source id
 		 * @param data [in]:the msg body
 		 * @param size [in]:the msg body size
 		 * @param flags [in]:the msg flags
 		 */
-		using FuncProc = std::function<bool(const void *data, int size, int sender, int target, unsigned flags)>;
+		using FuncProc = std::function<bool(const void *data, int size, int sourceID, int msgID, unsigned flags)>;
 	public:///receive
 		/**
 		 * receive message with site ID.
@@ -58,19 +58,19 @@ namespace omf {
 		 */
 		virtual bool Receive(const FuncProc &cb)=0;
 		/**
-		 * receive message with specified ID.
-		 * @param target [in]:target ID.
+		 * receive message with msg ID.
+		 * @param msgID [in]:msg ID.
 		 * @param cb [in]:the receive callback
 		 * @return true/false
 		 */
-		virtual bool Receive(int target, const FuncProc &cb)=0;
+		virtual bool Receive(int msgID, const FuncProc &cb)=0;
 		/**
-		 * receive message specified in the ID list.
-		 * @param targets [in]: the target ID list.
+		 * receive message specified in the msgID list.
+		 * @param msgIDs [in]: the msg ID list.
 		 * @param cb [in]:the receive callback
 		 * @return true/false
 		 */
-		virtual bool Receive(std::initializer_list<int> targets, const FuncProc &cb)=0;
+		virtual bool Receive(std::initializer_list<int> msgIDs, const FuncProc &cb)=0;
 	public:///register,
 		/**
 		 * register the callback to receive message with the site ID automatically.
@@ -79,19 +79,36 @@ namespace omf {
 		 */
 		virtual bool Register(const FuncProc &cb)=0;
 		/**
-		 * register the callback to receive message with the specified ID automatically.
-		 * @param id [in]:the target ID.
+		 * register the callback to receive message with the specified msg ID automatically.
+		 * @param msgID [in]:the msg ID.
 		 * @param cb [in]:the receive callback
 		 * @return true/false
 		 */
-		virtual bool Register(int id, const FuncProc &cb)=0;
+		virtual bool Register(int msgID, const FuncProc &cb)=0;
 		/**
-		 * register the callback to receive message specified in the ID list.
-		 * @param ids [in]:the target ID list.
+		 * register the callback to receive message specified in the msg ID list.
+		 * @param ids [in]:the msg ID list.
 		 * @param cb [in]:the receive callback
 		 * @return true/false
 		 */
-		virtual bool Register(std::initializer_list<int> ids, const FuncProc &cb)=0;
+		virtual bool Register(std::initializer_list<int> msgIDs, const FuncProc &cb)=0;
+		/**
+		 * unregister the Site ID process function.
+		 * @return true/fasle
+		 */
+		virtual bool UnRegister()=0;
+		/**
+		 * unregisger the msgID process function.
+		 * @param msgID[in]
+		 * @return true/false
+		 */
+		virtual bool UnRegister(int msgID)=0;
+		/**
+		 * unregisger the msgIDs process function.
+		 * @param msgIDs
+		 * @return true/false
+		 */
+		virtual bool UnRegister(std::initializer_list<int> msgIDs)=0;
 	public:
 		static OmfMsgSite* Globle();
 	};

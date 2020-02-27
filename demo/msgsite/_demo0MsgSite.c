@@ -17,8 +17,8 @@
 #define false 0
 #define true 1
 /////////////////////////////////////////////
-static int _id=0;
-static int _target=0;
+static int _srcID=0;
+static int _msgID=0;
 static const char* _msg="";
 static unsigned _flags=0;
 static int _send = 0;
@@ -27,10 +27,10 @@ static int _cb = 0;
 static char _short_options[]="i:c:s:t:m:f:H:?";
 static struct option _long_options[]={
 		{"help",1,0,'H'},
-		{"id",1,0,'i'},
+		{"srcID",1,0,'i'},
 		{"cb",0,0,'c'},
 		{"send",0,0,'s'},
-		{"target",1,0,'t'},
+		{"msgID",1,0,'t'},
 		{"msg",1,0,'m'},
 		{"flags",1,0,'f'},
 		{0,0,0,0}
@@ -39,22 +39,22 @@ static void OptionHelper(){
 	printf("demoMsgSite(...): \n");
 	printf("This demo is used to show how to use IMsgSite to send or receive messages.\n");
 
-	printf("--id,-i[%d]         set the message source id.\n",_id);
+	printf("--srcID,-i[%d]         set the message source id.\n",_srcID);
 	printf("receive message\n");
-	printf(" > demoMsgSite    	   ####receive message with target local site ID.  \n");
+	printf(" > demoMsgSite    	    ####receive message with target local site ID.  \n");
 	printf(" > demoMsgSite -c       ####receive message with target local site ID by callback \n");
-	printf(" > demoMsgSite -i 10    ####receive message with target 10#.  \n");
-	printf(" > demoMsgSite -c -i 10 ####receive message with target 10# by callback \n");
+	printf(" > demoMsgSite -t 10    ####receive 10# message  .  \n");
+	printf(" > demoMsgSite -c -t 10 ####receive 10# message by callback \n");
 
 	printf("--cb,-c[%d]         receive with register callback.\n",_cb);
-	printf("send message to target.\n");
-	printf(" > demoMsgSite -s -t 10 -m \"message context\"  		####send message to 10# \n");
-	printf(" > demoMsgSite -s -i 20 -t 10 -m \"message context\"  	####send message from 20# to 10# \n");
+	printf("send message.\n");
+	printf(" > demoMsgSite -s -t 10 -m \"message context\"  		####send a 10# message \n");
+	printf(" > demoMsgSite -s -i 20 -t 10 -m \"message context\"  	####send a 10# message from 20# \n");
 
 	printf("--send,-s[%d]       send message.\n",_send);
-	printf("--target,-t[%d]     set the send target.\n",_target);
-	printf("--msg,-m[%s] 		set the send message.\n",_msg);
-	printf("--flags,-f[%d] 		set the send message flags.\n",_flags);
+	printf("--msgID,-t[%d]      set the message ID.\n",_msgID);
+	printf("--msg,-m[%s] 		set the message body.\n",_msg);
+	printf("--flags,-f[%d] 		set the message flags.\n",_flags);
 }
 static int OptionParse(int argc,char **argv){
 	int opt;
@@ -76,7 +76,7 @@ static int OptionParse(int argc,char **argv){
 				OptionHelper();
 				return 0;
 			case 'i':
-				_id=atoi(optarg);
+				_srcID=atoi(optarg);
 				break;
 			case 'c':
 				_cb=1;
@@ -85,7 +85,7 @@ static int OptionParse(int argc,char **argv){
 				_send=1;
 				break;
 			case 't':
-				_target=atoi(optarg);
+				_msgID=atoi(optarg);
 				break;
 			case 'm':
 				_msg=optarg;
@@ -103,7 +103,7 @@ static int OptionParse(int argc,char **argv){
 
 ////////////////////////////////////////////
 static int cbReceive(void*hd,const void *data, int size, int sender, int target, unsigned flags){
-	dbgTestPVL(_id);
+	dbgTestPVL(_srcID);
 	dbgTestPVL((unsigned)data);
 	dbgTestPVL(size);
 	dbgTestPVL(sender);
@@ -120,25 +120,25 @@ static int Process(){
 	returnIfErrC(false,!omfMsgSiteIsWorking(site));
 	dbgTestPVL(omfMsgSiteGetID(site));
 	if(_send){
-		printf("send message[%08x]%d->%d:%s\n",_flags,_id,_target,_msg);
+		printf("send %d# message[%08x]%d#:%s\n",_msgID,_flags,_srcID,_msg);
 		int len = _msg?(strlen(_msg)+1):0;
-		returnIfErrC(false,!omfMsgSiteSend1(site,_id,_target,_msg,len,_flags));
+		returnIfErrC(false,!omfMsgSiteSend1(site,_srcID,_msgID,_msg,len,_flags));
 	}else if(_cb){
-		printf("receive %d # message by register cb\n",_id);
-		returnIfErrC(false,!omfMsgSiteRegister1(site,_id,&cbReceive,0));
+		printf("receive %d# message by register cb\n",_msgID);
+		returnIfErrC(false,!omfMsgSiteRegister1(site,_msgID,&cbReceive,0));
 		while(1)usleep(1000000u);
 	}else{
-		printf("receive %d# message\n",_id);
+		printf("receive %d# message\n",_msgID);
 		while(1){
-			returnIfErrC(false,!omfMsgSiteReceive1(site,_id,&cbReceive,0));
+			returnIfErrC(false,!omfMsgSiteReceive1(site,_msgID,&cbReceive,0));
 			usleep(100000u);
 		}
 	}
 	return true;
 }
 static int Print(){
-	dbgTestPVL(_id);
-	dbgTestPVL(_target);
+	dbgTestPVL(_srcID);
+	dbgTestPVL(_msgID);
 	dbgTestPVL(_send);
 	dbgTestPVL(_cb);
 	dbgTestPVL(_flags);
@@ -150,7 +150,7 @@ static int Check(){
 }
 ////////////////////////////////
 int main(int argc,char* argv[]){
-	dbgTestPSL("omfAacPlayer\n");
+	dbgTestPSL("demo0MsgSite\n");
 	///parse the input params
 	if(!OptionParse(argc,argv))return 0;
 	///output the params list

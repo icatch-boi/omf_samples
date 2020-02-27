@@ -12,7 +12,7 @@
 #endif
 
 /**
- * get the msg site with ID 0.
+ * get the default msg site.
  * @return the msg site handle.
  */
 EXTERNC void* omfMsgSite0Get();
@@ -30,26 +30,26 @@ EXTERNC int omfMsgSiteGetID(void*site);
 EXTERNC int omfMsgSiteIsWorking(void*site);
 ///send
 /**
- * send msg to target using default userID(set by Start(id))
+ * send msg with Site ID
  * @param site [in]:the site handle.
- * @param target [in]:the msg receiver id
+ * @param msgID [in]:the msg id
  * @param data [in]:the msg body
  * @param size [in]:the msg body size
  * @param flags [in]:the msg flags
  * @return true/false
  */
-EXTERNC int omfMsgSiteSend(void*site, int target, const void *data, int size, unsigned flags);
+EXTERNC int omfMsgSiteSend(void*site, int msgID, const void *data, int size, unsigned flags);
 /**
- * send msg from sender to target
+ * send msg with SourceID
  * @param site [in]:the site handle.
- * @param sender [in]:the msg sender id
- * @param target [in]:the msg receiver id
+ * @param sourceID [in]:the msg source id
+ * @param msgID [in]:the msg id
  * @param data [in]:the msg body
  * @param size [in]:the msg body size
  * @param flags [in]:the msg flags
  * @return true/false
  */
-EXTERNC int omfMsgSiteSend1(void*site, int sender,int target, const void *data, int size, unsigned flags);
+EXTERNC int omfMsgSiteSend1(void*site, int sourceID,int msgID, const void *data, int size, unsigned flags);
 /**
  * the receive callback
  * @param hd [in]: the input private data handle
@@ -59,7 +59,7 @@ EXTERNC int omfMsgSiteSend1(void*site, int sender,int target, const void *data, 
  * @param size [in]:the msg body size
  * @param flags [in]:the msg flags
  */
-typedef int(*OmfMsgSiteFuncProc)(void* hd, const void *data, int size, int sender, int target, unsigned flags);
+typedef int(*OmfMsgSiteFuncProc)(void* hd, const void *data, int size, int sourceID, int msgID, unsigned flags);
 /**
  * receive message with site ID.
  * @param site [in]:the site handle.
@@ -69,23 +69,23 @@ typedef int(*OmfMsgSiteFuncProc)(void* hd, const void *data, int size, int sende
  */
 EXTERNC int omfMsgSiteReceive(void*site, OmfMsgSiteFuncProc cb, void*hd);
 /**
- * receive message with specified ID.
+ * receive message with specified msgID.
  * @param site [in]:the site handle.
- * @param target [in]:target ID.
+ * @param msgID [in]: msg ID.
  * @param cb [in]:the receive callback
  * @param hd [in]:the private data handle, send to OmfMsgSiteFuncProc.
  * @return true/false
  */
-EXTERNC int omfMsgSiteReceive1(void*site, int target, OmfMsgSiteFuncProc cb, void*hd);
+EXTERNC int omfMsgSiteReceive1(void*site, int msgID, OmfMsgSiteFuncProc cb, void*hd);
 /**
- * receive message specified in the ID list.
+ * receive message specified in the msgID list.
  * @param site [in]:the site handle.
- * @param targets [in]: the target ID list. end of 0.
+ * @param msgIDs [in]: the msgID list. end of 0.
  * @param cb [in]:the receive callback
  * @param hd [in]:the private data handle, send to OmfMsgSiteFuncProc.
  * @return true/false
  */
-EXTERNC int omfMsgSiteReceive2(void*site, int* targets, OmfMsgSiteFuncProc cb, void*hd);
+EXTERNC int omfMsgSiteReceive2(void*site, int* msgIDs, OmfMsgSiteFuncProc cb, void*hd);
 ///register,
 /**
  * register the callback to receive message with the site ID automatically.
@@ -96,23 +96,43 @@ EXTERNC int omfMsgSiteReceive2(void*site, int* targets, OmfMsgSiteFuncProc cb, v
  */
 EXTERNC int omfMsgSiteRegister(void*site, OmfMsgSiteFuncProc cb, void*hd);
 /**
- * register the callback to receive message with the specified ID automatically.
+ * register the callback to receive message with the specified msgID automatically.
  * @param site [in]:the site handle.
- * @param id [in]:the target ID.
+ * @param msgID [in]:the msg ID.
  * @param cb [in]:the receive callback
  * @param hd [in]:the private data handle, send to OmfMsgSiteFuncProc.
  * @return true/false
  */
-EXTERNC int omfMsgSiteRegister1(void*site, int id, OmfMsgSiteFuncProc cb, void*hd);
+EXTERNC int omfMsgSiteRegister1(void*site, int msgID, OmfMsgSiteFuncProc cb, void*hd);
 /**
- * register the callback to receive message specified in the ID list.
+ * register the callback to receive message specified in the msgID list.
  * @param site [in]:the site handle.
- * @param targets [in]:the target ID list,end of 0.
+ * @param msgIDs [in]:the msgID list,end of 0.
  * @param cb [in]:the receive callback
  * @param hd [in]:the private data handle, send to OmfMsgSiteFuncProc.
  * @return true/false
  */
-EXTERNC int omfMsgSiteRegister2(void*site, int* targets, OmfMsgSiteFuncProc cb, void*hd);
+EXTERNC int omfMsgSiteRegister2(void*site, int* msgIDs, OmfMsgSiteFuncProc cb, void*hd);
 
+/**
+ * unregister the Site ID process function.
+ * @param site [in]:the site handle.
+ * @return true/fasle
+ */
+EXTERNC int omfMsgSiteUnRegister(void*site);
+/**
+ * unregisger the msgID process function.
+ * @param site [in]:the site handle.
+ * @param msgID [in]:the msg ID.
+ * @return true/false
+ */
+EXTERNC int omfMsgSiteUnRegister1(void*site,int msgID);
+/**
+ * unregisger the msgIDs process function.
+ * @param site [in]:the site handle.
+ * @param msgIDs [in]:the msgID list,end of 0.
+ * @return true/false
+ */
+EXTERNC int omfMsgSiteUnRegister2(void*site,int* msgIDs);
 
 #endif //STREAM_OMF_MSG_SITE_H
