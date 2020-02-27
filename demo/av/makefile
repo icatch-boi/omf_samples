@@ -1,5 +1,5 @@
 ALL =
-ALL+=omfRecord_
+ALL+=omfRecorder_
 ALL+=omfAudioRecorder_
 ALL+=omfAudioPlayer_
 ##
