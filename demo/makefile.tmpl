@@ -1,0 +1,68 @@
+ALL+=
+###
+all:$(ALL)
+###
+PREFIX ?= /opt/openwrt_toolchain/arm-openwrt-icatchtek-glibc/bin/arm-openwrt-linux-
+LIBS_PATH ?= ../../../_dualos/lib
+INCS_PATH ?= ../../../_dualos/include
+OUT_PATH ?= ./out
+###
+GCC ?= ${PREFIX}gcc
+GXX ?= ${PREFIX}g++
+GSTRIP ?= ${PREFIX}strip
+###
+CFLAGS += -Wno-error=pointer-sign -Wno-error=char-subscripts -Wno-error=unused-but-set-variable -Wno-error=unused-function
+CFLAGS += -mcpu=cortex-a7 -mabi=aapcs -mfloat-abi=hard -mlittle-endian -mno-unaligned-access
+CFLAGS += -flax-vector-conversions -mfpu=neon-vfpv4
+CFLAGS += -pthread -rdynamic
+CXXFLAGS += ${CFLAGS} -std=c++11 -Wall -g -O2 -fpermissive -fexceptions -Woverloaded-virtual -Wreturn-type
+
+###
+INCS += -I.
+INCS += -I${INCS_PATH}/
+INCS += -I${INCS_PATH}/core
+INCS += -I${INCS_PATH}/streaming
+INCS += -I${INCS_PATH}/streaming/common
+##
+LIBS +=
+###
+OBJS +=
+###
+%.o:%.cpp
+	@echo "compile cxx files..."
+	$(GXX) $(INCS) $(CXXFLAGS) -c $^ -o $@
+
+%.o:%.cc
+	@echo "compile cxx files..."
+	$(GXX) $(INCS) $(CXXFLAGS) -c $^ -o $@
+
+%.o:%.c
+	@echo "compile c files...."
+	$(GCC) $(INCS) $(CFLAGS) -c $^ -o $@
+
+%_:_%.o
+	@echo $@
+	$(GXX) $(INCS) $(CXXFLAGS) $^ -L${LIBS_PATH} $(LIBS) $(LDFLAGS) -o $@
+
+%.so:$(OBJS)
+	@echo $@
+	$(GXX) $(INCS) $(CXXFLAGS) $^ -shared -fPIC -o $@
+
+%.a:$(OBJS)
+	@echo $@
+	$(GXX) $(INCS) $(CXXFLAGS) $^ -o $@
+
+###	
+clean:
+	@echo "Removing linked and compiled files......"
+	rm -rf $(ALL) *.o
+
+###
+install:${ALL}
+	@mkdir -p $(OUT_PATH)
+	@mkdir -p $(OUT_PATH)/bin
+	@for tmp in $(ALL); \
+	do \
+		mv $$tmp $(OUT_PATH)/bin/; \
+	done
+	

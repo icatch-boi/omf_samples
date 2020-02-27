@@ -9,7 +9,7 @@
 #include "OmfDbg.h"
 #include "OmfAttrSet.h"
 #include "OmfHelper.h"
-#include "IMsgSite.h"
+#include "OmfMsgSite.h"
 ////////////////////////////////////////////
 #undef dbgEntryTest
 #define dbgEntryTest(s) dbgEntrySky(s)
@@ -66,7 +66,7 @@ static bool cbReceive(const void *data, int size, int sender, int target, unsign
 }
 static bool Process(OmfMain&omf,bool _dbg){
 	//omf.Command("show_factory");
-	auto site=IMsgSite::Globle();
+	auto site=OmfMsgSite::Globle();
 	returnIfErrC(false,!site);
 	returnIfErrC(false,!*site);
 	dbgTestPVL(site->GetSiteID());

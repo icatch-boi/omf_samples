@@ -1,16 +1,10 @@
 ALL =
-ALL+=omfPcmSrc_
-ALL+=omfAacSrc_
-ALL+=omfYuvSrc_
-ALL+=omfH264Src_
-ALL+=omfJpegSrc_
-ALL+=omfSpeaker_
-ALL+=omfMicrophone_
-###
-CFLAGS +=
-CXXFLAGS +=
-###
-INCS += -I.
+ALL+=omfTemplate_
+ALL+=omfRecord_
+ALL+=omfAudioRecorder_
+ALL+=omfAudioPlayer_
+##
+INCS +=
 ###
 LIBS += -lpluginiofile
 LIBS += -lpluginwav
