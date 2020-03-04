@@ -1,6 +1,6 @@
 #include "OmfMain.h"
 #include "OmfDbg.h"
-#include "IRtspService.h"
+#include "OmfRtspService.h"
 #include <string>
 #include <thread>
 #include <chrono>
@@ -12,7 +12,7 @@ using namespace omf::api;
 static int RtspServer(const char*urlmap,const char*authmap) {//dbgSkyPL();
 	dbgTestPVL(urlmap);
 	dbgTestPVL(authmap);
-	std::unique_ptr<IRtspService> rtsp{IRtspService::CreateNew(urlmap,authmap)};
+	std::unique_ptr<OmfRtspService> rtsp{OmfRtspService::CreateNew(urlmap,authmap)};
 	returnIfErrC(false,!rtsp.get());
 	returnIfErrC(false,!rtsp->Start());
 	std::this_thread::sleep_for(std::chrono::hours(1000000));

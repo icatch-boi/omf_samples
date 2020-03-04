@@ -189,7 +189,7 @@ static bool Process(bool _dbg){
 	///////////////////////////////////////
 	FILE* fd=fopen(_fname,"wb");
 	if(!fd){
-		printf("file aacsrc.aac open fail\n");
+		dbgErrPSL("open file fail:"<<_fname);
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////

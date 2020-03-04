@@ -1,11 +1,11 @@
 #pragma once
 #include "RtspServer.h"
-#include "IRtspService.h"
+#include "OmfRtspService.h"
 #include <thread>
 #include <mutex>
 namespace omf{
 namespace rtsp {
-	class RtspService:public IRtspService{
+	class RtspService:public OmfRtspService{
 	public:
 		RtspService(const char*urlmap=0,const char*authmap=0);
 		virtual ~RtspService();

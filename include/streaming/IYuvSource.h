@@ -8,6 +8,7 @@
 #include "common/MediaInfo.h"
 #include "common/IStreamControl.h"
 #include "common/IYuvDevice.h"
+#include "common/IVideoSource.h"
 namespace omf {
 	namespace api {
 		namespace streaming {
@@ -40,6 +41,7 @@ namespace omf {
 			class IYuvSource
 				: public virtual common::IStreamOutput
 				, public virtual common::IYuvDevice
+				, public virtual common::IVideoSource
 			{
 			public:
 				virtual ~IYuvSource() {}
@@ -47,13 +49,6 @@ namespace omf {
 			public:
 				using YuvMediaInfo=omf::api::streaming::common::YuvMediaInfo;
 			public:
-				/**
-				 * Select the sensor with ID.
-				 * @param id [in] sensor ID.\n
-				 * 		default: 0\n
-				 * 		v37 support: 0,1,2 \n
-				 */
-				virtual void SelectSensor(int id)=0;
 				/**
 				 * create a new YuvSource instance. \n
 				 * @param keywords[in] the keywords for selecting a YuvSource type. \n

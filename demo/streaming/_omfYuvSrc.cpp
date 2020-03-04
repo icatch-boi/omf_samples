@@ -21,7 +21,7 @@ using namespace omf::api::streaming::common;
 ////////////////////////////////////////////////////////////
 static const char* _fname=0;
 static int _seconds=30;//seconds
-static const char* _keywords="dualos-vbrc-pull";
+static const char* _keywords="dualos-pull";
 static int _sensorID = 0;
 static int _width=1920;
 static int _height=1080;
@@ -33,7 +33,7 @@ static bool _exit = false;
 static OmfHelper::Item _options0[]{
 	{"omfH264Src(...): \n"
 	 "This demo shows how to get YUV streaming from OMF using IYuvSource interface.\n"
-	 "  omfYuvSrc -n test.yuv -d 30 -w1920 -h1080\n"
+	 "> omfYuvSrc -n test.yuv -d 30 -w1920 -h1080\n"
 	},
 	{"fname"	,'n', _fname	,"record filename(*.aac)."},
 	{"duration"	,'d', _seconds	,"process execute duration(*s)."},
@@ -130,7 +130,7 @@ static bool ProcessPush(IYuvSource*src,FILE*fd){
 }
 static bool Process(bool _dbg){
 	///////////////////////////////////////
-	//create a h264Source instance with keywords.
+	//create a YuvSource instance with keywords.
 	dbgTestPVL(_keywords);
 	std::unique_ptr<IYuvSource> src(IYuvSource::CreateNew(_keywords));
 	returnIfErrC(false,!src);
@@ -152,7 +152,7 @@ static bool Process(bool _dbg){
 	///////////////////////////////////////
 	FILE* fd=fopen(_fname,"wb");
 	if(!fd){
-		printf("file aacsrc.aac open fail\n");
+		dbgErrPSL("open file fail:"<<_fname);
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////

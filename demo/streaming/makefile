@@ -6,6 +6,7 @@ ALL+=omfH264Src_
 ALL+=omfJpegSrc_
 ALL+=omfSpeaker_
 ALL+=omfMicrophone_
+ALL+=omfPcmPlay_
 ###
 CFLAGS +=
 CXXFLAGS +=

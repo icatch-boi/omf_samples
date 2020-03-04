@@ -154,7 +154,7 @@ static bool Process(bool _dbg){
 	///////////////////////////////////////
 	FILE* fd=fopen(_fname,"wb");
 	if(!fd){
-		printf("file %s open fail\n",_fname?_fname:"nullptr");
+		dbgErrPSL("open file fail:"<<_fname);
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////

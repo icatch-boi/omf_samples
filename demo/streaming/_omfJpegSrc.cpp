@@ -21,12 +21,12 @@ using namespace omf::api::streaming::common;
 ////////////////////////////////////////////////////////////
 static const char* _fname=0;
 static int _seconds=30;//seconds
-static const char* _keywords="dualos-vbrc-pull";
+static const char* _keywords="dualos-pull";
 static int _sensorID = 0;
 static int _width=1920;
 static int _height=1080;
 static int _framerate=30;
-static int _bitrate=2000;///kb
+static int _qp=90;//0~100
 static int _triggerInterval=100;//seconds
 ////////////////////////////////////////////
 static bool _exit = false;
@@ -34,7 +34,7 @@ static bool _exit = false;
 static OmfHelper::Item _options0[]{
 	{"omfH264Src(...): \n"
 	 "This demo shows how to get JPEG streaming from OMF using IJpegSource interface.\n"
-	 "  omfJpegSrc -n test.jpeg -d30 -w 1920 -h1080 -fr 30 -b 2000\n"
+	 "> omfJpegSrc -n test.jpeg -d30 -w 1920 -h1080 -fr 30 -q 90\n"
 	},
 	{"fname"	,'n', _fname	,"record filename(*.aac)."},
 	{"duration"	,'d', _seconds	,"record duration(*s)."},
@@ -44,15 +44,15 @@ static OmfHelper::Item _options0[]{
 	{"h"		,'h', _height	,"set the height for yuv source."},
 	{"fr"		,'f', _framerate,"set the framerate for yuv source."},
 	{"the jpeg paramers:"},
-	{"bitrate"	,'b', _bitrate	,"set the bitrate(kb) to h264 codec."},
+	{"qp"	,'q', _qp	,"set the QP(0~100) to JPEG codec."},
 	{"misc:"},
 	{"interval"	,'i', _triggerInterval	,"set the interval(seconds) per trigger. Only used for IsSupportSingleFrameTrigger()."},
 	{"keywords"	,'k', _keywords	,"select the IJpegSource with keywords:"
 							  	"\n <module>-<brc>-<output>-<tigger>,eg.."
-		 						"\n dualos-vbrc"
-								"\n dualos-vbrc-pull"
-								"\n dualos-vbrc-pull-trigger"
-								"\n dualos-vbrc-push-trigger"
+		 						"\n dualos-push"
+								"\n dualos-pull"
+								"\n dualos-pull-trigger"
+								"\n dualos-push-trigger"
    },
 	{},
 };
@@ -140,7 +140,7 @@ static bool ProcessPush(IJpegSource*src,FILE*fd){
 }
 static bool Process(bool _dbg){
 	///////////////////////////////////////
-	//create a h264Source instance with keywords.
+	//create a JpegSource instance with keywords.
 	dbgTestPVL(_keywords);
 	std::unique_ptr<IJpegSource> src(IJpegSource::CreateNew(_keywords));
 	returnIfErrC(false,!src);
@@ -149,13 +149,13 @@ static bool Process(bool _dbg){
 	src->SetWidth(_width);
 	src->SetHeight(_height);
 	//set BitRateControl
-	src->SetBitRate(_bitrate*1000);
+	src->SetQP(_qp);
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
 	//get streaming parameters after Open().
 	FILE* fd=fopen(_fname,"wb");
 	if(!fd){
-		printf("file aacsrc.aac open fail\n");
+		dbgErrPSL("open file fail:"<<_fname);
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////
@@ -175,7 +175,7 @@ static bool Check(){
 }
 ////////////////////////////////
 int main(int argc,char* argv[]){
-	dbgNotePSL("omfH264Src(...)\n");
+	dbgNotePSL("omfJpegSrc(...)\n");
 	///parse the input params
 	OmfHelper helper(_options0,argc,argv);
 	///--help

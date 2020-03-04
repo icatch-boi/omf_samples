@@ -30,7 +30,7 @@ static bool _exit = false;
 static OmfHelper::Item _options0[]{
 	{"omfPcmSrc(...): \n"
 	 "This demo shows how to get PCM streaming from OMF using IPcmSource interface.\n"
-	 "  omfPcmSrc -n test.pcm -s 30\n"
+	 "  omfPcmSrc -n test.pcm -d 30\n"
 	},
 	{"fname",'n', _fname		,"record filename(*.aac)."},
 	{"duration",'d', _seconds	,"process execute duration(*s)."},
@@ -186,7 +186,7 @@ static bool Process(bool _dbg){
 	////////////////////////////////////////////////////////
 	FILE* fd=fopen(_fname,"wb");
 	if(!fd){
-		printf("file %s open fail\n",_fname?_fname:"nullptr");
+		dbgErrPSL("open file fail:"<<_fname);
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////

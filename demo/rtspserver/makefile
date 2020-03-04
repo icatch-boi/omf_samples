@@ -1,19 +1,8 @@
 ALL =
-ALL+=libpluginrtsp4.so
-#ALL+=demoRtspServer_
+ALL+=omfRtspServer_
 ###
 CFLAGS +=
-CXXFLAGS += -DSOCKLEN_T=socklen_t
-CXXFLAGS += -DNO_SSTREAM=1
-CXXFLAGS += -D_LARGEFILE_SOURCE=1
-CXXFLAGS += -D_FILE_OFFSET_BITS=64
-CXXFLAGS += -DLOCALE_NOT_USED
-CXXFLAGS += -DREAD_FROM_FILES_SYNCHRONOUSLY
-###
-INCS += -I${INCS_PATH}/BasicUsageEnvironment/include
-INCS += -I${INCS_PATH}/groupsock/include
-INCS += -I${INCS_PATH}/UsageEnvironment/include
-INCS += -I${INCS_PATH}/liveMedia/include
+CXXFLAGS +=
 ###
 LIBS += -lliveMedia
 LIBS += -lgroupsock
@@ -41,18 +30,7 @@ LIBS += -lfwporting
 LIBS += -ldl
 LIBS += -ldbglinux
 ###
-OBJS +=RtspService.o
-OBJS +=RtspServer.o
-OBJS +=RtspSession.o
-OBJS +=IRtspService.o
-OBJS +=RtspSmss.o
-OBJS +=RtspSmssH264.o
-#OBJS +=RtspSmssH265.o
-#OBJS +=RtspSmssJpeg.o
-#OBJS +=RtspSmssPcm.o
-OBJS +=RtspSmssAac.o
-OBJS +=RtpSource.o
-OBJS +=RtpSink.o
+INCS += -I${INCS_PATH}/apps
 ###
 include ../makefile.tmpl
 
