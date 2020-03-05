@@ -30,7 +30,7 @@ LIBS += -lfwporting
 LIBS += -ldl
 LIBS += -ldbglinux
 ###
-INCS += -I${INCS_PATH}/apps
+INCS +=
 ###
 include ../makefile.tmpl
 
