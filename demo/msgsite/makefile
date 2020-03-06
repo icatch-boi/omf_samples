@@ -1,6 +1,6 @@
 ALL =
-ALL+=demoMsgSite_
-ALL+=demo0MsgSite_
+ALL+=omfMsgSite_
+ALL+=omf0MsgSite_
 ###
 CFLAGS +=
 CXXFLAGS +=

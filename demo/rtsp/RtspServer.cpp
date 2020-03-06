@@ -48,7 +48,7 @@ RtspServer::~RtspServer() {
 ServerMediaSession* RtspServer
 ::lookupServerMediaSession(char const *url,
 						   Boolean isFirstLookupInSession) {
-	dbgTestPVL(url);
+	dbgNotePVL(url);
 	dbgTestPVL((bool)isFirstLookupInSession);
 	ServerMediaSession* sms =
 		RTSPServerSupportingHTTPStreaming::lookupServerMediaSession(url,isFirstLookupInSession);

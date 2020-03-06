@@ -46,6 +46,7 @@ bool RtspSmss::init(const char* type
 	returnIfErrC(0,!_src);
 	returnIfErrC(0,!_src->ChangeUp(State::ready));
 	returnIfErrC(0,!Parse());
+	return true;
 }
 FramedSource* RtspSmss::createNewStreamSource(unsigned, unsigned& estBitrate) {dbgTestPL();
 	estBitrate = 1000;///KBit
