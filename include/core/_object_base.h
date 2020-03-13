@@ -14,6 +14,7 @@ namespace omf {
 
 		static void operator delete(void *, size_t);
 
+		static const bool _globle_enable;
 	public:
 		template<class T = object_base>
 		static bool Compare(const T *tag0, const T *tag1) { return *tag0 < *tag1; }

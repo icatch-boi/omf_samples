@@ -1,7 +1,7 @@
 #include "RtspSmss.h"
 #include "RtpSource.h"
 #include "RtpSink.h"
-#include "_rtp.h"
+#include "rtp.h"
 #include "OmfDbg.h"
 #include "omf_api.h"
 #undef dbgEntryTest

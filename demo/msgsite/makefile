@@ -1,6 +1,7 @@
 ALL =
 ALL+=omfMsgSite_
-ALL+=omf0MsgSite_
+ALL+=omfMsgSite0_
+ALL+=omfMemPool_
 ###
 CFLAGS +=
 CXXFLAGS +=

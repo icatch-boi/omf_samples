@@ -12,6 +12,8 @@ namespace omf {
 				public:
 					virtual ~IYuvDevice(){}
 				public:
+					using YuvMediaInfo=omf::api::streaming::common::YuvMediaInfo;
+				public:
 					/**
 					 * set the width of image.
 					 * @param w [in]the width \n

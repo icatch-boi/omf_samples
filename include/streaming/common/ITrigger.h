@@ -10,7 +10,7 @@ namespace omf {
 				class ITrigger {
 				public:
 					virtual bool IsSupportSingleFrameTrigger() const=0;
-					virtual void Trigger()=0;
+					virtual bool Trigger()=0;
 				};
 			}
 		}

@@ -20,7 +20,7 @@ namespace omf {
 				 * 		DBRC:\n
 				 * @see BitRateControl
 				 */
-					virtual void SetBitRate(int br)=0;
+					virtual bool SetBitRate(int br)=0;
 				};
 			}
 		}

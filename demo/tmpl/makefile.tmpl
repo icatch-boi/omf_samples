@@ -15,7 +15,7 @@ GSTRIP ?= ${PREFIX}strip
 CFLAGS += -Wno-error=pointer-sign -Wno-error=char-subscripts -Wno-error=unused-but-set-variable -Wno-error=unused-function
 CFLAGS += -mcpu=cortex-a7 -mabi=aapcs -mfloat-abi=hard -mlittle-endian -mno-unaligned-access
 CFLAGS += -flax-vector-conversions -mfpu=neon-vfpv4
-CFLAGS += -pthread -rdynamic
+CFLAGS += -pthread -rdynamic -fPIC
 CXXFLAGS += ${CFLAGS} -std=c++11 -Wall -g -O2 -fpermissive -fexceptions -Woverloaded-virtual -Wreturn-type
 
 ###
@@ -47,7 +47,7 @@ OBJS +=
 
 %.so:$(OBJS)
 	@echo $@
-	$(GXX) $(INCS) $(CXXFLAGS) $^ -shared -fPIC -o $@
+	$(GXX) $(INCS) $(CXXFLAGS) $^ -shared -o $@
 
 %.a:$(OBJS)
 	@echo $@
@@ -56,14 +56,14 @@ OBJS +=
 ###	
 clean:
 	@echo "Removing linked and compiled files......"
-	rm -rf $(ALL) *.o
+	rm -rf $(ALL) *.o ./out
 
 ###
 install:${ALL}
 	@mkdir -p $(OUT_PATH)
-	@mkdir -p $(OUT_PATH)/bin
 	@for tmp in $(ALL); \
 	do \
-		mv $$tmp $(OUT_PATH)/bin/; \
+		mv $$tmp $(OUT_PATH); \
 	done
-	
+
+.PHONY : all clean install

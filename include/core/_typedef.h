@@ -91,8 +91,11 @@ typedef struct{
 	void* buf;
 	int len;
 }BufferSizePair;
-
-}
+typedef struct {
+	int offset;
+	int len;
+}OffsetSizePair;
+};
 
 //////////////////////////////////////////////////
 

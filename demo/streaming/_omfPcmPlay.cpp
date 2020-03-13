@@ -104,12 +104,11 @@ static bool ProcessSpeaker(IPcmPlayer*player){
 }
 static bool Process(bool _dbg){
 	///////////////////////////////////////
-	//create a PcmSource instance with keywords.
+	//create a IPcmPlayer instance with keywords.
 	dbgTestPVL(_keywords);
 	std::unique_ptr<IPcmPlayer> player(IPcmPlayer::CreateNew(_keywords));
 	returnIfErrC(false,!player);
 	//set pcm player parameters
-	returnIfErrC(-1,!player);
 	player->SetSampleRate(_rate);
 	player->SetChannels(_channels);
 
@@ -154,7 +153,7 @@ static bool Process(bool _dbg){
 		}
 		dbgTestPVL(data_len);
 		///fill data
-		returnIfErrCS(-1,!player->IsSupportedPushFrame(),"this dev is not supported push frame!");
+		returnIfErrCS(false,!player->IsSupportedPushFrame(),"this dev is not supported push frame!");
 		std::shared_ptr<frame_t> frm{new frame_t{0,buf.get(),data_len,true,tp,nullptr}};
 		returnIfErrC(false,!player->PushFrame(frm));
 		///

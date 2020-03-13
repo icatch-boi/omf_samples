@@ -61,8 +61,6 @@ int main(int argc, char *argv[]){
 	//omf.LogConfig("all=false,err=true,note=true");
 	///debug
 	omf.Debug(true);
-	///process signal int
-	omf.SignalINT(true);
 	///
 	std::unique_ptr<char[]> urlmap{new char[1024*32]};
 	CreateRtspUrlMap(urlmap.get());

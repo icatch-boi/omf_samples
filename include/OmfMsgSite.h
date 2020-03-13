@@ -71,6 +71,13 @@ namespace omf {
 		 * @return true/false
 		 */
 		virtual bool Receive(std::initializer_list<int> msgIDs, const FuncProc &cb)=0;
+		/**
+		 * receive message specified in the msgID list.
+		 * @param msgIDs [in]: the msg ID list,endof 0;
+		 * @param cb [in]:the receive callback
+		 * @return true/false
+		 */
+		virtual bool Receive(int* msgIDs, const FuncProc &cb)=0;
 	public:///register,
 		/**
 		 * register the callback to receive message with the site ID automatically.
@@ -87,11 +94,18 @@ namespace omf {
 		virtual bool Register(int msgID, const FuncProc &cb)=0;
 		/**
 		 * register the callback to receive message specified in the msg ID list.
-		 * @param ids [in]:the msg ID list.
+		 * @param msgIDs [in]:the msg ID list.
 		 * @param cb [in]:the receive callback
 		 * @return true/false
 		 */
 		virtual bool Register(std::initializer_list<int> msgIDs, const FuncProc &cb)=0;
+		/**
+		 * register the callback to receive message specified in the msg ID list.
+		 * @param msgIDs [in]:the msg ID list,endof 0;
+		 * @param cb [in]:the receive callback
+		 * @return true/false
+		 */
+		virtual bool Register(int* msgIDs, const FuncProc &cb)=0;
 		/**
 		 * unregister the Site ID process function.
 		 * @return true/fasle
@@ -109,6 +123,12 @@ namespace omf {
 		 * @return true/false
 		 */
 		virtual bool UnRegister(std::initializer_list<int> msgIDs)=0;
+		/**
+		 * unregisger the msgIDs process function.
+		 * @param msgIDs [in]:the msg ID list,endof 0;
+		 * @return true/false
+		 */
+		virtual bool UnRegister(int* msgIDs)=0;
 	public:
 		static OmfMsgSite* Globle();
 	};

@@ -14,93 +14,14 @@ namespace omf {
 				public:
 					virtual ~IBitRateControl(){}
 				public:
-					enum class BitRateControl {
-						nothing = 0,
-						CBRC,/**< Constant Bit Rate Control. \n
- 								 * Adjust bit stream size to follow the target bit-rate. \n
- 								 * The given parameter[br] takes effect at next GOP.\n
- 								 * Not affect frame rate control.\n
- 								 * @li SetQP(int qp) is invalid. \n
-								 * @li SetBitRate(int br) is valid and takes effect at next GOP. \n
-								 * @li SetBitRateMinimum(int min) is invalid.\n
-				 				 * @li SetBitRateMaximum(int max) is invalid.\n
-								 */
-						MBRC,    /**< Manual Bit Rate Control. \n
- 								 * Adjust streaming bit-rate to follow the target bit-rate.\n
- 								 * The given parameter[br] takes effect at next FRAME.\n
- 								 * Not affect frame rate control.
-  								 * @li SetQP(int qp) is invalid. \n
-								 * @li SetBitRate(int br) is valid and takes effect every frame. \n
-								 * @li SetBitRateMinimum(int min) is invalid.\n
-				 				 * @li SetBitRateMaximum(int max) is invalid.\n
-								 */
-						DBRC,    /**< Dynamic Bit Rate Control. \n
-								 * Adjust streaming bit-rate to follow the target bit-rate.\n
- 								 * The given parameter[br] takes effect at next FRAME.\n
- 								 * Frame-rate is calculated automatically to achieve the purpose of regulating the bit stream.
-								 * @li SetQP(int qp) is invalid. \n
-								 * @li SetBitRate(int br) is valid and takes effect every frame. \n
-								 * @li SetBitRateMinimum(int min) is invalid.\n
-								 * @li SetBitRateMaximum(int max) is invalid.\n
-								 * @li SetFrameRate(int fr) is invalid and the fr is calculated by algorithm. \n
-								 * @li SetFrameRateMinimum(int min) is valid. \n
-								 * @li SetFrameRateMaximum(int max) is valid. \n
-								 * */
-						ABRC,    /**< Self-Adapt Bit Rate Control. \n
- 								 * According to pipeline congestion,\n
- 								 * automatically adjust bit stream size
- 								 * to adapt to pipeline bandwidth.\n
- 								 * frame-rate and bit-rate are calculated automatically.\n
-								 * @li SetQP(int qp) is invalid. \n
-								 * @li SetBitRate(int br) is invalid.\n
-								 * @li SetFrameRate(int fr) is invalid.\n
-								 * @li SetFrameRateMinimum(int min) is valid.\n
-								 * @li SetFrameRateMaximum(int max) is valid.\n
-								 * @li SetBitRateMinimum(int min) is valid.\n
-								 * @li SetBitRateMaximum(int max) is valid.\n
-								 */
-						MFRC,    /**< Manual Frame Rate Control. \n
- 								 * Adjust streaming frame-rate to follow the target.\n
- 								 * Not affect bit rate control.\n
-								 * @li SetFrameRate(int fr) is valid. \n
-								 * @li SetFrameRateMinimum(int min) is invalid. \n
-								 * @li SetFrameRateMaximum(int max) is invalid. \n
-								 */
-						MQPC,    /**< Manual Quantization Parameter Control.\n
- 								 * Provide parameter[QP] directly to codec.
- 								 * Not affect frame rate control.\n
-								 * @li SetQP(int qp) is valid and takes effect every frame. \n
-								 * @li SetBitRate(int br) is invalid. \n
-								 * @li SetBitRateMinimum(int min) is invalid.\n
-				 				 * @li SetBitRateMaximum(int max) is invalid.\n
-								 */
-					};
-
+					typedef struct{const char* mode;const char* note;}mode_t;
+					virtual bool SetBrcMode(const char*)=0;
+					virtual std::vector<mode_t> GetBrcModes()const = 0;
+					virtual const mode_t& GetBrcMode()const = 0;
 				public:
-					/**
-					 * get the device supported BRC list.
-					 * @return the BitRateControl list
-					 * @see BitRateControl
-					 */
-					virtual std::vector <BitRateControl> BitRateControlSupportedList() const =0;
+					virtual bool IsSupportFrameRateControl()const = 0;
+					virtual bool IsSupportFrameRateRange()const = 0;
 
-					/**
-					 * check whether support the spec BRC mode or not.\n
-					 * @param brc [in] the mode
-					 * @return supported/unsupported.
-					 * @see BitRateControl
-					 */
-					virtual bool IsSupport(BitRateControl brc) const =0;
-
-					/**
-					 * select the bit rate control(BRC).
-					 * @param brc [in] BitRateControl
-					 * @return true/false
-					 * @see BitRateControl
-					 */
-					virtual bool SelectBitRateControl(BitRateControl brc) =0;
-
-				public:
 					/**
 					 * set the maximum FR(frame rate).
 					 * @param fr [in]the maximum
@@ -108,7 +29,7 @@ namespace omf {
 					 * 	 	MFRC:\n
 					 * @see BitRateControl
 					 */
-					virtual void SetFrameRate(int fr)=0;
+					virtual bool SetFrameRate(int fr)=0;
 
 					/**
 					 * set the minimum frame rate.
@@ -118,7 +39,7 @@ namespace omf {
 					 * 	 	ABRC:\n
 					 * @see BitRateControl
 					 */
-					virtual void SetFrameRateMinimum(int min)=0;
+					virtual bool SetFrameRateMinimum(int min)=0;
 
 					/**
 					 * set the maximum frame rate.
@@ -128,10 +49,11 @@ namespace omf {
 					 * 	 	ABRC:\n
 					 * @see BitRateControl
 					 */
-					virtual void SetFrameRateMaximum(int max)=0;
+					virtual bool SetFrameRateMaximum(int max)=0;
 
 				public:
-
+					virtual bool IsSupportBitRateControl()const = 0;
+					virtual bool IsSupportBitRateRange()const = 0;
 
 					/**
 					 * set the minimum bit rate(BR).
@@ -140,7 +62,7 @@ namespace omf {
 					 * 	 	ABRC:\n
 					 * @see BitRateControl
 					 */
-					virtual void SetBitRateMinimum(int min)=0;
+					virtual bool SetBitRateMinimum(int min)=0;
 
 					/**
 					 * set the maximum bit rate(BR).
@@ -149,9 +71,12 @@ namespace omf {
 					 * 	 	ABRC:\n
 					 * @see BitRateControl
 					 */
-					virtual void SetBitRateMaximum(int max)=0;
+					virtual bool SetBitRateMaximum(int max)=0;
 
 				public:
+					virtual bool IsSupportQPControl()const = 0;
+					virtual bool IsSupportQPRange()const = 0;
+
 					/**
 					 * manual set the quantization parameter.
 					 * @param qp [in] quantization parameter. \n
@@ -161,7 +86,7 @@ namespace omf {
 					 * 	 	MQPC: \n
 					 * @see BitRateControl
 					 */
-					virtual void SetQP(int qp)=0;
+					virtual bool SetQP(int qp)=0;
 
 					/**
 					 * set the minimum quantization parameter(QP).
@@ -172,7 +97,7 @@ namespace omf {
 					 * 	 	ABRC:\n
 					 * @see BitRateControl
 					 */
-					virtual void SetQPMinimum(int min)=0;
+					virtual bool SetQPMinimum(int min)=0;
 
 					/**
 					 * set the maximum quantization parameter(QP).
@@ -183,7 +108,7 @@ namespace omf {
 					 * 	 	ABRC:\n
 					 * @see BitRateControl
 					 */
-					virtual void SetQPMaximum(int max)=0;
+					virtual bool SetQPMaximum(int max)=0;
 
 				public:
 					/**

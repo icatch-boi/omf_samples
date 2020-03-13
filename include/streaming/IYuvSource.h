@@ -45,9 +45,6 @@ namespace omf {
 			{
 			public:
 				virtual ~IYuvSource() {}
-
-			public:
-				using YuvMediaInfo=omf::api::streaming::common::YuvMediaInfo;
 			public:
 				/**
 				 * create a new YuvSource instance. \n

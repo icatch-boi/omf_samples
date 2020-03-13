@@ -5,7 +5,7 @@
 #pragma once
 
 #include "common/IStreamControl.h"
-#include "common/IVideo.h"
+#include "common/IVideoSource.h"
 
 namespace omf {
 	namespace api {
@@ -39,24 +39,16 @@ namespace omf {
 			 */
 			class IPhotography
 				: public virtual common::IStreamControl
-				, public virtual common::IVideo
+				, public virtual common::IVideoSource
 			{
 			public:
 				virtual ~IPhotography() {}
 			public:
 				/**
-				 * Select the sensor with ID.
-				 * @param id [in] sensor ID.\n
-				 * 		default: 0\n
-				 * 		v37 support: 0,1,2 \n
-				 */
-				virtual void SelectSensor(int id)=0;
-
-				/**
 				 * set the QP value for the encoder.
 				 * @param qp [in]
 				 */
-				virtual void SetQP(int qp) = 0;
+				virtual bool SetQP(int qp) = 0;
 
 				/**
 				 * get the current QP of the encoder.
