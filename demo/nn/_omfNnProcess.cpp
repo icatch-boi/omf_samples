@@ -23,7 +23,7 @@ static std::string CreateLayoutString(void*hd){
 		"type=ShmService,partner={"
 			"type=application,layout={"
 				"type=pipeline,name=pl-nn-process,layout={"
-					"pv-yuv-src-adv:w=1280,h=720"
+					"pv-yuv-src-adv:w=640,h=360"
 					"+FrameRateCtrl:fr=1"
 					"+HumanDetectSink:priv_data=%p,name=HumanDetectionSink"
 				"}"

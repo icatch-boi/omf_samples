@@ -29,17 +29,21 @@ static int _framerate=30;
 static int _bitrate=2000;///kb
 static const char* _goptype = "ippp";
 static int _gop = 15;
-static int _triggerInterval=100;//ms
+static int _triggerInterval=0;//ms
+static int _dumpFrm=1;
+static int _fluency=0;
+static int _showBrc=0;
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
 	{"omfH264Src(...): \n"
 	 "This demo shows how to get H264 streaming from OMF using IH264Source interface. \n"
-	 "> omfH264Src -n vbrcpull.h264 -d30 -w1920 -h1080 -f30 -b 128 -t ippp -g30 \n"
-	 "> omfH264Src -n vbrcpush.h264 -d30 -w1080 -h720 -k dualos-vbrc-push \n"
-	 "> omfH264Src -n cbrcpush.h264 -d30 -w1920 -h1080 -k dualos-cbrc -w1920 -h1080 -f30 \n"
-	 "> omfH264Src -n vbrcPushTrig.h264 -d30 -w1920 -h1080 -k dualos-vbrc-push-trigger -i 1000 \n"
+     "  omfH264Src -d5 -w1920 -h1080 -f30 -b 128 -t ippp -g30 -k vbrc -L \"\" -F 0 -e 3\n"
+	 "  omfH264Src -n vbrcpull.h264 -d30 -w1920 -h1080 -f30 -b 128 -t ippp -g30 \n"
+	 "  omfH264Src -n vbrcpush.h264 -d30 -w1080 -h720 -k dualos-vbrc-push \n"
+	 "  omfH264Src -n cbrcpush.h264 -d30 -w1920 -h1080 -k dualos-cbrc -w1920 -h1080 -f30 \n"
+	 "  omfH264Src -n vbrcPushTrig.h264 -d30 -w1920 -h1080 -k dualos-vbrc-push-trigger -i 1000 \n"
 	},
 	{"fname"	,'n', _fname	,"record filename(*.aac)."},
 	{"duration"	,'d', _seconds	,"record duration(*s)."},
@@ -53,17 +57,33 @@ static OmfHelper::Item _options0[]{
 	{"goptype"	,'t', _goptype	,"gop type(iiii,ippp,ibbp) of h264 encoder."},
 	{"gop"		,'g', _gop		,"gop of h264 encoder."},
 	{"misc:"},
+	{"dumpfrm"	,'F', [](){_dumpFrm=1;}	,"dump the frame."},
 	{"interval"	,'i', _triggerInterval	,"the interval(ms) per trigger. Only used for IsSupportSingleFrameTrigger()."},
+	{"bit rate control:"},
+	{"showBrc"	,'S', [](){_showBrc=1;}	,"show the h264 source bitrate control modes."},
+	{"fluency"	,'e', _fluency	,"[-7,7]the fluency for streaming."},
 	{"keywords"	,'k', _keywords	,"select the IH264Source with keywords:"
 							  	"\n <module>-<brc>-<output>-<tigger>,eg.."
 		 						"\n dualos-cbrc"
 		 						"\n dualos-cbrc-pull"
-		 						"\n dualos-cbrc-pull-trigger"
-		 						"\n dualos-cbrc-push-trigger"
+								"\n dualos-cbrc-push"
+		 						"\n dualos-cbrc-pull-trig"
+		 						"\n dualos-cbrc-push-trig"
 								"\n dualos-vbrc"
 								"\n dualos-vbrc-pull"
-								"\n dualos-vbrc-pull-trigger"
-								"\n dualos-vbrc-push-trigger"
+								"\n dualos-vbrc-push"
+								"\n dualos-vbrc-pull-trig"
+								"\n dualos-vbrc-push-trig"
+								"\n dualos-dbrc"
+								"\n dualos-dbrc-pull"
+								"\n dualos-dbrc-push"
+								"\n dualos-dbrc-pull-trig"
+								"\n dualos-dbrc-push-trig"
+								"\n dualos-abrc"
+								"\n dualos-abrc-pull"
+								"\n dualos-abrc-push"
+								"\n dualos-abrc-pull-trig"
+								"\n dualos-abrc-push-trig"
    },
 	{},
 };
@@ -86,33 +106,52 @@ static bool MessageProcess(const char* msg0){
 	}
 	return true;
 }
+static TimePoint _tpEnd(-1_s);
+static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line){
+	if(!frm->data || !frm->size)
+		return false;
+	///
+	if(_tpEnd==-1_s){
+		_tpEnd=frm->pts+Seconds(_seconds);
+	}else if(frm->pts>_tpEnd){
+		///frame receive is enough, exit profram.
+		_exit = true;
+		return false;
+	}
+	///write to file
+	if(fd)fwrite(frm->data,1,frm->size,fd);
+	///
+	if(!_dumpFrm)
+		return true;
+	dbgTestPS(line<<'#'<<frm->index
+					  << ',' << frm->data
+					  << ',' << frm->size
+					  << ',' << frm->iskeyframe
+					  << ',' << frm->pts
+					  << ','
+	);
+	dbgTestDL(frm->data, 16);
+	return true;
+}
+static void ProcessTrigger(IH264Source*src){dbgTestPL();
+	while(!_exit){
+		if(src->IsSupportSingleFrameTrigger()) {
+			if(src->CurrentState()==IH264Source::State::play)
+				src->Trigger();
+			std::this_thread::sleep_for(MilliSeconds(_triggerInterval));
+		}
+
+	}
+}
 static bool ProcessPull(IH264Source*src,FILE*fd){dbgTestPL();
 	//start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
 	//streaming....
-	auto end = Now()+Seconds(_seconds);
-	while(!_exit && Now()<end) {
-		std::shared_ptr<frame_t> frm;
-		returnIfErrCS(false, !src->PullFrame(frm), "pull frame fail!");
-		if(!frm->data || !frm->size)
-			continue;
-		///
-		dbgTestPSL(frm->index
-						   <<','<<frm->data
-						   <<','<<frm->size
-						   <<','<<frm->iskeyframe
-						   <<','<<frm->pts
-		);
-		dbgTestDL(frm->data,16);
-		///write to file
-		if(fd)fwrite(frm->data,1,frm->size,fd);
-		///sleep & trigger
-		auto interval = 10_ms;
-		if(src->IsSupportSingleFrameTrigger()) {
-			interval = MilliSeconds(_triggerInterval);
-			src->Trigger();
-		}
-		std::this_thread::sleep_for(interval);
+	while(!_exit) {
+		auto frm = src->PullFrame(false);
+		if(frm)
+			ProcessFrame(frm,fd,__LINE__);
+		std::this_thread::sleep_for(10_ms);
 	}
 	//stop streaming
 	returnIfErrC(false,!src->ChangeDown(State::ready));
@@ -121,29 +160,13 @@ static bool ProcessPull(IH264Source*src,FILE*fd){dbgTestPL();
 static bool ProcessPush(IH264Source*src,FILE*fd){dbgTestPL();
 	//set push callback
 	src->RegisterOutputCallback([&fd](std::shared_ptr<IH264Source::frame_t>&frm){
-		dbgTestPSL(frm->index
-						   <<','<<frm->data
-						   <<','<<frm->size
-						   <<','<<frm->iskeyframe
-						   <<','<<frm->pts
-		);
-		dbgTestDL(frm->data,16);
-		///
-		if(fd)fwrite(frm->data,1,frm->size,fd);
-		return true;
+		return ProcessFrame(frm,fd,__LINE__);
 	});
 	//start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
 	//streaming...
-	auto end = Now()+Seconds(_seconds);
-	while(!_exit && Now()<end) {
-		///sleep & trigger
-		auto interval = 10_ms;
-		if(src->IsSupportSingleFrameTrigger()) {
-			interval = MilliSeconds(_triggerInterval);
-			src->Trigger();
-		}
-		std::this_thread::sleep_for(interval);
+	while(!_exit) {
+		std::this_thread::sleep_for(10_ms);
 	}
 	//stop streaming
 	returnIfErrC(false,!src->ChangeDown(State::ready));
@@ -155,6 +178,15 @@ static bool Process(bool _dbg){
 	dbgTestPVL(_keywords);
 	std::unique_ptr<IH264Source> src(IH264Source::CreateNew(_keywords));
 	returnIfErrC(false,!src);
+	///
+	if(_showBrc){
+		auto brcs=src->GetBrcModes();
+		for(auto&brc:brcs){
+			dbgTestPSL(brc.mode<<','<<brc.note);
+		}
+		auto brc=src->GetBrcMode();
+		dbgTestPSL("current brc mode:"<<brc.mode<<','<<brc.note);
+	}
 	//set yuv srouce parameters
 	src->SelectSensor(_sensorID);//select the sensor0.
 	src->SetWidth(_width);
@@ -164,6 +196,7 @@ static bool Process(bool _dbg){
 	src->SetGopType(_goptype);
 	//set BitRateControl
 	src->SetBitRate(_bitrate*1000);
+	if(_fluency)src->SetFluency(_fluency);
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
 	//get streaming parameters after Open().
@@ -187,13 +220,23 @@ static bool Process(bool _dbg){
 	dbgTestDL(info.extraData,info.extraSize);
 	dbgTestPL();
 	///////////////////////////////////////
-	FILE* fd=fopen(_fname,"wb");
-	if(!fd){
-		dbgErrPSL("open file fail:"<<_fname);
+	FILE* fd=0;
+	if(_fname) {
+		fd=fopen(_fname, "wb");
+		if (!fd) {
+			dbgErrPSL("open file fail:" << _fname);
+		}
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////
-	//streaming......
+	///streaming......
+	_exit = false;
+	///trigger
+	std::unique_ptr<std::thread> thread;
+	if(_triggerInterval && src->IsSupportSingleFrameTrigger()) {
+		thread.reset(new std::thread(&ProcessTrigger,src.get()));
+	}
+	///process frame
 	if(src->IsSupportedPullFrame()){
 		returnIfErrC(false,!ProcessPull(src.get(),fd));
 	}else if(src->IsSupportedOutputFrameCallback()){

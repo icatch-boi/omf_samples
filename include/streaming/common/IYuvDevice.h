@@ -10,8 +10,6 @@ namespace omf {
 			namespace common {
 				class IYuvDevice:public virtual IVideo {
 				public:
-					virtual ~IYuvDevice(){}
-				public:
 					using YuvMediaInfo=omf::api::streaming::common::YuvMediaInfo;
 				public:
 					/**

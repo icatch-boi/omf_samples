@@ -11,8 +11,6 @@ namespace omf {
 			namespace common {
 				class IPcmDevice :public virtual IAudio{
 				public:
-					virtual ~IPcmDevice(){}
-				public:
 					virtual int GetDeviceID() const = 0;
 					virtual void GetDeviceID(int devid)=0;
 				public:

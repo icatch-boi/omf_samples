@@ -48,8 +48,6 @@ namespace omf{
 					, virtual public common::IAudio
 			{
 			public:
-				virtual ~IPcmPlayer() {}
-			public:
 				using PcmMediaInfo=omf::api::streaming::common::PcmMediaInfo;
 				using ISpeaker=omf::dev::IAudioDevice;
 			public:

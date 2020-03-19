@@ -42,8 +42,6 @@ namespace omf {
 				, public virtual common::IVideoSource
 			{
 			public:
-				virtual ~IPhotography() {}
-			public:
 				/**
 				 * set the QP value for the encoder.
 				 * @param qp [in]

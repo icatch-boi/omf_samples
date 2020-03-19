@@ -51,7 +51,7 @@ namespace omf {
 					i_frame_t iframe;///< the I Frame structure.
 					p_frame_t pframe;///< the P Frame structure.
 					int extraSize; ///< the extra data size.
-					char extraData[64];///< the extra data. eg. 00 00 00 01 68 xx ... 00 00 00 67 xx ...
+					char *extraData;///< the extra data. eg. 00 00 00 01 68 xx ... 00 00 00 67 xx ...
 					const char* pack;/// the h264 frame package format(avc,bitstream)
 					bool (*cbJumpToData)(unsigned char*&data,int& size,const char*pack);
 					bool (*cbJumpToDataBs)(unsigned char*&data,int& size);
@@ -87,6 +87,8 @@ namespace omf {
 					int version;
 					int rateidx;
 					int bitrate;
+					int extraSize; ///< the extra data size.
+					char *extraData;///< the extra data. eg.
 				} AacMediaInfo;
 			}
 		}

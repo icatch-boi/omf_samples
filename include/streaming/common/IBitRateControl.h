@@ -12,12 +12,10 @@ namespace omf {
 			namespace common {
 				class IBitRateControl:public virtual IEncoder {
 				public:
-					virtual ~IBitRateControl(){}
-				public:
 					typedef struct{const char* mode;const char* note;}mode_t;
 					virtual bool SetBrcMode(const char*)=0;
 					virtual std::vector<mode_t> GetBrcModes()const = 0;
-					virtual const mode_t& GetBrcMode()const = 0;
+					virtual mode_t GetBrcMode()const = 0;
 				public:
 					virtual bool IsSupportFrameRateControl()const = 0;
 					virtual bool IsSupportFrameRateRange()const = 0;
@@ -51,6 +49,7 @@ namespace omf {
 					 */
 					virtual bool SetFrameRateMaximum(int max)=0;
 
+					virtual bool SetFluency(int flue)=0;
 				public:
 					virtual bool IsSupportBitRateControl()const = 0;
 					virtual bool IsSupportBitRateRange()const = 0;

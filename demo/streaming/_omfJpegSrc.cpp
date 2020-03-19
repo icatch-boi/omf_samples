@@ -19,7 +19,7 @@ using namespace omf::api;
 using namespace omf::api::streaming;
 using namespace omf::api::streaming::common;
 ////////////////////////////////////////////////////////////
-static const char* _fname=0;
+static const char* _fname="source.jpeg";
 static int _seconds=30;//seconds
 static const char* _keywords="dualos-pull";
 static int _sensorID = 0;

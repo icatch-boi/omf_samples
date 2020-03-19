@@ -9,8 +9,6 @@ namespace omf {
 			namespace common {
 				class IAudio {
 				public:
-					virtual ~IAudio(){}
-				public:
 					/**
 					 * set sample rate.
 					 * @param rate [in]the number of sample rate.\n

@@ -50,8 +50,6 @@ namespace omf {
 				, virtual public common::IEncoder
 			{
 			public:
-				virtual ~IAacSource() {}
-			public:
 				using AacMediaInfo=omf::api::streaming::common::AacMediaInfo;
 			public:
 

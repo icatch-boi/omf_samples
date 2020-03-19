@@ -49,8 +49,6 @@ namespace omf {
 				, virtual public common::IAudio
 			{
 			public:
-				virtual ~IPcmSource() {}
-			public:
 				using PcmMediaInfo=omf::api::streaming::common::PcmMediaInfo;
 				using IMicrophone=omf::dev::IAudioDevice;
 			public:

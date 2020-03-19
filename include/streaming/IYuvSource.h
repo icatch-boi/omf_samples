@@ -44,8 +44,6 @@ namespace omf {
 				, public virtual common::IVideoSource
 			{
 			public:
-				virtual ~IYuvSource() {}
-			public:
 				/**
 				 * create a new YuvSource instance. \n
 				 * @param keywords[in] the keywords for selecting a YuvSource type. \n

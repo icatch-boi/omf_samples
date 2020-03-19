@@ -19,7 +19,7 @@ using namespace omf::api;
 using namespace omf::api::streaming;
 using namespace omf::api::streaming::common;
 ////////////////////////////////////////////////////////////
-static const char* _fname=0;
+static const char* _fname="source.aac";
 static int _seconds=30;
 static const char* _keywords="dualos";
 static const char* _mic = "dualos";

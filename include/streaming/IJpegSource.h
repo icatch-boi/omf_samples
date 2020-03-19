@@ -56,8 +56,6 @@ namespace omf {
 				, virtual public common::ITrigger
 			{
 			public:
-				virtual ~IJpegSource() {}
-			public:
 				using JpegMediaInfo=omf::api::streaming::common::JpegMediaInfo;
 			public:
 				/**

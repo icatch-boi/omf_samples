@@ -58,8 +58,6 @@ namespace omf {
 				, virtual public common::IH264
 			{
 			public:
-				virtual ~IH264Source() {}
-			public:
 				using H264MediaInfo=omf::api::streaming::common::H264MediaInfo;
 			public:
 				/**

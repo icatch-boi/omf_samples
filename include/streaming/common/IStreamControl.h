@@ -18,8 +18,6 @@ namespace omf {
 				 */
 				class IStreamControl:public virtual omf::object_base {
 				public:
-					virtual ~IStreamControl(){}
-				public:
 					const std::type_info& GetType() const{return typeid(*this);}
 				public:
 					using frame_t = omf::api::streaming::common::frame_t;
@@ -84,8 +82,6 @@ namespace omf {
 
 				class IStreamInput:public virtual IStreamControl {
 				public:
-					virtual ~IStreamInput(){}
-				public:
 					/**
 					 * check whether the push-operation is supported.
 					 * @return true/false
@@ -102,19 +98,17 @@ namespace omf {
 					 * @param frm [in]a streaming frame
 					 * @return true/false
 					 */
-					virtual bool PushFrame(std::shared_ptr<IStreamControl::frame_t> frm)=0;
+					virtual bool PushFrame(std::shared_ptr<frame_t> frm)=0;
 
 					/**
 					 * register a callback to generate the input frame
 					 * @param func the callback funnction
 					 * @return true/false
 					 */
-					virtual bool RegisterInputCallback(const IStreamControl::FuncFrame &func)=0;
+					virtual bool RegisterInputCallback(const FuncFrame &func)=0;
 				};
 
 				class IStreamOutput:public virtual IStreamControl {
-				public:
-					virtual ~IStreamOutput(){}
 				public:
 					/**
 					 * check whether the pull-operation is supported.
@@ -132,14 +126,15 @@ namespace omf {
 					 * @param frm [out]a streaming frame
 					 * @return true/false
 					 */
-					virtual bool PullFrame(std::shared_ptr<IStreamControl::frame_t>& frm,bool blocking=true)=0;
+					virtual bool PullFrame(std::shared_ptr<frame_t>& frm,bool blocking=true)=0;
+					virtual std::shared_ptr<frame_t> PullFrame(bool blocking=true)=0;
 
 					/**
 					 * register a callback to receive the output frame
 					 * @param func the callback funnction
 					 * @return true/false
 					 */
-					virtual bool RegisterOutputCallback(const IStreamControl::FuncFrame &func)=0;
+					virtual bool RegisterOutputCallback(const FuncFrame &func)=0;
 				public:
 					/**
 					 * get the output media info.

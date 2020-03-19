@@ -9,8 +9,6 @@ namespace omf {
 			namespace common {
 				class IVideo {
 				public:
-					virtual ~IVideo(){}
-				public:
 					/**
 					 * set the width of image.
 					 * @param w [in]the width \n

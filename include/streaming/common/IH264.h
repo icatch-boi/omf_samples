@@ -11,8 +11,6 @@ namespace omf {
 			namespace common{
 				class IH264{
 				public:
-					virtual ~IH264() {}
-				public:
 					/**
 					 * set the GOP(Group Of Pictures).
 					 * @param v [in] the GOP numbers.
