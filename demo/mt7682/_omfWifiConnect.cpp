@@ -18,7 +18,7 @@
 #include <mutex>
 #include <thread>
 #include <chrono>
-
+#include "DataInteraction.h"
 static std::mutex wlan_res_mtx;
 static std::mutex wlan_ifconfig_mtx;
 static int ifconfig_ready = 0;
@@ -58,6 +58,7 @@ struct net_ip_config {
 #define WLAN_WIFI_HAND_IPADDR	"/proc/driver/icatchtek_wlan/ipaddr"
 
 struct cipher_info {
+	int forceSe;
 	int enable;
 	int cipher_id;
 	int key_len;
@@ -68,23 +69,19 @@ struct cipher_info {
 
 static int _get_cipher_info_from_RTOS(struct cipher_info *info)
 {
-	char buf[256] = {0};
-	std::string param = "cmd=omfGetFromHost,sel=0xFFFA";
-	if(!info) {
-		return -1;
-	}
-	if(!omfCommand("shm0_cmd",param.c_str(), buf)) {
-		return -1;
-	}
-	void *attr0 = omfCreateAttrSet(buf);
-	int err = omfAttrGetInt(attr0,"res");
+	int err  = -1;
+	int len = 0;
+	int addr = 0;
+	returnIfErrC(-1, !CryptoCipherInfoGet(&err, &len, &addr));
+
 	if(!err) {
-		int len = omfAttrGetInt(attr0,"len");
-		int addr = omfAttrGetInt(attr0,"addr");
 		printf("len = %d, addr:%#x\n", len, addr);
 		int offset = 0;
 
 		void* cipher_info = (void*)addr;
+		memcpy(&info->forceSe, cipher_info + offset, 4);
+		offset += 4;
+
 		memcpy(&info->enable, cipher_info + offset, 4);
 		offset += 4;
 
@@ -128,13 +125,13 @@ static int _get_cipher_info_from_RTOS(struct cipher_info *info)
 		} else {
 			info->enable = 0;
 		}
-	}	else {
+	} else {
+		info->forceSe = 0;
 		info->enable = 0;
 		printf("==res==:%d\n", err);
 		return -1;
 	}
 
-	omfDestroy(attr0);
 	return 0;
 }
 
@@ -266,6 +263,15 @@ static bool _wifi_prepare(struct cipher_info *info)
 {
 	char cmdBuf[256] = {0};
 	char result[BUF_LENGTH] = {0};
+	if(info->forceSe && !info->enable) {
+
+		/* eg : not insmod wlan module ???
+		 * iCatch continue handle 7682.
+		 * */
+		printf("Warning:CUSTOMER_FORCE_USE_SECURITY= YES Crypto Enable = %d\n", info->enable);
+		printf("Warning:Please locate RTOS CUSTOMER_FORCE_USE_SECURITY\n", info->enable);
+		return false;
+	}
 	if(!_wlan_driver_is_install()) {
 		char version[64] = {0};
 		int ret = _get_system_kernel_verison(version);
@@ -418,13 +424,8 @@ static int xmitCallback(char* s,int len)
 	returnIfErrC(-1, !_sdioBuf);
 	returnIfErrC(-1, len > 4096);
 	memcpy(_sdioBuf,s,len);
-	char buf[1024];
 
-	sprintf(buf,"cmd=omfCmdToHost,sel=0xFFFD,data=%d,size=%d",(int)_sdioBuf,(int)len);
-	std::string para = buf;
-	if(omfCommand("shm0_cmd",para.c_str(), 0)){
-		//printf("send to icatos sdio\n");
-	}
+	SDIOXmitReceive((void*)_sdioBuf, len);
 	{
 		mt7687_packet_t *packet = (mt7687_packet_t*)s;
 		if((packet->header.type & 0xFFF) == IOT_CMD_REQUEST_LOW_POWER ) {
@@ -515,16 +516,16 @@ static void wifiConnect(const char* ssid,const char* pwd, struct cipher_info *in
  * swit sdio to linux or icatos
  * */
 static void sdioSwitch(int method){
-	char buf[128];
-	sprintf(buf,"cmd=omfCmdToHost,sel=%d",method);
-	std::string para = buf;
-	if(omfCommand("shm0_cmd", para.c_str(), buf)){
-		dbgTestPSL(buf);
-		void *attr0 = omfCreateAttrSet(buf);
-		_sdioBuf = (char*)omfAttrGetInt(attr0, "sdioRecvBuf");
-		if(!_sdioBuf) printf("sdio buf get failed!!!");
-		omfDestroy(attr0);
+
+	if(SDIO_SWITCH_LINUX == method) {
+		int buf = 0;
+		SDIOSwitchLinux(&buf);
+		_sdioBuf = (char*)buf;
 	}
+	else if(SDIO_SWITCH_ICATOS == method) {
+		SDIOSwitchRtos();
+	}
+
 }
 
 /**deal with data from icatos**/
@@ -573,23 +574,15 @@ int main(int argc, char** argv ){
 		pwd = argv[2];
 	}
 	else{
-		char buf[128] = {0};
-		std::string para = "cmd=omfGetFromHost,sel=0xFFF6";
-		if(omfCommand("shm0_cmd",para.c_str(), buf)){
-			void *attr1 = omfCreateAttrSet(buf);
-			ssid = omfAttrGetStr(attr1,"ssid");//dbgTestPSL(ssid);
-			pwd = omfAttrGetStr(attr1,"pwd");//dbgTestPSL(pwd);
-			omfDestroy(attr1);
-		}
+		std::string SSID = {0};
+		std::string password = {0};
+		WifiParamsGet(SSID, password);
+		ssid = SSID.c_str();
+		pwd = password.c_str();
 	}
 
 	if(ssid) wifiConnect(ssid, pwd, &info);
 	std::lock_guard<std::mutex> lock(wlan_ifconfig_mtx);
-	///judge dns whether ok
-	//while(1){
-		//auto ret = system("ping www.baidu.com");
-		//usleep(2000*1000ull);
-	//}
 
 	///wait,for icatos and linux communicate
 	//usleep(360000ull*1000000ull);

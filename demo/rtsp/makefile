@@ -20,6 +20,7 @@ LIBS += -lUsageEnvironment
 LIBS += -lBasicUsageEnvironment
 ###
 LIBS += -lpluginpcm
+LIBS += -lpluginav
 ###
 LIBS += -lomfapi
 LIBS += -lomfapicxx

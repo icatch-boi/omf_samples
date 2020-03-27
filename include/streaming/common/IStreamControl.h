@@ -16,7 +16,7 @@ namespace omf {
 				/**
 				 * the base operator interface of a streaming
 				 */
-				class IStreamControl:public virtual omf::object_base {
+				class IStreamControl {
 				public:
 					const std::type_info& GetType() const{return typeid(*this);}
 				public:

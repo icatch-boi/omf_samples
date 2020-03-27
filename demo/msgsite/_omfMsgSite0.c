@@ -24,10 +24,12 @@ static const char* _msg="";
 static unsigned _flags=0;
 static int _send = 0;
 static int _cb = 0;
+static const char* _log="all=false,err=true,note=true";
 ////////////////////////////////////////////
-static char _short_options[]="i:c:s:t:m:f:H:?";
+static char _short_options[]="i:c:s:t:m:f:H:?:L";
 static struct option _long_options[]={
 		{"help",1,0,'H'},
+		{"log",1,0,'L'},
 		{"srcID",1,0,'i'},
 		{"cb",0,0,'c'},
 		{"send",0,0,'s'},
@@ -39,7 +41,7 @@ static struct option _long_options[]={
 static void OptionHelper(){
 	printf("demoMsgSite(...): \n");
 	printf("This demo is used to show how to use IMsgSite to send or receive messages.\n");
-
+	printf("--log,-L[%s]     the log config.\n",_log);
 	printf("--srcID,-i[%d]         set the message source id.\n",_srcID);
 	printf("receive message\n");
 	printf(" > demoMsgSite    	    ####receive message with target local site ID.  \n");
@@ -76,6 +78,9 @@ static int OptionParse(int argc,char **argv){
 			case 'H':
 				OptionHelper();
 				return 0;
+			case 'L':
+				_log = optarg;
+				break;
 			case 'i':
 				_srcID=atoi(optarg);
 				break;
@@ -160,9 +165,9 @@ int main(int argc,char* argv[]){
 	returnIfErrC(0,!Check());
 	///
 	omfInit(0);
-	omfCommand("show_classes",0,0);
+	omfCommand("show_modules",0,0);
 	omfCommand("sigsegv", 0, 0);
-	omfCommand("dbgEn","all=false,err=true,note=true",0);
+	omfCommand("dbgEn",_log,0);
 	///
 	Process();
 	///

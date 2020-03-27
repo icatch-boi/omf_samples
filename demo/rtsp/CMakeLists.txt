@@ -32,6 +32,7 @@ set(LIBRARY_DEPEND_LIBS
 		omfapicxx
 		omfapistreaming
 		pluginapistreaming
+		pluginav
 
 		liveMedia
 		groupsock

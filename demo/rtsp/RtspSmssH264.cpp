@@ -154,7 +154,7 @@ int RtspSmssH264::RtpHeadUpdate(uint8*ptr,int& len){
 	return 2;
 }
 bool RtspSmssH264::CreateSource(){dbgTestPL();
-	auto src=IH264Source::CreateNew("dualos-vbrc-pull");
+	auto src=IH264Source::CreateNew("dualos-vbrc-vfrc-pull");
 	returnIfErrC(false,!src);
 	_src=src;
 	if(_attr){dbgTestPL();

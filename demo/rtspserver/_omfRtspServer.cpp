@@ -1,10 +1,12 @@
 #include "OmfMain.h"
+#include "OmfHelper.h"
 #include "OmfDbg.h"
 #include "OmfRtspService.h"
 #include <string>
 #include <thread>
 #include <chrono>
 #include <memory>
+#include "omf_cmd_cxx.h"
 ///////////////////////////////////////
 #undef dbgEntryTest
 #define dbgEntryTest(s) dbgEntrySky(s)
@@ -12,12 +14,20 @@
 using namespace omf::rtsp;
 using namespace omf::api;
 //////////////////////////////////////
+static OmfHelper::Item _options0[]{
+		{"omfRtspServer(...): \n"
+		 "this demo is to start a RTSP server. \n"
+		},
+		{},
+};
+using namespace omf::api;
+//////////////////////////////////////
 static bool RtspServer(const char*urlmap,const char*authmap) {//dbgSkyPL();
 	dbgTestPVL(urlmap);
 	dbgTestPVL(authmap);
 	std::unique_ptr<OmfRtspService> rtsp{OmfRtspService::CreateNew(urlmap,authmap)};
 	returnIfErrC(false,!rtsp.get());
-	returnIfErrC(false,!rtsp->Start());dbgTestPL();
+	returnIfErrC(false,!rtsp->Start());dbgTestPSL(Now());
 	while(1){std::this_thread::sleep_for(std::chrono::hours(1ll));dbgTestPL();}
 	returnIfErrC(false,!rtsp->Stop());dbgTestPL();
 	return true;
@@ -54,11 +64,20 @@ static bool CreateRtspAuthMap(char* buff){
 }
 
 int main(int argc, char *argv[]){
+	dbgNotePSL("omfAacPlayer\n");
+	///parse the input params
+	OmfHelper helper(_options0,argc,argv);
+	///--help
+	returnIfTestC(0,!helper);
+	///output the params list
+	helper.Print();
+	///
 	OmfMain omf;
 	///show the modules loaded.
 	omf.ShowModules();
 	///disable all debug log.
-	//omf.LogConfig("all=false,err=true,note=true");
+	omf.Debug(helper.Debug());
+	if(helper.Log())omf.LogConfig(helper.Log());
 	///debug
 	omf.Debug(true);
 	///

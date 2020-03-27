@@ -3,6 +3,7 @@
 //
 #pragma once
 
+#include "_object_base.h"
 #include <string>
 #include <functional>
 namespace omf {
@@ -79,6 +80,12 @@ namespace omf {
 			 * @return true/false
 			 */
 			bool SignalINT(bool en);
+		public:
+			bool Register(const char* name,std::function<object_base*()>,std::type_info*type);
+			template<class T>
+			bool Register(const char* name){
+				return Register(name,[](){return new T();},&typeid(T));
+			}
 		};
 	}
 }
