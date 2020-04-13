@@ -35,6 +35,7 @@ namespace omf {
 		///
 		bool _dbg=false;
 		const char* _log=0;
+		const char* _display=0;
 		///
 		void init();
 		void AddDefault();
@@ -71,9 +72,14 @@ namespace omf {
 		bool Debug()const;
 		/**
 		 * return the log configer:--log or -L
-		 * @return
+		 * @return log configure string
 		 */
 		const char* Log()const;
+		/**
+		 * return the display configer:--show or -S
+		 * @return display configure string
+		 */
+		const char* Display()const;
 	protected:
 		char _short_options[1024];
 		struct option _long_options[128];

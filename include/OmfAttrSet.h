@@ -29,13 +29,16 @@ namespace omf{
 			 * @param str [in]:the serialize string
 			 */
 			OmfAttrSet(const char* str=0);
-
+		private:
+			OmfAttrSet(void*);
 		public:
 			/**
 			 * Check is Valid or not.
 			 * @return true/false
 			 */
 			operator bool() const;
+		public:
+			std::shared_ptr<OmfAttrSet> Next();
 		protected:
 			void* _obj=0;
 			std::shared_ptr<object_base> _obj0;

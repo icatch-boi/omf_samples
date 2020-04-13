@@ -55,7 +55,10 @@ ServerMediaSession* RtspServer
 	if(sms)return sms;
 	//dbgTestPVL(url);
 	const char* cfgs = _url_map.Get(url);//_url_map.GetOrDef(url,url);
-	//if(cfgs)cfgs=url;
+	if(!cfgs){
+		dbgNotePSL("URL is not a built-in streaming:"<<url);
+		cfgs=url;
+	}
 	dbgTestPVL(cfgs);
 	returnIfErrCS(0,!cfgs,url<<','<<_url_map.ToString());
 

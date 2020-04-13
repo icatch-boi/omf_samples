@@ -4,6 +4,7 @@
 #pragma once
 
 #include "_object_base.h"
+#include "OmfHelper.h"
 #include <string>
 #include <functional>
 namespace omf {
@@ -65,6 +66,21 @@ namespace omf {
 			 */
 			bool ShowModules();
 			/**
+			 * display the class info registered.
+			 * @return true/false
+			 */
+			bool ShowClasses();
+			/**
+			 * display the factory list registered.
+			 * @return true/false
+			 */
+			bool ShowFactory();
+			/**
+			 * display the inside memory pools .
+			 * @return true/false
+			 */
+			bool ShowMemoryPools();
+			/**
 			 * configure the omf log,
 			 * @return true/false
 			 */
@@ -86,6 +102,12 @@ namespace omf {
 			bool Register(const char* name){
 				return Register(name,[](){return new T();},&typeid(T));
 			}
+		public:
+			/**
+			 * get setting from OmfHelper.
+			 * @return true/false
+			 */
+			bool Helper(OmfHelper&);
 		};
 	}
 }

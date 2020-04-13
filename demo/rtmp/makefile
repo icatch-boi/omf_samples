@@ -27,7 +27,13 @@ LIBS += -lfwporting
 LIBS += -ldl
 LIBS += -ldbglinux
 ###
+LIBS += -lssl
+LIBS += -lcrypto
+#LIBS += -lpolarssl
+###
 INCS +=
+###
+OBJS_+= OmfRtmpClient.o
 ###
 include ../makefile.tmpl
 

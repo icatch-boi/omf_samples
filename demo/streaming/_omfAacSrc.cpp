@@ -19,7 +19,7 @@ using namespace omf::api;
 using namespace omf::api::streaming;
 using namespace omf::api::streaming::common;
 ////////////////////////////////////////////////////////////
-static const char* _fname="source.aac";
+static const char* _fname=0;
 static int _seconds=30;
 static const char* _keywords="dualos";
 static const char* _mic = "dualos";
@@ -152,9 +152,12 @@ static bool Process(bool _dbg){
 	dbgTestPVL(info.adtsLength);
 	dbgTestPVL(info.bitrate);
 	///////////////////////////////////////
-	FILE* fd=fopen(_fname,"wb");
-	if(!fd){
-		dbgErrPSL("open file fail:"<<_fname);
+	FILE* fd=0;
+	if(_fname) {
+		fd = fopen(_fname, "wb");
+		if (!fd) {
+			dbgErrPSL("open file fail:" << _fname);
+		}
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////
@@ -166,6 +169,7 @@ static bool Process(bool _dbg){
 	}else{
 		dbgErrPSL("null support output mode.");
 	}
+	returnIfErrC(false,!src->ChangeDown(State::null));
 	return true;
 }
 ////////////////////////////////////////////

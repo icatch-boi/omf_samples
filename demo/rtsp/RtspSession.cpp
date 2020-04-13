@@ -42,14 +42,13 @@ RtspSession::~RtspSession(){
 }
 
 RtspSession* RtspSession::CreateNew(UsageEnvironment& env,const char* cfgs,const char*url){
-	OmfAttrSet ap0(cfgs);
-	auto keys=ap0.Keys();
-	returnIfErrC(0,keys.empty());
+	std::shared_ptr<OmfAttrSet> ap0(new OmfAttrSet(cfgs));
+	returnIfErrC(0,!ap0);
 	auto session=new RtspSession(env,cfgs,url);
-	for(auto codec:keys){dbgTestPVL(codec);
-		auto vals=ap0.Get(codec);dbgTestPVL(vals);
-		if(vals) {
-			std::shared_ptr<OmfAttrSet> ap(new OmfAttrSet(vals));
+	auto ap=ap0;
+	while(ap){
+		auto codec = ap->Get("codec");
+		if(codec){
 			switch(::Hash(codec)){
 				case ::Hash("h264"):
 					session->addSubsession(new RtspSmssH264(env,ap));
@@ -62,6 +61,13 @@ RtspSession* RtspSession::CreateNew(UsageEnvironment& env,const char* cfgs,const
 					break;
 			}
 		}
+		ap=ap->Next();
+	}
+
+	if(!session->numSubsessions()){
+		dbgErrPSL("invalid streaming in cfgs:"<<cfgs);
+		delete session;
+		session=0;
 	}
 	return session;
 //	return new RtspSession(env,cfgs,url);

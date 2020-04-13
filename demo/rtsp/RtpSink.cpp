@@ -105,7 +105,7 @@ int RtpSink::UpdateBuff(bool isfirst,int len,int idx){
 }
 bool RtpSink::SendBuff(int size){
 	//return fRTPInterface.sendPacket(ptr, size);
-	int i=0,c=10;
+	int i=0,c=50;
 	while(!fRTPInterface.sendPacket(_buff, size) && i++<c){
 		putchar('d');
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));

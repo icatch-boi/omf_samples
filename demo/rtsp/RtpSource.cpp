@@ -12,15 +12,15 @@ RtpSource::RtpSource(UsageEnvironment & env, ISource* reader)
 	, _1st(true)
 {
 	dbgTestPSL((void*)_reader);
-	_reader->ChangeUp(omf::api::streaming::common::State::ready);
+	_reader->ChangeUp(ISource::State::ready);
 }
 RtpSource::~RtpSource(){
 	//delete _reader;
-	_reader->ChangeDown(omf::api::streaming::common::State::ready);
+	_reader->ChangeDown(ISource::State::ready);
 }
 void RtpSource::doGetNextFrame(){dbgTestPL();
 	//nextTask()=envir().taskScheduler().scheduleDelayedTask(0,(TaskFunc*)Process,this);
-	_reader->ChangeUp(omf::api::streaming::common::State::play);
+	_reader->ChangeUp(ISource::State::play);
 }
 bool RtpSource::EOS(){
 	handleClosure();

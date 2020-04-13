@@ -19,7 +19,7 @@ using namespace omf::api;
 using namespace omf::api::streaming;
 using namespace omf::api::streaming::common;
 ////////////////////////////////////////////////////////////
-static const char* _fname="source.jpeg";
+static const char* _fname=0;
 static int _seconds=30;//seconds
 static const char* _keywords="dualos-pull";
 static int _sensorID = 0;
@@ -36,7 +36,7 @@ static OmfHelper::Item _options0[]{
 	 "This demo shows how to get JPEG streaming from OMF using IJpegSource interface.\n"
 	 "> omfJpegSrc -n test.jpeg -d30 -w 1920 -h1080 -fr 30 -q 90\n"
 	},
-	{"fname"	,'n', _fname	,"record filename(*.aac)."},
+	{"fname"	,'n', _fname	,"record filename(*.jpeg)."},
 	{"duration"	,'d', _seconds	,"record duration(*s)."},
 	{"the yuv paramers:"},
 	{"sid"		,'s', _sensorID	,"select the sensor with the id."},
@@ -153,9 +153,12 @@ static bool Process(bool _dbg){
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
 	//get streaming parameters after Open().
-	FILE* fd=fopen(_fname,"wb");
-	if(!fd){
-		dbgErrPSL("open file fail:"<<_fname);
+	FILE* fd=0;
+	if(_fname) {
+		fd = fopen(_fname, "wb");
+		if (!fd) {
+			dbgErrPSL("open file fail:" << _fname);
+		}
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////
@@ -167,6 +170,7 @@ static bool Process(bool _dbg){
 	}else{
 		dbgErrPSL("null support output mode.");
 	}
+	returnIfErrC(false,!src->ChangeDown(State::null));
 	return true;
 }
 ////////////////////////////////////////////

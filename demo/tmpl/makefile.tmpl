@@ -1,13 +1,15 @@
 ALL+=
+Targets?=$(ALL)
 ###
-all:$(ALL)
+all:$(Targets)
 ###
-PREFIX ?=
-ifeq ($(GCC7.3), YES)
-    PREFIX ?= /opt/openwrt_toolchain/arm-openwrt-icatchtek-bsp4-glibc/bin/arm-openwrt-linux-gnueabi-
+
+ifeq ($(GCC7.3), 1)
+    PREFIX_= /opt/openwrt_toolchain/arm-openwrt-icatchtek-bsp4-glibc/bin/arm-openwrt-linux-gnueabi-
 else
-    PREFIX ?= /opt/openwrt_toolchain/arm-openwrt-icatchtek-glibc/bin/arm-openwrt-linux-
+    PREFIX_= /opt/openwrt_toolchain/arm-openwrt-icatchtek-glibc/bin/arm-openwrt-linux-
 endif
+PREFIX?=$(PREFIX_)
 LIBS_PATH ?= ../../lib
 INCS_PATH ?= ../../include
 OUT_PATH ?= ./out
@@ -19,8 +21,8 @@ GSTRIP ?= ${PREFIX}strip
 CFLAGS += -Wno-error=pointer-sign -Wno-error=char-subscripts -Wno-error=unused-but-set-variable -Wno-error=unused-function
 CFLAGS += -mcpu=cortex-a7 -mabi=aapcs -mfloat-abi=hard -mlittle-endian -mno-unaligned-access
 CFLAGS += -flax-vector-conversions -mfpu=neon-vfpv4
-CFLAGS += -pthread -rdynamic -fPIC
-CXXFLAGS += ${CFLAGS} -std=c++11 -Wall -g -O2 -fpermissive -fexceptions -Woverloaded-virtual -Wreturn-type
+CFLAGS += -rdynamic -fPIC
+CXXFLAGS += ${CFLAGS} -std=c++11 -Wall -g -O2 -fpermissive -fexceptions -Woverloaded-virtual -Wreturn-type -pthread
 
 ###
 INCS += -I.
@@ -32,6 +34,8 @@ INCS += -I${INCS_PATH}/streaming/common
 LIBS +=
 ###
 OBJS +=
+###
+OBJS_+=
 ###
 %.o:%.cpp
 	@echo "compile cxx files..."
@@ -45,7 +49,7 @@ OBJS +=
 	@echo "compile c files...."
 	$(GCC) $(INCS) $(CFLAGS) -c $^ -o $@
 
-%_:_%.o
+%_:_%.o ${OBJS_}
 	@echo $@
 	$(GXX) $(INCS) $(CXXFLAGS) $^ -L${LIBS_PATH} $(LIBS) $(LDFLAGS) -o $@
 
@@ -60,14 +64,17 @@ OBJS +=
 ###	
 clean:
 	@echo "Removing linked and compiled files......"
-	rm -rf $(ALL) *.o ./out
+	rm -rf $(Targets) *.o ./out
 
 ###
-install:${ALL}
+install:all
 	@mkdir -p $(OUT_PATH)
-	@for tmp in $(ALL); \
+	@for tmp in $(Targets); \
 	do \
 		mv $$tmp $(OUT_PATH); \
 	done
 
-.PHONY : all clean install
+.PHONY : clean install
+
+printAll:
+	@echo $(ALL)

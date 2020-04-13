@@ -19,7 +19,7 @@ using namespace omf::api;
 using namespace omf::api::streaming;
 using namespace omf::api::streaming::common;
 ////////////////////////////////////////////////////////////
-static const char* _fname="source.pcm";
+static const char* _fname=0;
 static int _seconds=30;
 static const char* _keywords="dualos";
 static const char* _mic = "dualos";
@@ -32,7 +32,7 @@ static OmfHelper::Item _options0[]{
 	 "This demo shows how to get PCM streaming from OMF using IPcmSource interface.\n"
 	 "  omfPcmSrc -n test.pcm -d 30\n"
 	},
-	{"fname",'n', _fname		,"record filename(*.aac)."},
+	{"fname",'n', _fname		,"record filename(*.pcm)."},
 	{"duration",'d', _seconds	,"process execute duration(*s)."},
 	{"mic"		,'m', _mic		,"select the mic with the keywords.Usually use the default values."},
 	{"keywords",'k', _keywords	,"select the IPcmSource with keywords.Usually use the default values."},
@@ -184,9 +184,12 @@ static bool Process(bool _dbg){
 	dbgTestPVL(info.bytePerSample());
 
 	////////////////////////////////////////////////////////
-	FILE* fd=fopen(_fname,"wb");
-	if(!fd){
-		dbgErrPSL("open file fail:"<<_fname);
+	FILE* fd=0;
+	if(_fname) {
+		fd = fopen(_fname, "wb");
+		if (!fd) {
+			dbgErrPSL("open file fail:" << _fname);
+		}
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////
@@ -199,6 +202,7 @@ static bool Process(bool _dbg){
 	}else{
 		dbgErrPSL("null support output mode.");
 	}
+	returnIfErrC(false,!src->ChangeDown(State::null));
 	return true;
 }
 ////////////////////////////////////////////

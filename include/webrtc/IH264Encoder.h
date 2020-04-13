@@ -3,7 +3,9 @@
 //
 
 #pragma once
-#include "OmfApiFrame.h"
+#include "OmfFrame.h"
+#include "OmfState.h"
+#include "OmfMessage.h"
 #include <string>
 #include <chrono>
 #include <functional>
@@ -12,10 +14,10 @@ namespace omf {
 	namespace webrtc {
 		class IH264Encoder {
 		public:
-			using frame_t = omf::api::streaming::common::frame_t;
-			using State = omf::api::streaming::common::State;
-			using FuncFrame = omf::api::streaming::common::FuncFrame;
-			using FuncMessage = omf::api::streaming::common::FuncMessage;
+			using frame_t = omf::api::frame_t;
+			using State = omf::api::State;
+			using FuncFrame = omf::api::FuncFrame;
+			using FuncMessage = omf::api::FuncMessage;
 		public:
 			static IH264Encoder* CreateNew(const char*);
 			virtual ~IH264Encoder(){}

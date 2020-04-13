@@ -25,7 +25,7 @@ static const char* _keywords="dualos-vbrc-pull";
 static int _sensorID = 0;
 static int _width=1920;
 static int _height=1080;
-static int _framerate=30;
+static int _framerate=0;
 static int _bitrate=2000;///kb
 static const char* _goptype = "ippp";
 static int _gop = 15;
@@ -45,7 +45,7 @@ static OmfHelper::Item _options0[]{
 	 "  omfH264Src -n cbrcpush.h264 -d30 -w1920 -h1080 -k dualos-cbrc -w1920 -h1080 -f30 \n"
 	 "  omfH264Src -n vbrcPushTrig.h264 -d30 -w1920 -h1080 -k dualos-vbrc-push-trigger -i 1000 \n"
 	},
-	{"fname"	,'n', _fname	,"record filename(*.aac)."},
+	{"fname"	,'n', _fname	,"record filename(*.h264)."},
 	{"duration"	,'d', _seconds	,"record duration(*s)."},
 	{"the yuv paramers:"},
 	{"sid"		,'s', _sensorID	,"select the sensor with the id."},
@@ -197,6 +197,7 @@ static bool Process(bool _dbg){
 	//set BitRateControl
 	src->SetBitRate(_bitrate*1000);
 	if(_fluency)src->SetFluency(_fluency);
+	if(_framerate)src->SetFrameRate(_framerate);
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
 	//get streaming parameters after Open().
@@ -244,6 +245,8 @@ static bool Process(bool _dbg){
 	}else{
 		dbgErrPSL("null support output mode.");
 	}
+	returnIfErrC(false,!src->ChangeDown(State::null));
+	dbgTestPVL(src.get());
 	return true;
 }
 ////////////////////////////////////////////

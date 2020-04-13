@@ -150,9 +150,13 @@ static bool Process(bool _dbg){
 	dbgTestPVL(info.isInterlaced);
 	dbgTestPVL(info.frameSize);
 	///////////////////////////////////////
-	FILE* fd=fopen(_fname,"wb");
-	if(!fd){
-		dbgErrPSL("open file fail:"<<_fname);
+
+	FILE* fd=0;
+	if(_fname) {
+		fd = fopen(_fname, "wb");
+		if (!fd) {
+			dbgErrPSL("open file fail:" << _fname);
+		}
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////
@@ -164,6 +168,7 @@ static bool Process(bool _dbg){
 	}else{
 		dbgErrPSL("null support output mode.");
 	}
+	returnIfErrC(false,!src->ChangeDown(State::null));
 	return true;
 }
 ////////////////////////////////////////////

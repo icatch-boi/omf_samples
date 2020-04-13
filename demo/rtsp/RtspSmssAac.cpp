@@ -108,7 +108,11 @@ int RtspSmssAac::RtpHeadUpdate(uint8*ptr,int& len){
 	return 0;
 }
 bool RtspSmssAac::CreateSource(){
-	auto src=IAacSource::CreateNew("dualos-pull");
+	std::string keywords="dualos";
+	if(_attr)_attr->Get("keywords",keywords);
+	keywords += "-pull";
+	dbgTestPVL(keywords);
+	auto src=IAacSource::CreateNew(keywords.c_str());
 	returnIfErrC(false,!src);
 	_src=src;
 	if(_attr){

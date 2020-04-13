@@ -3,7 +3,9 @@
 //
 
 #pragma once
-#include "OmfApiFrame.h"
+#include "OmfFrame.h"
+#include "OmfState.h"
+#include "OmfMessage.h"
 #include <string>
 #include <chrono>
 #include <functional>
@@ -13,10 +15,10 @@ namespace omf {
 	namespace webrtc {
 		class IYuvSource {
 		public:
-			using frame_t = omf::api::streaming::common::frame_t;
-			using State = omf::api::streaming::common::State;
-			using FuncFrame = omf::api::streaming::common::FuncFrame;//std::function<bool(std::shared_ptr<frame_t>&)>;
-			using FuncMessage = omf::api::streaming::common::FuncMessage;//std::function<bool(const char *)>;
+			using frame_t = omf::api::frame_t;
+			using State = omf::api::State;
+			using FuncFrame = omf::api::FuncFrame;
+			using FuncMessage = omf::api::FuncMessage;
 		public:
 			static IYuvSource* CreateNew(const char*);
 			virtual ~IYuvSource(){}

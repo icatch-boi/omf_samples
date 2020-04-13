@@ -19,7 +19,7 @@ using namespace omf::chrono;
 namespace omf{
 	namespace rtsp{
 		using ISource = omf::api::streaming::common::IStreamOutput;
-		using Packet = omf::api::streaming::common::frame_t;
+		using Packet = ISource::frame_t;
 		using OmfAttrSet = omf::api::OmfAttrSet;
 
 		//#define R32(i,v) ((p[i])|((v)<<8))

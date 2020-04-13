@@ -4,7 +4,7 @@
 #include "OmfMain.h"
 #include "OmfDbg.h"
 #include "OmfHelper.h"
-#include "../OmfRtmpClient.h"
+#include "OmfRtmpClient.h"
 #include <string>
 #include <thread>
 ///////////////////////////////////////
@@ -15,15 +15,15 @@ using namespace omf;
 using namespace omf::rtmp;
 using namespace omf::api;
 //////////////////////////////////////
-static int _seconds = 30;//seconds
+static int _seconds = 3600;//seconds
 static int _samplerate = 16000;
 static int _width = 1920;
 static int _height = 1080;
 static int _framerate = 30;
-static int _bitrate = 2000;///kb
+static int _bitrate = 500000;///kb
 static const char* _goptype = "ippp";
 static int _gop = 15;
-static const char* _url = "rtmps://live-api-s.facebook.com:443/rtmp/234253087263166?s_bl=1&s_ps=1&s_sw=0&s_vt=api-s&a=AbxNyfgUCblIdJQp";
+static const char* _url = "rtmps://live-api-s.facebook.com:443/rtmp/978265025900961?s_bl=1&s_ps=1&s_sw=0&s_vt=api-s&a=Abxccekoz3DYFWyF";
 //////////////////////////////////////
 static OmfHelper::Item _options0[]{
 		{"OmfRtmpClient(...): \n"

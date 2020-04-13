@@ -2,15 +2,17 @@
 #include "OmfHelper.h"
 #include "OmfDbg.h"
 #include "OmfRtspService.h"
+#include "_chrono_base.h"
 #include <string>
 #include <thread>
 #include <chrono>
 #include <memory>
-#include "omf_cmd_cxx.h"
 ///////////////////////////////////////
 #undef dbgEntryTest
 #define dbgEntryTest(s) dbgEntrySky(s)
 //////////////////////////////////////
+using namespace omf;
+using namespace omf::chrono;
 using namespace omf::rtsp;
 using namespace omf::api;
 //////////////////////////////////////
@@ -35,10 +37,10 @@ static bool RtspServer(const char*urlmap,const char*authmap) {//dbgSkyPL();
 
 static bool CreateRtspUrlMap(char* buff){
 	///h264 width,height,bitrate,framerate,gop
-	const char* vattern="%s={h264={w=%d,h=%d,br=%d,fr=%d,gop=%d}}";
+	const char* vattern="%s={codec=h264,w=%d,h=%d,br=%d,fr=%d,gop=%d}";
 	///aac bitrate,bandwidth
-	const char* aattern="%s={aac={rate=%d,ch=%d,br=%d,bw=%d}}";
-	const char* pattern="%s={h264={w=%d,h=%d,br=%d,fr=%d,gop=%d},aac={rate=%d,ch=%d,br=%d,bw=%d}}";
+	const char* aattern="%s={codec=aac,rate=%d,ch=%d,br=%d,bw=%d}";
+	const char* pattern="%s={codec=h264,w=%d,h=%d,br=%d,fr=%d,gop=%d+codec=aac,rate=%d,ch=%d,br=%d,bw=%d}";
 	char* ptr=buff;
 	/////////////////////////
 	ptr+=sprintf(ptr,pattern,"stream0",/*h264*/1920,1080,1024*128*8 ,24, 24, /*aac*/16000,1,38000,16000);*ptr++=',';

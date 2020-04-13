@@ -1,6 +1,7 @@
 ALL =
 ALL+=omfEventService_
 ALL+=omfEventServiceTrigger_
+ALL+=omfPreRecord_
 ###
 CFLAGS +=
 CXXFLAGS +=
