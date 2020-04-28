@@ -146,7 +146,7 @@ namespace omf {
 						,TypeName(typeid(T))
 						,to_string(t)
 						,descript
-					 	,[&t,longname](){if(!!t)std::cout<<longname<<'='<<t<<std::endl;}
+					 	,[&t,longname](){std::cout<<longname<<'='<<to_string(t)<<std::endl;}
 				);
 			}
 		public:

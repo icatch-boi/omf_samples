@@ -56,7 +56,7 @@ bool RtspService::Open() {
 	_server = RtspServer::createNew(*_env,{554,8554},_auth,_urlmap.c_str());
 	returnIfErrC(false,!_server);
 	char *url = _server->rtspURLPrefix();
-	dbgTestSL("RtspServer(1.0)/Live555("
+	dbgNoteSL("\nRtspServer()/Live555("
 			<<LIVEMEDIA_LIBRARY_VERSION_STRING
 			<<"):\n"
 			<<_server->rtspURLPrefix());
@@ -65,9 +65,9 @@ bool RtspService::Open() {
 	if (_server->setUpTunnelingOverHTTP(80) ||
 		_server->setUpTunnelingOverHTTP(8000) ||
 		_server->setUpTunnelingOverHTTP(8080)) {
-		dbgTestSL("RTSP-over-HTTP tunneling:"<<_server->httpServerPortNum());
+		dbgNoteSL("RTSP-over-HTTP tunneling:"<<_server->httpServerPortNum());
 	} else {
-		dbgTestSL("RTSP-over-HTTP tunneling is not available.");
+		dbgNoteSL("RTSP-over-HTTP tunneling is not available.");
 	}
 
 	return true;

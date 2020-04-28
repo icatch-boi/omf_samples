@@ -295,6 +295,36 @@ EXTERNC int omfRegisterSource4(const char*name
 		,omfRegisterSource_msg msg
 );
 
+typedef struct omf_frame {
+	int index;
+	void*data;
+	int size;
+	int iskeyframe;
+	long long pts_ms;
+	void*free_data;
+	void(*free)(void*free_data);
+	void*pkt;
+}omf_frame;
+
+typedef void* 	(*omfRegisterFilter_open3)(char* media,void* priv_data,void*obj);
+typedef void 	(*omfRegisterFilter_close)(void*hd);
+typedef int 	(*omfRegisterFilter_proc)(void*hd,omf_frame*frm);
+typedef int 	(*omfRegisterFilter_msg)(void*hd,const char*msg);
+/**  register a group callback to a new filter element
+ * @param name the new source element's type
+ * @param open
+ * @param close
+ * @param proc
+ * @param msg
+ * @return 1(true)/0(false)
+ **/
+EXTERNC int omfRegisterFilter(const char*name
+		,omfRegisterFilter_open3 open
+		,omfRegisterFilter_close close
+		,omfRegisterFilter_proc proc
+		,omfRegisterFilter_msg msg
+);
+
 /**  register a pipeline with the configure string
  * @param name the pipeline name
  * @param cfgs the configure string, ex: RingSoure~H264Encoder~RingSink

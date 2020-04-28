@@ -37,19 +37,19 @@ typedef union {
 	void* ptr[2];
 }V64;
 
-enum class Position {
+enum class Position:unsigned {
 	front = 0,
 	current = 1,
 	end = 2,
 };
 
-enum class Concurrent {
+enum class Concurrent:unsigned {
 	nonsupport = 0,
 	safe = 1,
 	blocking = 2,
 };
 
-enum class Approximate {
+enum class Approximate:int {
 	prev = -1,
 	nearest = 0,
 	next = 1,

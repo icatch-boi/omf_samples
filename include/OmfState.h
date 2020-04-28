@@ -7,7 +7,7 @@ namespace omf {
 	namespace api {
 		class OmfState {
 		public:
-			enum class State{
+			enum class State:int{
 				null=1,
 				ready=2,
 				play=4,

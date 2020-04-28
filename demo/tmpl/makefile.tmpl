@@ -1,9 +1,9 @@
 ALL+=
 Targets?=$(ALL)
 ###
-all:$(Targets)
+all:preprc $(Targets)
 ###
-
+GCC7.3 ?= 1
 ifeq ($(GCC7.3), 1)
     PREFIX_= /opt/openwrt_toolchain/arm-openwrt-icatchtek-bsp4-glibc/bin/arm-openwrt-linux-gnueabi-
 else
@@ -18,12 +18,9 @@ GCC ?= ${PREFIX}gcc
 GXX ?= ${PREFIX}g++
 GSTRIP ?= ${PREFIX}strip
 ###
-CFLAGS += -Wno-error=pointer-sign -Wno-error=char-subscripts -Wno-error=unused-but-set-variable -Wno-error=unused-function
-CFLAGS += -mcpu=cortex-a7 -mabi=aapcs -mfloat-abi=hard -mlittle-endian -mno-unaligned-access
-CFLAGS += -flax-vector-conversions -mfpu=neon-vfpv4
-CFLAGS += -rdynamic -fPIC
-CXXFLAGS += ${CFLAGS} -std=c++11 -Wall -g -O2 -fpermissive -fexceptions -Woverloaded-virtual -Wreturn-type -pthread
-
+CFLAGS += -mcpu=cortex-a7 -mabi=aapcs -mfloat-abi=hard -mlittle-endian -mno-unaligned-access -pthread -rdynamic -fPIC -flax-vector-conversions -mfpu=neon-vfpv4 -Os -Wno-error=pointer-sign -Wno-error=char-subscripts -Wno-error=unused-but-set-variable -Wno-error=unused-function -funwind-tables -ffunction-sections
+CXXFLAGS += ${CFLAGS} -std=c++11 -fpermissive -fexceptions -Woverloaded-virtual -Wreturn-type -pthread
+LDFLAGS += -Wl,--no-as-needed,--copy-dt-needed-entries
 ###
 INCS += -I.
 INCS += -I${INCS_PATH}/
@@ -51,11 +48,11 @@ OBJS_+=
 
 %_:_%.o ${OBJS_}
 	@echo $@
-	$(GXX) $(INCS) $(CXXFLAGS) $^ -L${LIBS_PATH} $(LIBS) $(LDFLAGS) -o $@
+	$(GXX) $(INCS) $(CXXFLAGS) $^ $(LDFLAGS) -L${LIBS_PATH} $(LIBS) -o $@
 
 %.so:$(OBJS)
 	@echo $@
-	$(GXX) $(INCS) $(CXXFLAGS) $^ -shared -o $@
+	$(GXX) $(INCS) $(CXXFLAGS) $^ $(LDFLAGS) -shared -o $@
 
 %.a:$(OBJS)
 	@echo $@
@@ -74,7 +71,13 @@ install:all
 		mv $$tmp $(OUT_PATH); \
 	done
 
-.PHONY : clean install
+.PHONY : clean install printGccVersion printAll preprc
+
+preprc: printGccVersion
 
 printAll:
 	@echo $(ALL)
+
+gccVer := `$(GCC) -dumpversion`
+printGccVersion:
+	@echo $(gccVer)

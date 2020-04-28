@@ -90,6 +90,12 @@ namespace omf {
 					int extraSize; ///< the extra data size.
 					char *extraData;///< the extra data. eg.
 				} AacMediaInfo;
+
+				typedef struct {
+					int rate;///< the sample rate.
+					int channels;///< the channels.
+					std::string media;
+				} AudioMediaInfo;
 			}
 		}
 	}

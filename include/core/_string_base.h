@@ -17,19 +17,27 @@ char* StrdupTo(const char*,char);
 //#if _GLIBCXX_USE_C99 || _GLIBCXX_USE_C99_STDIO
 
 using std::to_string;
+std::string to_string(void*v);
 static inline std::string to_string(const char*s){return s?s:"nullptr";}
 static inline std::string to_string(char*s){return s?s:"nullptr";}
 static inline std::string to_string(const std::string&s){return s;}
+template<class T>
+static inline std::string to_string(T*v){return (void*)v;}
 
-static inline std::string operator+(const std::string&str,int8  v){return str+std::to_string(v);}
-static inline std::string operator+(const std::string&str,int16 v){return str+std::to_string(v);}
-static inline std::string operator+(const std::string&str,int32 v){return str+std::to_string(v);}
-static inline std::string operator+(const std::string&str,int64 v){return str+std::to_string(v);}
-static inline std::string operator+(const std::string&str,uint8  v){return str+std::to_string(v);}
-static inline std::string operator+(const std::string&str,uint16 v){return str+std::to_string(v);}
-static inline std::string operator+(const std::string&str,uint32 v){return str+std::to_string(v);}
-static inline std::string operator+(const std::string&str,uint64 v){return str+std::to_string(v);}
-static inline std::string operator+(const std::string&str,bool v){return str+(v?"true":"false");}
+static inline std::string operator+(const std::string&str,char*  v){return str+to_string(v);}
+static inline std::string operator+(const std::string&str,const char* v){return str+to_string(v);}
+//static inline std::string operator+(const std::string&str,std::string& v){return str+to_string(v);}
+static inline std::string operator+(const std::string&str,int8   v){return str+to_string(v);}
+static inline std::string operator+(const std::string&str,int16  v){return str+to_string(v);}
+static inline std::string operator+(const std::string&str,int32  v){return str+to_string(v);}
+static inline std::string operator+(const std::string&str,int64  v){return str+to_string(v);}
+static inline std::string operator+(const std::string&str,uint8  v){return str+to_string(v);}
+static inline std::string operator+(const std::string&str,uint16 v){return str+to_string(v);}
+static inline std::string operator+(const std::string&str,uint32 v){return str+to_string(v);}
+static inline std::string operator+(const std::string&str,uint64 v){return str+to_string(v);}
+static inline std::string operator+(const std::string&str,bool   v){return str+(v?"true":"false");}
+template<class T=void>
+static inline std::string operator+(const std::string&str,T* v){return str+to_string(v);}
 
 static inline unsigned atou(const char*s){return strtoul(s,0,0);}
 

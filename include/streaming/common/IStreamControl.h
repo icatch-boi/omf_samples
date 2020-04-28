@@ -22,11 +22,8 @@ namespace omf {
 					:public virtual OmfState
 					,public virtual OmfMessage
 					,public virtual OmfFrame
+					,public virtual object_base
 				{
-				public:
-					virtual ~IStreamControl(){}
-				public:
-					const std::type_info& GetType() const{return typeid(*this);}
 				public:
 					/**
 					 * set attributes to instance.
@@ -65,6 +62,13 @@ namespace omf {
 					 */
 					virtual bool RegisterInputCallback(const FuncFrameRef &func)=0;
 					virtual bool RegisterInputCallback(const FuncFrameReturn &func)=0;
+
+				public:
+					/**
+					 * get the output media info.
+					 * @return the output media infomation string.
+					 */
+					virtual bool SetMediaInfo(const char*) = 0;
 				};
 
 				class IStreamOutput:public virtual IStreamControl {

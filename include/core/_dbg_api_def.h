@@ -4,7 +4,7 @@
 #pragma once
 
 namespace omf{
-	enum DebugIndex{
+	enum DebugIndex:unsigned{
 		DBG_IDX_CHN_0=0,
 		DBG_IDX_CHN_1=1,
 		DBG_IDX_CHN_2=2,
@@ -37,7 +37,7 @@ namespace omf{
 		DBG_IDX_SKY		=29,
 	};
 
-	enum DebugSelecter{
+	enum DebugSelecter:unsigned{
 		DBG_CHN_0=1<<DBG_IDX_CHN_0,
 		DBG_CHN_1=1<<DBG_IDX_CHN_1,
 		DBG_CHN_2=1<<DBG_IDX_CHN_2,
