@@ -4,7 +4,7 @@ using namespace NAMESPACE_ICATCH_PLUGIN::rtsp;
 
 DEFINE_REGISTER(RtspSmssPcm) {
 	TClass<UsageEnvironment*,PacketRing*>::Register<RtspSmssPcm>(
-		name ? name : "rtsp-smss-pcm-live555", {
+		 "rtsp-smss-pcm-live555", {
 		})->Init(LIBRARY, VERSION(0), "iCatchtek", "jg.wang");
 }
 RtspSmssPcm::RtspSmssPcm(UsageEnvironment *env,PacketRing* ring)

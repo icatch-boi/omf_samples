@@ -12,7 +12,7 @@
 #endif
 
 /*Activate plugin*/
-typedef void (*CbRegister)(const char*name);
+typedef void (*CbRegister)();
 #define ACTIVATE(m) extern CbRegister __cb_register_##m;sum|=(unsigned)(void*)__cb_register_##m;
 #define ACTIVATE_PLUGIN(m) ACTIVATE(Plugin##m)
 #define ACTIVATE_APP(m) ACTIVATE(App##m)

@@ -31,15 +31,11 @@ set(LIBRARY_DEPEND_LIBS
 		omfapi
 		omfapicxx
 		omfapistreaming
-		pluginapistreaming
-		pluginav
 
 		liveMedia
 		groupsock
 		UsageEnvironment
 		BasicUsageEnvironment
-
-		pluginbase
 		)
 regLibrary()
 

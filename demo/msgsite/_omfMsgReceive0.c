@@ -82,20 +82,8 @@ static int cbReceive(void*hd,const void *data, int size){
 }
 static bool receiveMsg(){
 	printf("receive message:%s\n",_name);
-	char data[1024];
 	while(1){
-		int size = omfMsgSiteUserReceive(_name,data,1024);
-		if(size){
-			printf("%s/%d:%s#received %s msg:%s\n",__FILE__,__LINE__,__FUNCTION__,_name,(const char*)data);
-		}
-		usleep(100000u);
-	}
-	return true;
-}
-static bool receiveMsgWithCb(){
-	printf("receive message:%s\n",_name);
-	while(1){
-		returnIfErrC(false,!omfMsgSiteUserReceiveCb(_name,&cbReceive,0));
+		returnIfErrC(false,!omfMsgSiteUserReceive(_name,&cbReceive,0));
 		usleep(100000u);
 	}
 	return true;
@@ -111,7 +99,6 @@ static bool receiveMsgByRegisterCb(){
 static int Process(){
 	//return receiveMsg();
 	return receiveMsgByRegisterCb();
-	//return receiveMsgWithCb();
 }
 static int Print(){
 	dbgTestPVL0(_name);

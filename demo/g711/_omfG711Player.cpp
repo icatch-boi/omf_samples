@@ -25,7 +25,7 @@ std::string _decoder;
 static OmfHelper::Item _options0[]{
 	{"omfG711Player(...): \n"
 	 "play the audio file(*.wav). eg..\n"
-	 "> omfG711Player -n test.wav -d10\n"
+	 "> omfG711Player -n test.wav \n"
 	},
 	{"fname"	,'n', _fname 		,"set the file name."},
 	{"rate"		,'r', _rate			,"set the sample rate of pcm."},
@@ -79,7 +79,7 @@ static bool Process(bool _dbg){
 	return true;
 }
 static bool CheckParamers(){
-	returnIfErrC(0,!_fname);
+	returnIfErrC(false,!_fname);
 	///
 	auto url = std::string("file://")+_fname;
 	OmfAttrSet ap(url);
@@ -90,15 +90,15 @@ static bool CheckParamers(){
 	switch(::Hash(ext)){
 		case ::Hash("wav"):
 			_demuxer = "wav-demuxer:";
+			_decoder = "+g711-decoder:name=decoder";
+			break;
+		case ::Hash("alaw"):
+			_demuxer = (std::string)"IOSource:media_str={type=media-alaw,name=src,ch="+_channels+",rate="+_rate+"},";
 			_decoder = "+alaw-decoder:name=decoder";
 			break;
-		case ::Hash("pcm"):
-			_demuxer = (std::string)"IOSource:media_str={type=media-pcm,name=pcm,ch="+_channels+",rate="+_rate+"},";
-			_decoder = "";
-			break;
-		case ::Hash("aac"):
-			_demuxer = "aac-demuxer";
-			_decoder = "+aac-decoder";
+    	case ::Hash("ulaw"):
+			_demuxer = (std::string)"IOSource:media_str={type=media-ulaw,name=src,ch="+_channels+",rate="+_rate+"},";
+			_decoder = "+ulaw-decoder:name=decoder";
 			break;
 		default:
 			dbgErrPSL("unkonw audio file format:"<< _fname);
@@ -124,7 +124,7 @@ int main(int argc,char* argv[]){
 	omf.Debug(helper.Debug());
 	if(helper.Log())omf.LogConfig(helper.Log());
 	///
-	CheckParamers();
+	returnIfErrC(0,!CheckParamers());
 	Process(helper.Debug());
 	///
 	return 0;

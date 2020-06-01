@@ -8,18 +8,11 @@ CXXFLAGS +=
 ###
 INCS += -I.
 ###
-LIBS += -lomfapi
 LIBS += -lomfapicxx
-#LIBS += -lomfapistreaming
-#LIBS += -lpluginapistreaming
+LIBS += -lomfapi
 ###
-LIBS += -lshm
-LIBS += -lpluginshm
-LIBS += -lipc
-LIBS += -lpluginipc
+LIBS += -lpluginshmbase
 ###
-LIBS += -lpluginbase
-LIBS += -lfwcore
 LIBS += -lfwbase
 LIBS += -lfwporting
 ###

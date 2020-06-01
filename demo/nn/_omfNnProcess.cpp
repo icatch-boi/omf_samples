@@ -1,11 +1,11 @@
 #include "omf_api.h"
-#include "omf_msg_site.h"
+#include "omf_msg_site_user.h"
 #include <thread>
 #include <chrono>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define returnIfErrC(v,c) if(c){printf("%s/%d:%s:%s\n",__FILE__,__LINE__,__FUNCTION__,#c);return v;}
+//#define returnIfErrC(v,c) if(c){printf("%s/%d:%s:%s\n",__FILE__,__LINE__,__FUNCTION__,#c);return v;}
 #define dbgTestPL() printf("%s\%d:%s:\n",__FILE__,__LINE__,__FUNCTION__);
 #define dbgTestPSL(v) printf("%s\%d:%s:%s\n",__FILE__,__LINE__,__FUNCTION__,v);
 #define dbgTestPDL(v) printf("%s\%d:%s:%s=%d\n",__FILE__,__LINE__,__FUNCTION__,#v,v);
@@ -13,14 +13,13 @@
 #define returnIfErrC(v,c) if(c){dbgTestPSL(#c);return v;}
 #define returnIfErrC0(c) if(c){dbgTestPSL(#c);return;}
 
-static int _srcID=0;
-static int _msgID=100;
+static const char* _msgName="NNResult";
 
 static std::string CreateLayoutString(void*hd){
 	auto str = new char[2048];
 	std::unique_ptr<char[]> ptr_str(str);
 	sprintf(str,
-		"type=ShmService,partner={"
+		"type=ShmService,index=1,partner={"
 			"type=application,layout={"
 				"type=pipeline,name=pl-nn-process,layout={"
 					"pv-yuv-src-adv:w=640,h=360"
@@ -33,13 +32,10 @@ static std::string CreateLayoutString(void*hd){
 	);
 	return str;
 }
-
-static int MsgcbReceive(void*hd,const void *data, int size, int sender, int target, unsigned flags){
+static int MsgcbReceive(void* priv_hd, const void *data, int size){
+	dbgTestPDL((unsigned)priv_hd);
 	dbgTestPDL((unsigned)data);
 	dbgTestPDL(size);
-	dbgTestPDL(sender);
-	dbgTestPDL(target);
-	dbgTestPDL(flags);
 	if(data){
 		dbgTestPVL((const char*)data);
 	}
@@ -48,15 +44,12 @@ static int MsgcbReceive(void*hd,const void *data, int size, int sender, int targ
 
 static int MsgProcess() {
 	dbgTestPL();
-	void* site=omfMsgSite0Get();
-	returnIfErrC(false,!site);
-	returnIfErrC(false,!omfMsgSiteIsWorking(site));
-	dbgTestPDL(omfMsgSiteGetID(site));
-	returnIfErrC(false,!omfMsgSiteRegister1(site,_msgID,&MsgcbReceive,0));
+	returnIfErrC(0,!omfMsgSiteUserRegister(_msgName,&MsgcbReceive,0));
+	return 1;
 }
 static int MsgClose() {
-	void* site=omfMsgSite0Get();
-	returnIfErrC(false,!omfMsgSiteUnRegister1(site,_msgID));
+	returnIfErrC(0,!omfMsgSiteUserUnRegister(_msgName));
+	return 1;
 }
 
 static int NNprocess(const char*str,int wait) {

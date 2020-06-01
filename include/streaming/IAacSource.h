@@ -3,15 +3,13 @@
 //
 
 #pragma once
-#include "IPcmSource.h"
+#include "IAudioSource.h"
 #include "common/IEncoder.h"
 namespace omf {
 	namespace api {
 		namespace streaming {
 			/**
-			 *@example _demoAacSource.cpp
-			 */
-			/**
+			 * @example _demoAacSource.cpp
 			 * @brief provide YUV date source.
 			 * You can get PCM realtime streaming from the interface.\n
 			 * Firstly,create an instance.\n
@@ -20,16 +18,7 @@ namespace omf {
 			 *  set PCM Device parameters:
 			 *  	SelectMIC(int id) \n
 			 *  	SetSampleRate(int rate) \n
-			 *  	IsSupportStereo()\n
-			 *  		SetChannels(int ch) \n
-			 *  	IsSupportVolumeControl()\n
-			 *  		SetVolume(int vol)\n
-			 *  	IsSupportAutoGainControl()\n
-			 *  		EnableAGC()\n
-			 *  		DisableAGC()\n
-			 *  	IsSupportMute()\n
-			 *  		EnableMute()\n
-			 *  		DisableMute()\n
+			 *  	SetChannels(int ch) \n			 *
 			 *  set AAC Encoder parameters:\n
 			 *  	SetBitRate(int br)\n
 			 *  	SetProfile(const char *profile)\n
@@ -46,7 +35,7 @@ namespace omf {
 			 *  GetAacMediaInfo(). call after Open().\n
 			 */
 			class IAacSource
-				: virtual public IPcmSource
+				: virtual public IAudioSource
 				, virtual public common::IEncoder
 			{
 			public:
@@ -90,6 +79,13 @@ namespace omf {
 				 * @return the new IAacSource instance.
 				 */
 				static IAacSource *CreateNew(const char *keywords);
+
+			protected:
+				/**
+				 * @note this source is fixed codec:AAC, this api is invalid.
+				 * @return false
+				 */
+				using IAudioSource::SetCodec;
 			};
 		}
 	}

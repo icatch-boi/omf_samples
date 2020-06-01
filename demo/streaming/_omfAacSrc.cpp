@@ -26,6 +26,8 @@ static const char* _mic = "dualos";
 static int _bitrate=128;///KB
 static int _channels=0;
 static int _triggerInterval=100;//seconds
+static int _aec = 0;
+static const char* _aecpara=0;
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
@@ -139,6 +141,7 @@ static bool Process(bool _dbg){
 	src->SetBitRate(_bitrate*1000);
 	src->SetProfile("LC");
 	src->SetTargetChannels(_channels);//encode to 1 channels.
+	src->SetAEC(_aec,_aecpara);
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
 	//get streaming parameters after Open().

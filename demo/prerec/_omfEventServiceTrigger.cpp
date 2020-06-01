@@ -98,7 +98,6 @@ static bool Trigger(OmfObject&obj){
 	return true;
 }
 static bool Process(bool _dbg){
-	///"type=SharedMemory,name=shm,BufferName=evt,size=4096,free=true"
 	auto layout =(std::string)
 		"type=EventSharedMemoryObject,name=ShmEventTrigger,free=false";
 	OmfObject obj(layout);

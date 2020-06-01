@@ -9,7 +9,7 @@ using namespace NAMESPACE_ICATCH_PLUGIN::rtsp;
 
 DEFINE_REGISTER(RtspSmssH265) {
 	TClass<UsageEnvironment*,PacketRing*>::Register<RtspSmssH265>(
-		name ? name : "rtsp-smss-h265-hevc-live555", {
+		 "rtsp-smss-h265-hevc-live555", {
 		})->Init(LIBRARY, VERSION(0), "iCatchtek", "jg.wang");
 }
 RtspSmssH265::RtspSmssH265(UsageEnvironment *env,PacketRing* ring)

@@ -37,10 +37,7 @@ static OmfHelper::Item _options0[]{
 ////////////////////////////////////////////
 static bool Process(bool _dbg){
 	auto layout = (std::string)
-		"type=StampParam,name=stampparam"
-			",ShmMax="+_shmmax+
-			",ShmIdx="+_shmidx+
-			",ShmName="+_shmname
+		"type=StampService,name=stamp,ShmName="+_shmname
 	;
 	dbgTestPSL(layout);
 	OmfObject obj(layout);

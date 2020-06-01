@@ -20,10 +20,8 @@ LIBS += -lomfapicxx
 LIBS += -lomfapistreaming
 LIBS += -lpluginapistreaming
 ###
-LIBS += -lshm
+LIBS += -lpluginshmbase
 LIBS += -lpluginshm
-LIBS += -lipc
-LIBS += -lpluginipc
 ###
 LIBS += -lpluginbase
 LIBS += -lfwcore

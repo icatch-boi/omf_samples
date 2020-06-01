@@ -6,20 +6,17 @@ INCS +=
 ###
 LIBS += -lpluginiofile
 LIBS += -lpluginwav
-LIBS += -lpluginmp4
-LIBS += -lpluginav
 LIBS += -lpluginpcm
 LIBS += -lpluging711
+LIBS += -lg711
 ###
 LIBS += -lomfapi
 LIBS += -lomfapicxx
 LIBS += -lomfapistreaming
 LIBS += -lpluginapistreaming
 ###
-LIBS += -lshm
+LIBS += -lpluginshmbase
 LIBS += -lpluginshm
-LIBS += -lipc
-LIBS += -lpluginipc
 ###
 LIBS += -lpluginbase
 LIBS += -lfwcore

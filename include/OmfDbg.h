@@ -16,7 +16,7 @@
 #include "_dbg_cfg_cout.h"
 ///
 #define CVAL(v) #v<<'='<<v
-#define ENDL() std::endl
+#define ENDL() '\n'//std::endl
 #define POSTION strrchr(__FILE__,'/')<<'/'<<__LINE__<<':'<<__FUNCTION__<<"()"
 ///
 #define dbgTestS(s) dbgEntryTest(s)

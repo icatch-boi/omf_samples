@@ -19,7 +19,7 @@ using namespace omf::api::streaming::common;
 
 //DEFINE_REGISTER(RtspSmssH264) {
 //	TClass<UsageEnvironment*,PacketRing*>::Register<RtspSmssH264>(
-//		name ? name : "rtsp-smss-h264-live555", {
+//		 "rtsp-smss-h264-live555", {
 //		})->Init(LIBRARY, VERSION(0), "iCatchtek", "jg.wang");
 //}
 RtspSmssH264::RtspSmssH264(UsageEnvironment&env,std::shared_ptr<OmfAttrSet>attr)

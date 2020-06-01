@@ -34,16 +34,7 @@ typedef int(*OmfMsgSiteUserCbProc)(void* priv_hd, const void *data, int size);
  * @param hd [in]:the private data handle, send to OmfMsgSiteFuncProc.
  * @return true/false
  */
-EXTERNC int omfMsgSiteUserReceiveCb(const char* name, OmfMsgSiteUserCbProc cb, void*priv_hd);
-
-/**
- * receive message with cb.
- * @param name [in]: msg name.
- * @param data [in]:msg buff
- * @param max [in]:buff max size
- * @return msg body size.
- */
-EXTERNC int omfMsgSiteUserReceive(const char* name, void *data, int max);
+EXTERNC int omfMsgSiteUserReceive(const char* name, OmfMsgSiteUserCbProc cb, void*priv_hd);
 
 /**
  * register the receiver to msg site.

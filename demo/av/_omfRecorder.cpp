@@ -48,9 +48,9 @@ static int _fileLimit = 1000;
 static bool FileListAdd(const char*url);
 /////////////////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
-	{"omfRecord(...): \n"
+	{"omfRecorder(...): \n"
 	 "record the video and audio streaming to a container file(*.mp4/*.mov). eg..\n"
-	 "> omfRecord -n test.mp4 -S30 -d300 -Caac -B128 -c h264 -w1920 -h1080 -f24 -b1000 -t ippp -g24 -K500 -F1000\n"
+	 "> omfRecorder -n test.mp4 -S30 -d300 -Caac -B128 -c h264 -w1920 -h1080 -f24 -b1000 -t ippp -g24 -K500 -F1000\n"
 	},
 	{"fname"	,'n', _fname			,"set the record file name."},
 	{"duration"	,'d', _recordSeconds	,"set the record duration."},
@@ -238,7 +238,7 @@ static bool Check(){
 }
 /////////////////////////////////////////////
 int main(int argc,char* argv[]){
-	dbgNotePSL("omfRecord(...)\n");
+	dbgNotePSL("omfRecorder(...)\n");
 	///parse the input params
 	OmfHelper helper(_options0,argc,argv);
 	///--help

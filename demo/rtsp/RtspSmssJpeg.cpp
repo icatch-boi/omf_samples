@@ -5,7 +5,7 @@ using namespace NAMESPACE_ICATCH_PLUGIN::rtsp;
 
 DEFINE_REGISTER(RtspSmssJpeg) {
 	TClass<UsageEnvironment*,PacketRing*>::Register<RtspSmssJpeg>(
-		name ? name : "rtsp-smss-jpeg-live555", {
+		 "rtsp-smss-jpeg-live555", {
 		})->Init(LIBRARY, VERSION(0), "iCatchtek", "jg.wang");
 }
 RtspSmssJpeg::RtspSmssJpeg(UsageEnvironment *env,PacketRing* ring)

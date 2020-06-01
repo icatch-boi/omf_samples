@@ -12,7 +12,7 @@ using namespace omf::rtsp;
 using namespace omf::api;
 
 //DEFINE_REGISTER(RtspService) {
-//	TClass<>::Register<RtspService>(name ? name : "service-rtsp-server-live555", {
+//	TClass<>::Register<RtspService>( "service-rtsp-server-live555", {
 //		new TProperty("auth",&RtspService::AddAuth),
 //		new TProperty("url_map",&RtspService::_url_map),
 //	})->Init(LIBRARY, VERSION(0), "iCatchtek", "jg.wang");

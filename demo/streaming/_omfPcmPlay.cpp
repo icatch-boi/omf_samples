@@ -58,50 +58,6 @@ static bool MessageProcess(const char* msg0){
 	}
 	return true;
 }
-
-static bool ProcessSpeaker0(IPcmPlayer*player){
-	auto speaker = player->Speaker();
-	returnIfErrC(false,!speaker);
-	auto vol = speaker->Volume();
-	dbgTestPSL("get volume:"<<vol<<"(10s)");
-	//streaming....
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	//reset volume
-	if(speaker->IsSupportVolumeControl()) {
-		speaker->Volume(40);
-		dbgTestPSL("set volume to 40(10s).");
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	//reset volume
-	if(speaker->IsSupportVolumeControl()) {
-		speaker->Volume(60);
-		dbgTestPSL("set volume to 60(10s).");
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	//reset mute
-	if(speaker->IsSupportMute()){
-		dbgTestPSL("enable mute(10s)");
-		speaker->Mute(1);
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	//reset mute
-	if(speaker->IsSupportMute()) {
-		dbgTestPSL("disable mute(10s)");
-		speaker->Mute(0);
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	///
-	if(speaker->IsSupportVolumeControl()) {
-		speaker->Volume(vol);
-		dbgTestPSL("set volume to "<<vol);
-	}
-	return true;
-}
-static bool ProcessSpeaker(IPcmPlayer*player){
-	std::thread thread([player](){ProcessSpeaker0(player);});
-	thread.detach();
-	return true;
-}
 static bool Process(bool _dbg){
 	///////////////////////////////////////
 	//create a IPcmPlayer instance with keywords.
@@ -132,7 +88,7 @@ static bool Process(bool _dbg){
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////
 	//volume......
-	ProcessSpeaker(player.get());
+	//ProcessSpeaker(player.get());
 	//////////////////////////////////
 	//streaming......
 	auto duration = 1000_ms;//ms

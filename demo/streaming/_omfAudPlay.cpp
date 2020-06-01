@@ -26,15 +26,20 @@ static int _rate = 0;
 static int _channels = 0;
 static const char* _media=0;
 static int _triggerInterval=100;//seconds
+static int _packetSize = 0;
+static bool _opus= false;
+static Duration _packetDur = _duration_zero;
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
 		{"omfAudPlay(...): \n"
 		 "This demo shows how to play audio streaming using IAudioPlayer interface.\n"
-		 "  omfAudPlay -n test.pcm -r 16000 -c 1 -m pcm\n"
-		 "  omfAudPlay -n test.g711 -r 16000 -c 1 -m g711\n"
-		 "  omfAudPlay -n test.g722 -r 16000 -c 1 -m g722\n"
+		 "  omfAudPlay -n test.pcm -r 16000 -c 1 -m codec=pcm\n"
+		 "  omfAudPlay -n test.alaw -r 16000 -c 1 -m codec=alaw\n"
+		 "  omfAudPlay -n test.ulaw -r 16000 -c 1 -m codec=ulaw\n"
+		 "  omfAudPlay -n test.g722 -r 16000 -c 1 -m codec=g722\n"
+   		 "	omfAudPlay -n test.opus  -r 16000 -c 1 -m codec=opus\n"
 		},
 		{"fname",'n', _fname		,"play filename(*.aac)."},
 		{"keywords",'k', _keywords	,"select the IAudioPlayer with keywords.Usually use the default values."},
@@ -63,49 +68,6 @@ static bool MessageProcess(const char* msg0){
 	return true;
 }
 
-static bool ProcessSpeaker0(IAudioPlayer*player){
-	auto speaker = player->Speaker();
-	returnIfErrC(false,!speaker);
-	auto vol = speaker->Volume();
-	dbgTestPSL("get volume:"<<vol<<"(10s)");
-	//streaming....
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	//reset volume
-	if(speaker->IsSupportVolumeControl()) {
-		speaker->Volume(40);
-		dbgTestPSL("set volume to 40(10s).");
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	//reset volume
-	if(speaker->IsSupportVolumeControl()) {
-		speaker->Volume(60);
-		dbgTestPSL("set volume to 60(10s).");
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	//reset mute
-	if(speaker->IsSupportMute()){
-		dbgTestPSL("enable mute(10s)");
-		speaker->Mute(1);
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	//reset mute
-	if(speaker->IsSupportMute()) {
-		dbgTestPSL("disable mute(10s)");
-		speaker->Mute(0);
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	///
-	if(speaker->IsSupportVolumeControl()) {
-		speaker->Volume(vol);
-		dbgTestPSL("set volume to "<<vol);
-	}
-	return true;
-}
-static bool ProcessSpeaker(IAudioPlayer*player){
-	std::thread thread([player](){ProcessSpeaker0(player);});
-	thread.detach();
-	return true;
-}
 static bool Process(OmfMain&omf){
 	///////////////////////////////////////
 	//create a IAudioPlayer instance with keywords.
@@ -132,12 +94,9 @@ static bool Process(OmfMain&omf){
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////
-	//volume......
-	ProcessSpeaker(player.get());
-	//////////////////////////////////
 	//streaming......
-	auto duration = 1000_ms;//ms
-	int buf_size=_rate*_channels*2;
+	auto duration = _packetDur;//ms
+	int buf_size= _packetSize;
 	std::unique_ptr<char[]> buf(new char[buf_size]);//malloc(buf_size);
 	TimePoint tp=Now();
 	dbgTestPVL(buf_size);
@@ -147,6 +106,15 @@ static bool Process(OmfMain&omf){
 	dbgTestPSL("streaming ");
 	while(!_exit){
 		int data_len = buf_size;
+		if(_opus){
+			uint32 framesize = 0;
+			uint32 ret = fread(&framesize,1,4,fd);
+			if(ret<=0){
+				dbgTestPSL("play end!");
+				break;
+			}
+			buf_size = data_len = framesize;
+		}
 		data_len=fread(buf.get(),1,buf_size,fd);//printf("read file:%d\n",data_len);
 		if(data_len<=0){
 			dbgTestPSL("play end!");
@@ -156,19 +124,56 @@ static bool Process(OmfMain&omf){
 		///fill data
 		returnIfErrCS(false,!player->IsSupportedPushFrame(),"this dev is not supported push frame!");
 		std::shared_ptr<frame_t> frm{new frame_t{0,buf.get(),data_len,true,tp,nullptr}};
-		returnIfErrC(false,!player->PushFrame(frm));
+		returnIfErrC(false,!player->PushFrame(frm,true));
 		///
 		tp+=duration;
-		std::this_thread::sleep_until(tp);
+		//std::this_thread::sleep_until(tp);
+		std::this_thread::sleep_for(10_ms);
 	}
 	////////////////////////////////////////////////////////
 	return true;
 }
 ////////////////////////////////////////////
-static bool Check(){
-	returnIfErrC(false,!_media);
+static bool CheckPacketSize(){
+	returnIfErrC(0,!_fname);
+	///
+	auto url = std::string("file://")+_fname;
+	OmfAttrSet ap(url);
+	returnIfErrC(false,!ap);
+	auto ext = ap.Get("ext");
+	returnIfErrC(false,!ext);
+	///
+	_packetDur = 100_ms;//ms
+	_opus = false;
+	auto ms = toMs(_packetDur);
+	switch(::Hash(ext)){
+		case ::Hash("pcm"):	
+			_packetSize = _rate*_channels*2;
+			break;
+		case ::Hash("alaw"):
+		case ::Hash("ulaw"):
+			_packetSize = _rate*_channels*2/2;
+			break;
+		case ::Hash("g722"):
+			_packetSize = _rate*_channels*2/4;
+			break;
+		case ::Hash("opus"):
+			_packetSize = _rate;
+			_opus = true;
+			break;
+		default:
+			dbgErrPSL("unkonw audio file format:"<< _fname);
+			return false;
+	}
+	_packetSize=_packetSize*ms/1000;
 	return true;
 }
+static bool Check(){
+	returnIfErrC(false,!_media);
+	returnIfErrC(false,!CheckPacketSize());
+	return true;
+}
+
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfAudPlay(...)\n");

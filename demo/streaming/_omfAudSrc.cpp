@@ -23,6 +23,8 @@ static const char* _fname=0;
 static int _seconds=30;
 static const char* _keywords="dualos";
 static const char* _codec=0;
+static bool _aec=0;
+static const char* _aecpara=0;
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
@@ -30,14 +32,17 @@ static OmfHelper::Item _options0[]{
 	{"omfAudSrc(...): \n"
 	 "This demo shows how to get audio streaming from OMF using IAudioSource interface.\n"
 	 "  omfAudSrc -n test.pcm -d 30\n"
-	 "  omfAudSrc -n test.aac -d 30 -c aac:br=128\n"
-	 "  omfAudSrc -n test.g711 -d 30 -c g711:\n"
-	 "  omfAudSrc -n test.g722 -d 30 -c g722:\n"
+	 "  omfAudSrc -n test.aac -d 30 -c aac:br=128000\n"
+	 "  omfAudSrc -n test.alaw -d 30 -c alaw\n"
+	 "  omfAudSrc -n test.ulaw -d 30 -c ulaw\n"
+	 "  omfAudSrc -n test.g722 -d 30 -c g722\n"
+     "	omfAudSrc -n test.opus  -d 10 -c opus\n"
 	},
 	{"fname",'n', _fname		,"record filename(*.pcm)."},
 	{"duration",'d', _seconds	,"process execute duration(*s)."},
 	{"keywords",'k', _keywords	,"select the IAudioSource with keywords.Usually use the default values."},
 	{"codec",'c', _codec		,"set the audio codec:eg.. aac:br=128000"},
+	{"codec",'e', _aec		,"set the pcm aec enable"},
 	{},
 };
 ////////////////////////////////////////////
@@ -102,6 +107,11 @@ static bool ProcessPush(IAudioSource*src,FILE*fd){
 		);
 		dbgTestDL(frm->data,16);
 		///
+		if(_codec && !strcmp(_codec,"opus")){
+			uint32 framesize = frm->size;
+			if(fd)fwrite(&framesize,1,4,fd);
+		}
+
 		if(fd)fwrite(frm->data,1,frm->size,fd);
 		return true;
 	});
@@ -122,49 +132,6 @@ static bool ProcessPush(IAudioSource*src,FILE*fd){
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
-static bool ProcessMic0(IAudioSource*src){
-	auto mic = src->Microphone();
-	returnIfErrC(false,!mic);
-	auto vol = mic->Volume();
-	dbgTestPSL("get volume:"<<vol<<"(10s)");
-	//streaming....
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	//reset volume
-	if(mic->IsSupportVolumeControl()) {
-		mic->Volume(40);
-		dbgTestPSL("set volume to 40(10s).");
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	//reset volume
-	if(mic->IsSupportVolumeControl()) {
-		mic->Volume(60);
-		dbgTestPSL("set volume to 60(10s).");
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	//reset mute
-	if(mic->IsSupportMute()){
-		dbgTestPSL("enable mute(10s)");
-		mic->Mute(1);
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	//reset mute
-	if(mic->IsSupportMute()) {
-		dbgTestPSL("disable mute(10s)");
-		mic->Mute(0);
-	}
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-	///
-	if(mic->IsSupportVolumeControl()) {
-		mic->Volume(vol);
-		dbgTestPSL("set volume to "<<vol);
-	}
-	return true;
-}
-static bool ProcessMic(IAudioSource*src){
-	std::thread thread([src](){ProcessMic0(src);});
-	thread.detach();
-	return true;
-}
 static bool Process(bool _dbg){dbgTestPL();
 	///////////////////////////////////////
 	//create a IAudioSource instance with keywords.
@@ -173,6 +140,8 @@ static bool Process(bool _dbg){dbgTestPL();
 	returnIfErrC(false,!src);
 	//set audio srouce parameters
 	src->SetCodec(_codec);
+
+	src->SetAEC(_aec,_aecpara);
 
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
@@ -193,7 +162,7 @@ static bool Process(bool _dbg){dbgTestPL();
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////
 	//streaming......
-	ProcessMic(src.get());
+	//ProcessMic(src.get());
 	if(src->IsSupportedPullFrame()){
 		returnIfErrC(false,!ProcessPull(src.get(),fd));
 	}else if(src->IsSupportedOutputFrameCallback()){

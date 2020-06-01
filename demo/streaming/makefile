@@ -19,6 +19,7 @@ LIBS += -lpluginaac
 LIBS += -lpluging711
 LIBS += -lpluging722
 LIBS += -lpluginpcm
+LIBS += -lplugindev
 ###
 LIBS += -lpluginiofile
 LIBS += -lpluginav
@@ -28,10 +29,8 @@ LIBS += -lomfapicxx
 LIBS += -lomfapistreaming
 LIBS += -lpluginapistreaming
 ###
-LIBS += -lshm
+LIBS += -lpluginshmbase
 LIBS += -lpluginshm
-LIBS += -lipc
-LIBS += -lpluginipc
 ###
 LIBS += -lpluginbase
 LIBS += -lfwcore

@@ -66,7 +66,7 @@ static bool CreateRtspAuthMap(char* buff){
 }
 
 int main(int argc, char *argv[]){
-	dbgNotePSL("omfAacPlayer\n");
+	dbgNotePSL("omfRtspServer");
 	///parse the input params
 	OmfHelper helper(_options0,argc,argv);
 	///--help

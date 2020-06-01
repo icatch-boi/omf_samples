@@ -18,7 +18,7 @@ static const char* _fname=0;
 static int _seconds=0;
 static int _rate=0;
 static int _channels=0;
-static char* _codec = 0;
+static char* _codec = "alaw";
 ////////////////////////////////////////////
 static bool _exit = false;
 std::string _muxer;
@@ -27,8 +27,8 @@ std::string _encoder;
 static OmfHelper::Item _options0[]{
 	{"omfG711Recorder(...): \n"
 	 "record the sounds to a file(*.wav)\n"
-	 "> omfG711Recorder -n test.wav -d10\n"
-	 "> omfG711Recorder -n test.wav -r 16000 -c 1 -d10\n"
+	 "> omfG711Recorder -n test.wav -d 10 -r 16000 -c 1 -m alaw\n"
+	 "> omfG711Recorder -n test.wav -d 10 -r 16000 -c 1 -m ulaw \n"
 	},
 	{"fname"	,'n', _fname 		,"set the file name."},
 	{"duration",'d', _seconds		,"set the record duration(*s)."},
@@ -104,15 +104,6 @@ static bool CheckParamers(){
 		case ::Hash("wav"):
 			_muxer = "wav-muxer";
 			_encoder = "";
-			dbgErrPL();
-			break;
-		case ::Hash("pcm"):
-			_muxer = "IOSink";
-			_encoder = "";
-			break;
-		case ::Hash("aac"):
-			_muxer = "IOSink";
-			_encoder = "+aac-encoder";
 			break;
 		default:
 			dbgErrPSL("unkonw audio file format:"<< _fname);
@@ -138,6 +129,7 @@ int main(int argc,char* argv[]){
 	omf.Debug(helper.Debug());
 	if(helper.Log())omf.LogConfig(helper.Log());
 	///
+	returnIfErrC(0,!CheckParamers());
 	CheckParamers();
 	Process(helper.Debug());
 	///

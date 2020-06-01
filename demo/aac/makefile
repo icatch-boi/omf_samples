@@ -7,9 +7,6 @@ CXXFLAGS +=
 INCS += -I.
 ###
 LIBS += -lpluginiofile
-#LIBS += -lpluginwav
-#LIBS += -lpluginmp4
-#LIBS += -lpluginav
 LIBS += -lpluginpcm
 ###
 LIBS += -lomfapi
@@ -17,10 +14,11 @@ LIBS += -lomfapicxx
 LIBS += -lomfapistreaming
 LIBS += -lpluginapistreaming
 ###
-LIBS += -lshm
+LIBS += -lpluginshmbase
 LIBS += -lpluginshm
-LIBS += -lipc
-LIBS += -lpluginipc
+###
+LIBS += -laac
+LIBS += -lpluginaac
 ###
 LIBS += -lpluginbase
 LIBS += -lfwcore

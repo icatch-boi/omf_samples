@@ -13,6 +13,7 @@ namespace omf {
 	namespace api {
 		namespace streaming {
 			/**
+			 * @example _demoAudSrc.cpp
 			 * @brief provide audio date source.
 			 * You can get AUDIO realtime streaming from the interface.\n
 			 * Firstly,create an instance.\n
@@ -20,16 +21,8 @@ namespace omf {
 			 * Secondly,set the parameters.\n
 			 *  SelectMIC(int id) \n
 			 *  SetSampleRate(int rate) \n
-			 *  IsSupportStereo()\n
-			 *  	SetChannels(int ch) \n
-			 *  IsSupportVolumeControl()\n
-			 *  	SetVolume(int vol)\n
-			 *  IsSupportAutoGainControl()\n
-			 *  	EnableAGC()\n
-			 *  	DisableAGC()\n
-			 *  IsSupportMute()\n
-			 *  	EnableMute()\n
-			 *  	DisableMute()\n
+			 *  SetChannels(int ch) \n
+			 *  SetCodec(const char* codec)\n
 			 * Thirdly,	register streaming callbck.\n
 			 * 	RegisterMessageCallback(const FuncMessage &func)\n
 			 * 	RegisterOutputCallback(const IStreamControl::FuncFrame &func) \n
@@ -53,6 +46,7 @@ namespace omf {
 				 * select the MIC device.
 				 * @param keywords [in] the microphone device keywords. \n
 		 		 *		default: 0 select current microphone \n
+		 		 * @note The default MIC of the system is used, which is usually not set.
 				 */
 				virtual bool SelectMicrophone(const char*keywords=0)=0;
 
@@ -67,6 +61,34 @@ namespace omf {
 				 * @return true/false
 				 */
 				virtual bool SetCodec(const char*)=0;
+
+			public:
+				/**
+				 * check if support AEC(acoustic -echo-cancel).
+				 * @return true/false
+				 */
+				virtual bool IsSupportAEC()const=0;
+				/**
+				 * enable/disable AEC and set param
+				 * @param enable [in]enable/disable
+				 * @param param [in]params string
+				 * @return true/false
+				 */
+				virtual bool SetAEC(bool enable,const char*param)=0;
+
+			public:
+				/**
+				 * check if support ANS(acoustic-noise-suppress).
+				 * @return true/false
+				 */
+				virtual bool IsSupportANS()const=0;
+				/**
+				 * enable/disable ANS and set param
+				 * @param enable [in]enable/disable
+				 * @param param [in]params string
+				 * @return true/false
+				 */
+				virtual bool SetANS(bool enable,const char*param)=0;
 			public:
 				/**
 				 * get the output pcm media info.

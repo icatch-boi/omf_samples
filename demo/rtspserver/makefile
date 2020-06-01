@@ -17,11 +17,14 @@ LIBS += -lomfapicxx
 LIBS += -lomfapistreaming
 LIBS += -lpluginapistreaming
 ###
-LIBS += -lshm
+LIBS += -lpluginshmbase
 LIBS += -lpluginshm
-LIBS += -lipc
-LIBS += -lpluginipc
 ###
+LIBS += -lpluginaac
+###
+LIBS += -lpluginpcm
+###
+LIBS += -lpluginav
 LIBS += -lpluginbase
 LIBS += -lfwcore
 LIBS += -lfwbase

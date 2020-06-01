@@ -11,7 +11,7 @@ using namespace omf::api::streaming::common;
 ///
 //DEFINE_REGISTER(RtspSmssAac) {
 //	TClass<UsageEnvironment*,PacketRing*>::Register<RtspSmssAac>(
-//		name ? name : "rtsp-smss-aac-live555", {
+//		 "rtsp-smss-aac-live555", {
 //		})->Init(LIBRARY, VERSION(0), "iCatchtek", "jg.wang");
 //}
 RtspSmssAac::RtspSmssAac(UsageEnvironment& env,std::shared_ptr<OmfAttrSet>attr)

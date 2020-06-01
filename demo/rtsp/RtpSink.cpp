@@ -147,7 +147,7 @@ void RtpSink::Loop(){//dbgInfoPL();
 	//auto pkt = _src->GeneratePacket();
 	auto pkt = _src->GeneratePacket();
 	int us = 10000;
-	if(pkt) {//dbgTestPSL(_smss._codec);
+	if(pkt && pkt->data && pkt->size) {//dbgTestPSL(_smss._codec);
 		Process(pkt.get());		
 		us = 1000;
 	}

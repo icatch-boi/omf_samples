@@ -48,7 +48,7 @@ OBJS_+=
 
 %_:_%.o ${OBJS_}
 	@echo $@
-	$(GXX) $(INCS) $(CXXFLAGS) $^ $(LDFLAGS) -L${LIBS_PATH} $(LIBS) -o $@
+	$(GXX) $(INCS) $(CXXFLAGS) $^ $(LDFLAGS) -L${LIBS_PATH} $($@LIBS) $(LIBS) -o $@
 
 %.so:$(OBJS)
 	@echo $@

@@ -1,14 +1,33 @@
-#include "omf_api.h"
 #include "IAudioDevice.h"
+#include "OmfMain.h"
+#include "OmfHelper.h"
 #include "OmfDbg.h"
 ////////////////////////////////////////////
 #undef dbgEntryTest
 #define dbgEntryTest(s) dbgEntrySky(s)
 /////////////////////////////////////////////
+using namespace omf;
 using namespace omf::dev;
+using namespace omf::api;
 /////////////////////////////////////////////
 using ISpeaker = omf::dev::IAudioDevice;
 /////////////////////////////////////////////
+static int _vol = -1;
+static int _mute = -1;
+static int _info = 0;
+/////////////////////////////////////////////
+static OmfHelper::Item _options0[]{
+		{"omfSpeaker(...): \n"
+		 "This demo shows how to control speaker volume using ISpeaker interface.\n"
+		 "> omfSpeaker -v 30\n"
+		 "> omfSpeaker -m 1\n"
+		},
+		{"vol"	,'v', _vol	,"change the volume."},
+		{"mute"	,'m', _mute	,"set or clear mute."},
+		{"info"	,'s', _info	,"display the drive info."},
+		{},
+};
+
 static ISpeaker* GetSpeaker() {
 	static ISpeaker *_speaker = 0;
 	if(!_speaker)
@@ -49,22 +68,20 @@ bool GetSpeakerInfo(){dbgTestPL();
 
 //
 int main(int argc,char* argv[]){
+	dbgNotePSL("omfSpeaker(...)\n");
+	///parse the input params
+	OmfHelper helper(_options0,argc,argv);
+	///--help
+	returnIfTestC(0,!helper);
+	///output the params list
 	//
-	//initialize the omf system
-	returnIfErrC(false,!omfInit(0));
+	OmfMain omf;
 	//
-	returnIfErrC(0,!GetSpeakerInfo());
+	omf.Helper(helper);
 	//
-	if(argc>1) {
-		int vol = atoi(argv[1]);
-		returnIfErrC(0, !SetSpeakerVol(vol));
-	}
-	//
-	//if(argc>1) {
-	//	int mute = atoi(argv[1]);
-	//	returnIfErrC(0,!SetSpeakerMute(mute));
-	//}
-	//uninitialize the omf system
-	returnIfErrC(false,!omfUninit(0));
+	if(_info>0)GetSpeakerInfo();
+	if(_vol>=0)SetSpeakerVol(_vol);
+	if(_mute>=0)SetSpeakerMute(_mute);
+
 	return true;
 }

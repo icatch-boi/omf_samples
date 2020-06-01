@@ -69,6 +69,7 @@ static bool Process(bool _dbg){
 	}
 	///
 	returnIfErrC(false,!obj.StatusUp("null"));
+	return true;
 }
 ////////////////////////////////
 int main(int argc,char* argv[]){
