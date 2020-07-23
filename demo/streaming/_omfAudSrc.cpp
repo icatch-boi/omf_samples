@@ -24,14 +24,16 @@ static int _seconds=30;
 static const char* _keywords="dualos";
 static const char* _codec=0;
 static bool _aec=0;
-static const char* _aecpara=0;
+static const char* _aecpara="level=2,ansmode=3";
+static int _rate = 16000;
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
 	{"omfAudSrc(...): \n"
 	 "This demo shows how to get audio streaming from OMF using IAudioSource interface.\n"
-	 "  omfAudSrc -n test.pcm -d 30\n"
+	 "  omfAudSrc -n test.pcm -d 30 -r 16000\n"
+	 "  omfAudSrc -n test.pcm -d 30 -e 1 -p level=2,ansmode=3\n"
 	 "  omfAudSrc -n test.aac -d 30 -c aac:br=128000\n"
 	 "  omfAudSrc -n test.alaw -d 30 -c alaw\n"
 	 "  omfAudSrc -n test.ulaw -d 30 -c ulaw\n"
@@ -42,7 +44,10 @@ static OmfHelper::Item _options0[]{
 	{"duration",'d', _seconds	,"process execute duration(*s)."},
 	{"keywords",'k', _keywords	,"select the IAudioSource with keywords.Usually use the default values."},
 	{"codec",'c', _codec		,"set the audio codec:eg.. aac:br=128000"},
-	{"codec",'e', _aec		,"set the pcm aec enable"},
+	{"samplerate",'r', _rate		,"set the audio samplerate:eg.. aac:rate=16000"},
+	{"\naec:"},
+	{"aec",'e', _aec		,"set the pcm aec enable"},
+	{"aecpara",'p', _aecpara	,"aec params.eg.. keys=webrtc,level=2,ansmode=3"},
 	{},
 };
 ////////////////////////////////////////////
@@ -140,6 +145,7 @@ static bool Process(bool _dbg){dbgTestPL();
 	returnIfErrC(false,!src);
 	//set audio srouce parameters
 	src->SetCodec(_codec);
+	src->SetSampleRate(_rate);
 
 	src->SetAEC(_aec,_aecpara);
 
@@ -180,17 +186,13 @@ static bool Check(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfAudSrc(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);dbgTestPL();
-	///--help
-	returnIfTestC(0,!helper);dbgTestPL();
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
-	returnIfErrC(0,!Check());dbgTestPL();
-	///init the omf module
-	OmfMain omf;dbgTestPL();
-	omf.Helper(helper);dbgTestPL();
+	returnIfErrC(0,!Check());
 	///process
-	Process(helper.Debug());dbgTestPL();
+	Process(OmfMain::Globle().DebugMode());
 	///
 	return 0;
 }

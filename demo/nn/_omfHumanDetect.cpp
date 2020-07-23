@@ -99,24 +99,16 @@ static bool Process(bool _dbg){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfHumanDetect\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
 	returnIfErrC(0,!_width);
 	returnIfErrC(0,!_height);
 	returnIfErrC(0,!_fr);
 	returnIfErrC(0,!_seconds);
 	///
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
-	
-	Process(helper.Debug());
+	Process(OmfMain::Globle().DebugMode());
 	///
 	return 0;
 }

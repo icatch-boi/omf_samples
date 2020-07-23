@@ -15,6 +15,8 @@ LIBS += -lpluginpcm
 ##
 LIBS += -lpluginaac
 ###
+LIBS += -lplugindev
+###
 LIBS += -lomfapi
 LIBS += -lomfapicxx
 LIBS += -lomfapistreaming

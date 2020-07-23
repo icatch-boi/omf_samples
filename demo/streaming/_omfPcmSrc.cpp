@@ -25,7 +25,8 @@ static const char* _keywords="dualos";
 static const char* _mic = "dualos";
 static int _triggerInterval=100;//seconds
 static int _aec = 0;
-static const char* _aecpara=0;
+static const char* _aecpara="level=2,ansmode=3";
+static int _rate = 16000;
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
@@ -33,13 +34,16 @@ static OmfHelper::Item _options0[]{
 	{"omfPcmSrc(...): \n"
 	 "This demo shows how to get PCM streaming from OMF using IPcmSource interface.\n"
 	 "  omfPcmSrc -n test.pcm -d 30\n"
+	 "  omfPcmSrc -n test.pcm -d 30 -e 1 -p level=2,ansmode=3\n"
 	},
 	{"fname",'n', _fname		,"record filename(*.pcm)."},
 	{"duration",'d', _seconds	,"process execute duration(*s)."},
 	{"mic"		,'m', _mic		,"select the mic with the keywords.Usually use the default values."},
 	{"keywords",'k', _keywords	,"select the IPcmSource with keywords.Usually use the default values."},
+	{"samplerate",'r', _rate	,"set the audio samplerate:eg.. rate=16000"},
+	{"\naec:"},
 	{"aec"      ,'e', _aec	    ,"enable/disable aec."},
-	{"aecpara",'p', _aecpara	,"aec params.eg.. keys=webrtc"},
+	{"aecpara",'p', _aecpara	,"aec params.eg.. keys=webrtc,level=2,ansmode=3"},
 	{},
 };
 ////////////////////////////////////////////
@@ -131,7 +135,8 @@ static bool Process(bool _dbg){
 	std::unique_ptr<IPcmSource> src(IPcmSource::CreateNew(_keywords));
 	returnIfErrC(false,!src);
 	//set pcm srouce parameters
-	src->SelectMicrophone(_mic);//select the MIC.
+	//src->SelectMicrophone(_mic);//select the MIC.
+	src->SetSampleRate(_rate);//set the samplerate.
 	src->SetAEC(_aec,_aecpara);
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
@@ -173,21 +178,13 @@ static bool Check(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfPcmSrc(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
 	returnIfErrC(0,!Check());
-	///init the omf module
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
 	///process
-	Process(helper.Debug());
+	Process(OmfMain::Globle().DebugMode());
 	///
 	return 0;
 }

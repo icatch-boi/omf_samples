@@ -18,7 +18,7 @@ using namespace omf::api;
 using namespace omf::chrono;
 namespace omf{
 	namespace rtsp{
-		using ISource = omf::api::streaming::common::IStreamOutput;
+		using ISource = omf::api::streaming::common::IStreamSource;
 		using Packet = ISource::frame_t;
 		using OmfAttrSet = omf::api::OmfAttrSet;
 

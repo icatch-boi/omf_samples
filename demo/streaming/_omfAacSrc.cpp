@@ -27,7 +27,10 @@ static int _bitrate=128;///KB
 static int _channels=0;
 static int _triggerInterval=100;//seconds
 static int _aec = 0;
-static const char* _aecpara=0;
+static const char* _aecpara="level=2,ansmode=3";
+static bool _dumpFrm=true;
+static int _cache=0;    ///the vlc cache size
+static int _prerecIdx=0;	///enable/disable preRecord
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
@@ -36,13 +39,18 @@ static OmfHelper::Item _options0[]{
   	"This demo shows how to get AAC streaming from OMF using IAacSource interface."
 	 "> omfAacSrc -n test.aac -d30 -b 128 -c 1\n"
 	 "> omfAacSrc -n test.aac -d30 -b 128\n"
+	 "> omfAacSrc -d30 -r 1\n"
+	 "> omfAacSrc -d30 -C 2048\n"
 	},
 	{"fname",'n', _fname	,"set the record filename(*.aac)."},
 	{"duration",'d', _seconds	,"set process execute duration(*s)."},
 	{"\naac codec paramters:"},
 	{"bitrate",'b', _bitrate	,"set the bitrate(kb) to aac codec."},
 	{"channels",'c', _channels	,"set the target channels to aac codec.0:follow the channels of pcm src,other is force to rechannels."},
+	{"cache"	,'C', _cache    ,"the vlc cache size,default is no cache."},
+	{"prerec"   ,'r', _prerecIdx,"set preRecord vbrc index and enable preRecord."},
 	{"\nmisc:"},
+	{"dumpfrm"	,'F', [](){_dumpFrm=false;}	,"dump the frame."},
 	{"mic"		,'m', _mic	,"select the mic with the keywords.Usually use the default values."},
 	{"keywords",'k', _keywords	,"select the IAacSource with keywords.Usually use the default values."},
 	{},
@@ -66,33 +74,43 @@ static bool MessageProcess(const char* msg0){
 	}
 	return true;
 }
+static TimePoint _tpEnd(-1_s);
+static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line){
+	if(!frm->data || !frm->size)
+		return false;
+	///
+	if(_tpEnd==-1_s){
+		_tpEnd=frm->pts+Seconds(_seconds);
+	}else if(frm->pts>_tpEnd){
+		///frame receive is enough, exit profram.
+		_exit = true;
+		return false;
+	}
+	///write to file
+	if(fd)fwrite(frm->data,1,frm->size,fd);
+	///
+	if(_dumpFrm) {
+		dbgTestPS(line << '#' << frm->index
+		               << ',' << frm->data
+		               << ',' << frm->size
+		               << ',' << frm->iskeyframe
+		               << ',' << frm->pts
+		               << ','
+		);
+		dbgTestDL(frm->data, 8);
+	}
+	return true;
+}
 static bool ProcessPull(IAacSource*src,FILE*fd){
 	//start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
 	//streaming....
 	auto end = Now()+Seconds(_seconds);
 	while(!_exit && Now()<end) {
-		std::shared_ptr<IAacSource::frame_t> frm;
-		returnIfErrCS(false, !src->PullFrame(frm), "pull frame fail!");
-		if(!frm->data || !frm->size)
-			continue;
-		///
-		dbgTestPSL(frm->index
-						   <<','<<frm->data
-						   <<','<<frm->size
-						   <<','<<frm->iskeyframe
-						   <<','<<frm->pts
-		);
-		dbgTestDL(frm->data,16);
-		///write to file
-		if(fd)fwrite(frm->data,1,frm->size,fd);
-		///sleep & trigger
-		auto interval = 10_ms;
-		//if(src->IsSupportSingleFrameTrigger()) {
-		//	interval = Seconds(_triggerInterval);
-		//	src->Trigger();
-		//}
-		std::this_thread::sleep_for(interval);
+		auto frm = src->PullFrame(true);
+		if(frm)
+			ProcessFrame(frm,fd,__LINE__);
+		std::this_thread::sleep_for(10_ms);
 	}
 	//stop streaming
 	returnIfErrC(false,!src->ChangeDown(State::ready));
@@ -101,16 +119,7 @@ static bool ProcessPull(IAacSource*src,FILE*fd){
 static bool ProcessPush(IAacSource*src,FILE*fd){
 	//set push callback
 	src->RegisterOutputCallback([&fd](std::shared_ptr<IAacSource::frame_t>&frm){
-		dbgTestPSL(frm->index
-						   <<','<<frm->data
-						   <<','<<frm->size
-						   <<','<<frm->iskeyframe
-						   <<','<<frm->pts
-		);
-		dbgTestDL(frm->data,16);
-		///
-		if(fd)fwrite(frm->data,1,frm->size,fd);
-		return true;
+		return ProcessFrame(frm,fd,__LINE__);
 	});
 	//start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
@@ -129,19 +138,39 @@ static bool ProcessPush(IAacSource*src,FILE*fd){
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
+static bool SetParams(IAacSource*src){
+	std::string paras;
+	if(_cache){
+		paras+=",cache=";
+		paras+=_cache;//dbgTestPVL(_cache);dbgTestPVL(paras);
+	}
+	if(_prerecIdx){
+		paras+=",prerec=";
+		paras+=_prerecIdx;
+	}
+	dbgTestPVL(paras);
+	if(!paras.empty())src->Set(paras.c_str()+1);
+	return true;
+}
 static bool Process(bool _dbg){
 	///////////////////////////////////////
 	//create a AacSource instance with keywords.
-	dbgTestPVL(_keywords);
-	std::unique_ptr<IAacSource> src(IAacSource::CreateNew(_keywords));
+	std::string keywords=_keywords;
+	if(_prerecIdx)keywords="prerec-"+keywords;
+	dbgTestPVL(keywords);
+	std::unique_ptr<IAacSource> src(IAacSource::CreateNew(keywords.c_str()));
 	returnIfErrC(false,!src);
+	src->RegisterMessageCallback(&MessageProcess);
 	//set pcm srouce parameters
-	src->SelectMicrophone(_mic);//select the MIC.
+	//src->SelectMicrophone(_mic);//select the MIC.
+	//set aec
+	//src->SetAEC(_aec,_aecpara);
 	///set aac codec
 	src->SetBitRate(_bitrate*1000);
 	src->SetProfile("LC");
 	src->SetTargetChannels(_channels);//encode to 1 channels.
 	src->SetAEC(_aec,_aecpara);
+	SetParams(src.get());
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
 	//get streaming parameters after Open().
@@ -182,21 +211,13 @@ static bool Check(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfAacSrc(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
 	returnIfErrC(0,!Check());
-	///init the omf module
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
 	///process
-	Process(helper.Debug());
+	Process(OmfMain::Globle().DebugMode());
 	///
 	return 0;
 }

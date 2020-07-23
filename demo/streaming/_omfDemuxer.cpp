@@ -1,5 +1,7 @@
 #include <thread>
 #include <memory>
+#include <vector>
+#include <stdio.h>
 #include "_call.h"
 #include "_hash.h"
 #include "_chrono_base.h"
@@ -11,7 +13,6 @@
 #include "IDemuxer.h"
 #include "IH264Source.h"
 #include "IAacSource.h"
-#include "IDemuxer.h"
 ////////////////////////////////////////////////////////////
 #undef dbgEntryTest
 #define dbgEntryTest(s) dbgEntrySky(s)
@@ -21,10 +22,10 @@ using namespace omf::chrono;
 using namespace omf::api;
 using namespace omf::api::streaming;
 using namespace omf::api::streaming::common;
-using ISource = IStreamOutput;
+using ISource = IStreamSource;
 ////////////////////////////////////////////////////////////
 static const char* _fname=0;
-static FILE* _fd=0;
+static int _save=0;
 ////////////////////////////////////////////
 static bool _exit = false;
 static bool _dumpFrm = true;
@@ -36,6 +37,7 @@ static OmfHelper::Item _options0[]{
 		 "  omfDemuxer -n test.mp4 \n"
 		},
 		{"fname",'n', _fname		,"demux filename(*.mp4)."},
+		{"save",'s', _save		,"save streaming(*.aac/*.h264)."},
 		{},
 };
 ////////////////////////////////////////////
@@ -126,7 +128,7 @@ static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line){
 	dbgTestDL(frm->data, 16);
 	return true;
 }
-static bool Process(OmfMain&omf){
+static bool Process(){
 	///////////////////////////////////////
 	//create a IDemuxer instance with keywords.
 	dbgTestPVL(_keywords);
@@ -137,15 +139,25 @@ static bool Process(OmfMain&omf){
 	demux->Url(((std::string)"file://"+_fname).c_str());
 	//open streaming
 	returnIfErrC(false,!demux->ChangeUp(State::ready));
+	std::vector<FILE*> fds;
 	//get the output
 	for(auto src:demux->Outputs()){
-		//set push callback
-		src->RegisterOutputCallback([&_fd](ISource::Frame& frm){
-			return ProcessFrame(frm,_fd,__LINE__);
-		});
 		//
 		auto mediaiInfo = src->GetMediaInfo();
 		dbgTestPSL(mediaiInfo);
+		OmfAttrSet ap(mediaiInfo);
+		///
+		FILE*fd=0;
+		if(_save){
+			auto codec = ap.Get("codec");
+			auto fn = (std::string)_fname+'.'+codec;dbgTestPVL(fn);
+			fd=fopen(fn.c_str(),"wb");
+			fds.push_back(fd);
+		}
+		//set push callback
+		src->RegisterOutputCallback([fd](ISource::Frame& frm){
+			return ProcessFrame(frm,fd,__LINE__);
+		});
 		///
 		ProcessH264(src) || ProcessAac(src);
 	}
@@ -155,6 +167,10 @@ static bool Process(OmfMain&omf){
 		std::this_thread::sleep_for(100_ms);
 	}
 	returnIfErrC(false,!demux->ChangeDown(State::null));
+	////////////////////////////////////////////////////////
+	for(auto fd:fds){
+		if(fd)fclose(fd);
+	}
 	////////////////////////////////////////////////////////
 	return true;
 }
@@ -166,19 +182,13 @@ static bool Check(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfDemuxer(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
+///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
-	//returnIfErrC(0,!Check());
-	///init the omf module
-	OmfMain omf;
-	//omf.Command("show_classes",0,0);
-	omf.LogConfig("all=true,err=true,note=true");
-	omf.Helper(helper);
-	///process
-	Process(omf);
+	returnIfErrC(0,!Check());
+	///
+	Process();
 	///
 	return 0;
 }

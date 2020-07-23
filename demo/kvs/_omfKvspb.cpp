@@ -9,6 +9,7 @@
 #include "OmfAttrSet.h"
 #include "OmfHelper.h"
 #include "IH264Source.h"
+#include "IAacSource.h"
 ////////////////////////////////////////////
 #undef dbgEntryTest
 #define dbgEntryTest(s) dbgEntrySky(s)
@@ -21,42 +22,30 @@ using namespace omf::api::streaming::common;
 ////////////////////////////////////////////////////////////
 static const char* _fname=0;
 static int _seconds=30;//seconds
-static const char* _keywords="dualos-vbrc-pull";
-static int _sensorID = 0;
+static const char* _keywords="Kvspb";
 static int _width=1920;
 static int _height=1080;
 static int _framerate=0;
 static int _bitrate=2000;///kb
 static const char* _goptype = "ippp";
-static int _gop = 15;
-static int _triggerInterval=0;//ms
-static bool _dumpFrm=true;
+static int _gop = 30;
 static int _fluency=0;
-static bool _showBrc=false;
-///
-static const char* _h264Param=0;    ///the h264 other params;
-static int _cache=0;    ///the vlc cache size
-static int _prerecIdx=0;	///enable/disable preRecord
-///
-static bool _blocking=false;
+static int _showBrc=0;
+static const char* _vbrc="vbrc";
+static int _push = 0;
 ////////////////////////////////////////////
 static bool _exit = false;
+static OmfMain* _main=0;
 ////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
-	{"omfH264Src(...): \n"
+	{"omfKvspb(...): \n"
 	 "This demo shows how to get H264 streaming from OMF using IH264Source interface. \n"
-     "  omfH264Src -d5 -w1920 -h1080 -f30 -b 128 -t ippp -g30 -k vbrc -F \n"
-	 "  omfH264Src -d5 -w1920 -h1080 -f30 -b 5000 -t ippp -g30 -C 256 -F -n test2048.h264\n"
-	 "  omfH264Src -d5 -r 1\n"
-	 "  omfH264Src -n vbrcpull.h264 -d30 -w1920 -h1080 -f30 -b 128 -t ippp -g30 \n"
-	 "  omfH264Src -n vbrcpush.h264 -d30 -w1080 -h720 -k dualos-vbrc-push \n"
-	 "  omfH264Src -n cbrcpush.h264 -d30 -w1920 -h1080 -k dualos-cbrc -w1920 -h1080 -f30 \n"
-	 "  omfH264Src -n vbrcPushTrig.h264 -d30 -w1920 -h1080 -k dualos-vbrc-push-trigger -i 1000 \n"
+     "  omfKvspb -d5 -w1920 -h1080 -f30 -b 128 -t ippp -g30 -v vbrc -p 1 -L \"\" -F 0 -e 3\n"
+
 	},
-	{"fname"	,'n', _fname	,"record filename(*.h264)."},
+	{"fname"	,'n', _fname	,"record filename(*.*)."},
 	{"duration"	,'d', _seconds	,"record duration(*s)."},
 	{"the yuv paramers:"},
-	{"sid"		,'s', _sensorID	,"select the sensor with the id."},
 	{"w"		,'w', _width	,"width of image."},
 	{"h"		,'h', _height	,"height of image."},
 	{"fr"		,'f', _framerate,"frame number per seconds."},
@@ -64,38 +53,19 @@ static OmfHelper::Item _options0[]{
 	{"bitrate"	,'b', _bitrate	,"bitrate(kb) of h264 encoder."},
 	{"goptype"	,'t', _goptype	,"gop type(iiii,ippp,ibbp) of h264 encoder."},
 	{"gop"		,'g', _gop		,"gop of h264 encoder."},
-	{"h264"	    ,'c', _h264Param,"the other h264 codec params."},
-	{"cache"	,'C', _cache    ,"the vlc cache size,default is no cache."},
-	{"prerec"   ,'r', _prerecIdx,"set preRecord vbrc index and enable preRecord."},
 	{"misc:"},
-	{"dumpfrm"	,'F', [](){_dumpFrm=false;}	,"disable dump the frame."},
-	{"interval"	,'i', _triggerInterval	,"the interval(ms) per trigger. Only used for IsSupportSingleFrameTrigger()."},
-	{"blockfrm"	,'B', [](){_blocking=true;}	,"blocking to process frame."},
 	{"bit rate control:"},
 	{"showBrc"	,'S', [](){_showBrc=1;}	,"show the h264 source bitrate control modes."},
 	{"fluency"	,'e', _fluency	,"[-7,7]the fluency for streaming."},
-	{"keywords"	,'k', _keywords	,"select the IH264Source with keywords:"
-							  	"\n <module>-<brc>-<output>-<tigger>,eg.."
-		 						"\n dualos-cbrc"
-		 						"\n dualos-cbrc-pull"
-								"\n dualos-cbrc-push"
-		 						"\n dualos-cbrc-pull-trig"
-		 						"\n dualos-cbrc-push-trig"
-								"\n dualos-vbrc"
-								"\n dualos-vbrc-pull"
-								"\n dualos-vbrc-push"
-								"\n dualos-vbrc-pull-trig"
-								"\n dualos-vbrc-push-trig"
-								"\n dualos-dbrc"
-								"\n dualos-dbrc-pull"
-								"\n dualos-dbrc-push"
-								"\n dualos-dbrc-pull-trig"
-								"\n dualos-dbrc-push-trig"
-								"\n dualos-abrc"
-								"\n dualos-abrc-pull"
-								"\n dualos-abrc-push"
-								"\n dualos-abrc-pull-trig"
-								"\n dualos-abrc-push-trig"
+	{"vbrc"	    ,'v', _vbrc	    ,"set vbrc mode:eg..\n"
+	                                   "\n cbrc"
+	                                   "\n vbrc"
+	                                   "\n vbrc-vfrc"
+	                                   "\n abrc-afrc"
+							  },
+	{"push"	    ,'p', _push	    ,"set output push mode,default pull mode:"},
+	{"keywords"	,'k', _keywords	,"select the IH264Source/IAacSource with keywords:default is \"kvspb\""
+
    },
 	{},
 };
@@ -112,11 +82,6 @@ static bool MessageProcess(const char* msg0){
 			dbgNotePSL("error");
 			_exit=true;
 			break;
-		case Hash("warning"):
-			dbgNotePSL("warning");
-			//_exit=true;
-			_blocking=false;
-			break;
 		default:
 			dbgTestPSL("unknow message:"<<msg);
 			break;
@@ -124,7 +89,7 @@ static bool MessageProcess(const char* msg0){
 	return true;
 }
 static TimePoint _tpEnd(-1_s);
-static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line){
+static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line,const char*codec){
 	if(!frm->data || !frm->size)
 		return false;
 	///
@@ -138,47 +103,35 @@ static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line){
 	///write to file
 	if(fd)fwrite(frm->data,1,frm->size,fd);
 	///
-	if(_dumpFrm) {
-		dbgTestPS(line << '#' << frm->index
-				       << ',' << frm->pts
-		               << ',' << frm->data
-		               << ',' << frm->size
-		               << ',' << frm->iskeyframe
-		               << ','
-		);
-		dbgTestDL(frm->data, 16);
-	}
-	while(_blocking)std::this_thread::sleep_for(1000_ms);
+	dbgTestPS(codec<<','<<line<<'#'<<frm->index
+					  << ',' << frm->data
+					  << ',' << frm->size
+					  << ',' << frm->iskeyframe
+					  << ',' << frm->pts
+					  << ','
+	);
+	dbgTestDL(frm->data, 16);
 	return true;
 }
-static void ProcessTrigger(IH264Source*src){dbgTestPL();
-	while(!_exit){
-		if(src->IsSupportSingleFrameTrigger()) {
-			if(src->CurrentState()==IH264Source::State::play)
-				src->Trigger();
-			std::this_thread::sleep_for(MilliSeconds(_triggerInterval));
-		}
 
-	}
-}
-static bool ProcessPull(IH264Source*src,FILE*fd){dbgTestPL();
+static bool ProcessPull(IStreamSource*src,FILE*fd,const char*codec){dbgTestPL();
 	//start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
 	//streaming....
 	while(!_exit) {
 		auto frm = src->PullFrame(false);
 		if(frm)
-			ProcessFrame(frm,fd,__LINE__);
+			ProcessFrame(frm,fd,__LINE__,codec);
 		std::this_thread::sleep_for(10_ms);
 	}
 	//stop streaming
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
-static bool ProcessPush(IH264Source*src,FILE*fd){dbgTestPL();
+static bool ProcessPush(IStreamSource*src,FILE*fd,const char*codec){dbgTestPL();
 	//set push callback
-	src->RegisterOutputCallback([&fd](std::shared_ptr<IH264Source::frame_t>&frm){
-		return ProcessFrame(frm,fd,__LINE__);
+	src->RegisterOutputCallback([&fd,codec](std::shared_ptr<IStreamSource::frame_t>&frm){
+		return ProcessFrame(frm,fd,__LINE__,codec);
 	});
 	//start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
@@ -190,35 +143,59 @@ static bool ProcessPush(IH264Source*src,FILE*fd){dbgTestPL();
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
-static bool SetParams(IH264Source*src){
-	std::string paras;
-	if(_h264Param){
-		paras=",h264={";
-		paras+=_h264Param;
-		paras+="}";
+static bool ProcessAac(){
+	bool _dbg=OmfMain::Globle().DebugMode();
+	///////////////////////////////////////
+	//create a AacSource instance with keywords.
+	dbgTestPVL(_keywords);
+	std::unique_ptr<IAacSource> src(IAacSource::CreateNew("Kvspb"));
+	returnIfErrC(false,!src);
+	//set pcm srouce parameters
+	//src->SelectMicrophone(_mic);//select the MIC.
+	///set aac codec
+	src->SetBitRate(128000);//_bitrate*1000);
+	src->SetProfile("LC");
+	src->SetTargetChannels(1);//_channels);//encode to 1 channels.
+	//open streaming
+	returnIfErrC(false,!src->ChangeUp(State::ready));
+	//get streaming parameters after Open().
+	auto info = src->GetAacMediaInfo();
+	dbgTestPVL(info.rate);
+	dbgTestPVL(info.channels);
+	dbgTestPVL(info.hasADTS);
+	dbgTestPVL(info.profile);
+	dbgTestPVL(info.version);
+	dbgTestPVL(info.rateidx);
+	dbgTestPVL(info.adtsLength);
+	dbgTestPVL(info.bitrate);
+	///////////////////////////////////////
+	FILE* fd=0;
+	if(_fname) {
+		fd = fopen("kvspb.aac", "wb");
+		if (!fd) {
+			dbgErrPSL("open file fail:" << _fname);
+		}
 	}
-	if(_cache){
-		paras+=",cache=";
-		paras+=_cache;//dbgTestPVL(_cache);dbgTestPVL(paras);
+	ExitCall ecfd([fd](){if(fd)fclose(fd);});
+	//////////////////////////////////
+	//streaming......
+	if(src->IsSupportedPullFrame()){
+		returnIfErrC(false,!ProcessPull(src.get(),fd,"aac"));
+	}else if(src->IsSupportedOutputFrameCallback()){
+		returnIfErrC(false,!ProcessPush(src.get(),fd,"aac"));
+	}else{
+		dbgErrPSL("null support output mode.");
 	}
-	if(_prerecIdx){
-		paras+=",prerec=";
-		paras+=_prerecIdx;
-	}
-	dbgTestPVL(paras);
-	if(!paras.empty())src->Set(paras.c_str()+1);
+	returnIfErrC(false,!src->ChangeDown(State::null));
 	return true;
 }
-static bool Process(){
+static bool ProcessH264(){
 	bool _dbg=OmfMain::Globle().DebugMode();
 	///////////////////////////////////////
 	//create a h264Source instance with keywords.
-	std::string keywords=_keywords;
-	if(_prerecIdx)keywords="prerec-"+keywords;
-	dbgTestPVL(keywords);
-	std::unique_ptr<IH264Source> src(IH264Source::CreateNew(keywords.c_str()));
+	dbgTestPVL(_keywords);
+	std::unique_ptr<IH264Source> src(IH264Source::CreateNew("Kvspb-vbrc-pull"));
 	returnIfErrC(false,!src);
-	src->RegisterMessageCallback(&MessageProcess);
 	///
 	if(_showBrc){
 		auto brcs=src->GetBrcModes();
@@ -229,7 +206,6 @@ static bool Process(){
 		dbgTestPSL("current brc mode:"<<brc.mode<<','<<brc.note);
 	}
 	//set yuv srouce parameters
-	src->SelectSensor(_sensorID);//select the sensor0.
 	src->SetWidth(_width);
 	src->SetHeight(_height);
 	//set h264 encoder parameters
@@ -239,8 +215,6 @@ static bool Process(){
 	src->SetBitRate(_bitrate*1000);
 	if(_fluency)src->SetFluency(_fluency);
 	if(_framerate)src->SetFrameRate(_framerate);
-	///streaming params set
-	SetParams(src.get());
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
 	//get streaming parameters after Open().
@@ -266,7 +240,7 @@ static bool Process(){
 	///////////////////////////////////////
 	FILE* fd=0;
 	if(_fname) {
-		fd=fopen(_fname, "wb");
+		fd=fopen("kvspb.h264", "wb");
 		if (!fd) {
 			dbgErrPSL("open file fail:" << _fname);
 		}
@@ -275,39 +249,47 @@ static bool Process(){
 	//////////////////////////////////
 	///streaming......
 	_exit = false;
-	///trigger
-	std::unique_ptr<std::thread> thread;
-	if(_triggerInterval && src->IsSupportSingleFrameTrigger()) {
-		thread.reset(new std::thread(&ProcessTrigger,src.get()));
-	}
 	///process frame
-	if(src->IsSupportedPullFrame()){
-		returnIfErrC(false,!ProcessPull(src.get(),fd));
-	}else if(src->IsSupportedOutputFrameCallback()){
-		returnIfErrC(false,!ProcessPush(src.get(),fd));
-	}else{
-		dbgErrPSL("null support output mode.");
-	}
-	returnIfErrC(false,!src->ChangeDown(State::null));
-	dbgTestPVL(src.get());
+			if(src->IsSupportedPullFrame()){
+				returnIfErrC(false,!ProcessPull(src.get(),fd,"h264"));
+			}else if(src->IsSupportedOutputFrameCallback()){
+				returnIfErrC(false,!ProcessPush(src.get(),fd,"h264"));
+			}else{
+				dbgErrPSL("null support output mode.");
+			}
+			returnIfErrC(false,!src->ChangeDown(State::null));
+			dbgTestPVL(src.get());
+			return true;
+}
+static bool ProcessCtrl(){
+
+}
+static bool Process(){
+	std::thread h264([=](){ProcessH264();});
+	std::thread aac ([=](){ProcessAac ();});
+
+	h264.join();
+	aac.join();
 	return true;
 }
 ////////////////////////////////////////////
-static bool Check(){
+static bool Check(OmfHelper&helper){
+	returnIfTestC(false,!helper);
 	return true;
 }
 ////////////////////////////////
 int main(int argc,char* argv[]){
-	dbgNotePSL("omfH264Src(...)\n");
+	dbgNotePSL("omfKvspb(...)\n");
 	///parse the input parameters with the parser table,
 	///and initialize omf system.
 	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
-	///check the params
-	returnIfErrC(0,!Check());
-	///process
+	///
+	returnIfErrC(0,!Check(helper));
+	///
 	Process();
 	///
 	return 0;
+
 }
 
 

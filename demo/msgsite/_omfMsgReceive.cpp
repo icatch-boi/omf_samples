@@ -33,7 +33,8 @@ static bool cbReceive(const void *data, int size){
 	dbgTestPSL("received msg("<<Now()<<"):"<<(const char*)data);
 	return true;
 }
-static bool ReceiveWithRegisterCb(OmfMain&omf){
+static bool ReceiveWithRegisterCb(){
+	OmfMain&omf=OmfMain::Globle();
 	dbgTestPSL("register the cb on site to receive "<<_name<<"# message");
 	returnIfErrC(false,!OmfMsgSiteUser::Register(_name,&cbReceive));
 	dbgTestPSL("waiting ...");
@@ -42,7 +43,8 @@ static bool ReceiveWithRegisterCb(OmfMain&omf){
 	}
 	return true;
 }
-static bool ReceiveWithCb(OmfMain&omf){
+static bool ReceiveWithCb(){
+	OmfMain&omf=OmfMain::Globle();
 	dbgTestPSL("receive "<<_name<<"# message ...");
 	while(1){
 		returnIfErrC(false,!OmfMsgSiteUser::Receive(_name,&cbReceive));
@@ -50,9 +52,9 @@ static bool ReceiveWithCb(OmfMain&omf){
 	}
 	return true;
 }
-static bool Process(OmfMain&omf,bool _dbg){
-	ReceiveWithRegisterCb(omf);
-	//ReceiveWithCb(omf);
+static bool Process(){
+	ReceiveWithRegisterCb();
+	//ReceiveWithCb();
 	return true;
 }
 static bool Check(){
@@ -61,21 +63,13 @@ static bool Check(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("demoMsgReceive\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
 	returnIfErrC(0,!Check());
 	///
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
-	///
-	Process(omf,helper.Debug());
+	Process();
 	///
 	return 0;
 }

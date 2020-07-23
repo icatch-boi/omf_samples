@@ -50,7 +50,7 @@ static bool FileListAdd(const char*url);
 static OmfHelper::Item _options0[]{
 	{"omfRecorder(...): \n"
 	 "record the video and audio streaming to a container file(*.mp4/*.mov). eg..\n"
-	 "> omfRecorder -n test.mp4 -S30 -d300 -Caac -B128 -c h264 -w1920 -h1080 -f24 -b1000 -t ippp -g24 -K500 -F1000\n"
+	 "> omfRecorder -S30 -d300 -Caac -B128 -c h264 -w1920 -h1080 -f24 -b1000 -t ippp -g24 -K500 -F1000\n"
 	},
 	{"fname"	,'n', _fname			,"set the record file name."},
 	{"duration"	,'d', _recordSeconds	,"set the record duration."},
@@ -239,21 +239,13 @@ static bool Check(){
 /////////////////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfRecorder(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
 	returnIfErrC(0,!Check());
-	///init the omf module
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
 	///process
-	Process(helper.Debug());
+	Process(OmfMain::Globle().DebugMode());
 	///
 	return 0;
 }

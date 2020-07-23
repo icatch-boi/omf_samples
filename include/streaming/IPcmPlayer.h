@@ -44,7 +44,7 @@ namespace omf{
 			 *  GetPcmMediaInfo(). call after Open().\n			 *
 			 */
 			class IPcmPlayer
-					: virtual public common::IStreamInput
+					: virtual public common::IStreamSink
 					, virtual public common::IAudio
 			{
 			public:

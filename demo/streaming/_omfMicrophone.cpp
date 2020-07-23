@@ -68,15 +68,9 @@ bool GetMicrophoneInfo(){dbgTestPL();
 //
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfMicrophone(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	//
-	OmfMain omf;
-	//
-	omf.Helper(helper);
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	//
 	if(_info>0)GetMicrophoneInfo();
 	if(_vol>=0)SetMicrophoneVol(_vol);

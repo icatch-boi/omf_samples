@@ -31,7 +31,10 @@ static OmfHelper::Item _options0[]{
 		{},
 };
 ////////////////////////////////////////////
-static bool Process(OmfMain&omf,bool _dbg){
+static bool Process(){
+	OmfMain&omf=OmfMain::Globle();
+	bool _dbg=omf.DebugMode();
+	///
 	dbgTestPSL("send["<<_name<<"]:"<<_msg);
 	int len = _msg?(strlen(_msg)+1):0;
 	returnIfErrC(false,!OmfMsgSiteUser::Send(_name,_msg,len));
@@ -43,21 +46,13 @@ static bool Check(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("demoMsgSiteUser\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
 	returnIfErrC(0,!Check());
 	///
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
-	///
-	Process(omf,helper.Debug());
+	Process();
 	///
 	return 0;
 }

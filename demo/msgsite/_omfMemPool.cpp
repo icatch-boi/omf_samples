@@ -43,7 +43,10 @@ static OmfHelper::Item _options0[]{
 };
 ////////////////////////////////////////////
 
-static bool Process(OmfMain&omf,bool _dbg){
+static bool Process(){
+	OmfMain&omf=OmfMain::Globle();
+	bool _dbg=omf.DebugMode();
+	///
 	dbgTestPVL(Now());
 	auto pool = OmfMemPool::ShmPool();
 	returnIfErrC(false,!pool);
@@ -70,21 +73,13 @@ static bool Check(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("demoMemPool\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
 	returnIfErrC(0,!Check());
 	///
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	//if(helper.Log())omf.LogConfig(helper.Log());
-	///
-	Process(omf,helper.Debug());
+	Process();
 	///
 	return 0;
 }

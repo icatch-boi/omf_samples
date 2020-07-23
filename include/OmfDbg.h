@@ -14,10 +14,11 @@
 #include "_dbg_cfg_base.h"
 #include "_dbg_cout_std.h"
 #include "_dbg_cfg_cout.h"
+extern const char* dbgGetFileName(const char*path);
 ///
 #define CVAL(v) #v<<'='<<v
-#define ENDL() '\n'//std::endl
-#define POSTION strrchr(__FILE__,'/')<<'/'<<__LINE__<<':'<<__FUNCTION__<<"()"
+#define ENDL() std::endl
+#define POSTION dbgGetFileName(__FILE__)<<'/'<<__LINE__<<':'<<__FUNCTION__<<"()"
 ///
 #define dbgTestS(s) dbgEntryTest(s)
 ///

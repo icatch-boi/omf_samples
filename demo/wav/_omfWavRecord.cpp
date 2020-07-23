@@ -51,7 +51,8 @@ static bool MessageProcess(const char* msg0){
 	}
 	return true;
 }
-static bool Process(bool _dbg){
+static bool Process(){
+	auto _dbg=OmfMain::Globle().DebugMode();
 	auto layout = (std::string)
 		"type=Application,name=appWavRec,layout={"
 			"type=Pipeline,name=pl_wav_rec,layout={"
@@ -85,21 +86,11 @@ static bool Process(bool _dbg){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfWavRecord(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
-	///check the params
-	returnIfErrC(0,!_fname);
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
-	///
-	Process(helper.Debug());
+	Process();
 	///
 	return 0;
 }

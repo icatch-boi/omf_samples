@@ -25,9 +25,9 @@ std::string _decoder;
 static OmfHelper::Item _options0[]{
 	{"omfTapeRecorder(...): \n"
 	 "play the audio file(*.wav/*.pcm/*.aac). eg..\n"
-	 "> omfTapePlayer -n test.wav -d10\n"
-	 "> omfTapePlayer -n test.aac -d10\n"
-	 "> omfTapePlayer -n test.pcm -r 16000 -c 1 -d10\n"
+	 "> omfTapePlayer -n test.wav\n"
+	 "> omfTapePlayer -n test.aac\n"
+	 "> omfTapePlayer -n test.pcm -r 16000 -c 1\n"
 	},
 	{"fname"	,'n', _fname 		,"set the file name."},
 	{"rate"		,'r', _rate			,"set the sample rate of pcm."},
@@ -57,12 +57,13 @@ static bool MessageProcess(const char* msg0){
 	}
 	return true;
 }
-static bool Process(bool _dbg){
+static bool Process(){
+	bool _dbg=OmfMain::Globle().DebugMode();
 	auto layout = (std::string)
 		"type=Application,layout={"
 			"type=Pipeline,layout={"
-   				+_demuxer+"url=file://"+_fname+",dbg="+_dbg+
-				_decoder+
+   				+_demuxer+
+				'+'+_decoder+
 				"+PcmSink:name=player,live=true,dbg="+_dbg+
 			"}"
 		"}"
@@ -91,7 +92,7 @@ static bool CheckParamers(){
 	///
 	switch(::Hash(ext)){
 		case ::Hash("wav"):
-			_demuxer = "wav-demuxer";
+			_demuxer = "wav-demuxer:name=demux";
 			_decoder = "";
 			break;
 		case ::Hash("pcm"):
@@ -99,7 +100,7 @@ static bool CheckParamers(){
 			_decoder = "";
 			break;
 		case ::Hash("aac"):
-			_demuxer = "aac-demuxer";
+			_demuxer = "aac-demuxer:name=demux";
 			_decoder = "+aac-decoder";
 			break;
 		default:
@@ -107,26 +108,19 @@ static bool CheckParamers(){
 			return false;
 	}
 	returnIfErrC(false,_demuxer.empty());
+	_demuxer=_demuxer+",url=file://"+_fname+",dbg="+OmfMain::Globle().DebugMode();
 	return true;
 }
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfTapePlayer(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
-	returnIfErrC(0,!_fname);
+	returnIfErrC(0,!CheckParamers());
 	///
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
-	///
-	Process(helper.Debug());
+	Process();
 	///
 	return 0;
 }

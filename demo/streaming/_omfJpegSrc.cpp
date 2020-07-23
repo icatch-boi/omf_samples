@@ -138,7 +138,8 @@ static bool ProcessPush(IJpegSource*src,FILE*fd){
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
-static bool Process(bool _dbg){
+static bool Process(){
+	bool _dbg=OmfMain::Globle().DebugMode();
 	///////////////////////////////////////
 	//create a JpegSource instance with keywords.
 	dbgTestPVL(_keywords);
@@ -180,21 +181,13 @@ static bool Check(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfJpegSrc(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
 	returnIfErrC(0,!Check());
-	///init the omf module
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
 	///process
-	Process(helper.Debug());
+	Process();
 	///
 	return 0;
 }

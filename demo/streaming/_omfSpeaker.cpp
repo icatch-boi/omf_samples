@@ -69,16 +69,10 @@ bool GetSpeakerInfo(){dbgTestPL();
 //
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfSpeaker(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	//
-	OmfMain omf;
-	//
-	omf.Helper(helper);
-	//
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
+	///
 	if(_info>0)GetSpeakerInfo();
 	if(_vol>=0)SetSpeakerVol(_vol);
 	if(_mute>=0)SetSpeakerMute(_mute);

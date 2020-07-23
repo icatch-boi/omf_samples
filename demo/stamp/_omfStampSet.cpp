@@ -73,19 +73,9 @@ bool Process(int x,int y,unsigned color,const char* pattern,int draw,unsigned bg
 
 int main(int argc,char* argv[]) {
 	dbgNotePSL("omfStampSet()\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
-	///check the params
-	//...
-	///
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///
 	Process(_x,_y,_color,_pattern,_draw,_bgcolor);
 	///

@@ -59,13 +59,13 @@ static bool MessageProcess(const char* msg0){
 }
 static bool Process(bool _dbg){
 	auto sink=(std::string)"+FakeSink:name=sink,dbg="+_dbg+",live=false";
-	if(_fname)sink=(std::string)"+IOSink:name=sink,dbg="+_dbg+",url=file://_fname";
+	if(_fname)sink=(std::string)"+IOSink:name=sink,dbg="+true+",url=file://"+_fname+",only1st=true";
 	auto layout = (std::string)
 		"type=Application,layout={"
 			"type=Pipeline,layout={"
 				"ShmSource:connect={"
 					"type=Pipeline,name=plPreRecord"+_codec+
-				"}"
+				"},sendmsg={preRecOutput={oper=AfterStart,send={forward}},preRecOutputDisable={oper=BeforeStop,send={forward}}}"
 				"+PlayUntil:duration="+_seconds+"s"
 				+sink+
 			"}"
@@ -90,21 +90,13 @@ static bool CheckParamers(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfPreRecord(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
 	returnIfErrC(0,!_fname);
 	///
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
-	///
-	Process(helper.Debug());
+	Process(OmfMain::Globle().DebugMode());
 	///
 	return 0;
 }

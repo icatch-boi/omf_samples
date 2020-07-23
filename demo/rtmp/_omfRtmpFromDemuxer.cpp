@@ -23,7 +23,7 @@ using namespace omf::api;
 using namespace omf::api::streaming;
 using namespace omf::api::streaming::common;
 using namespace omf::rtmp;
-using ISource = IStreamOutput;
+using ISource = IStreamSource;
 ////////////////////////////////////////////////////////////
 static const char* _fname=0;
 static FILE* _fd=0;
@@ -161,19 +161,13 @@ static bool Check(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfDemuxer(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
 	//returnIfErrC(0,!Check());
-	///init the omf module
-	OmfMain omf;
-	//omf.Command("show_classes",0,0);
-	omf.LogConfig("all=true,err=true,note=true");
-	omf.Helper(helper);
 	///process
-	Process(omf);
+	Process(OmfMain::Globle());
 	///
 	return 0;
 }

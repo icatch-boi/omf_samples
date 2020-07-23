@@ -39,7 +39,7 @@ namespace omf {
 			 *  GetYuvMediaInfo(). call after Open().\n
 			 */
 			class IYuvSource
-				: public virtual common::IStreamOutput
+				: public virtual common::IStreamSource
 				, public virtual common::IYuvDevice
 				, public virtual common::IVideoSource
 			{

@@ -44,7 +44,7 @@ namespace omf{
 			 *  GetAudioMediaInfo(). call after Open().\n			 *
 			 */
 			class IAudioPlayer
-					: virtual public common::IStreamInput
+					: virtual public common::IStreamSink
 					, virtual public common::IAudio
 			{
 			public:

@@ -15,7 +15,7 @@ using namespace omf::api;
 using namespace omf::chrono;
 ////////////////////////////////////////////
 static const char* _fname=0;
-static int _seconds=0;
+static int _seconds=30;
 static int _rate=0;
 static int _channels=0;
 static char* _codec = "alaw";
@@ -115,23 +115,13 @@ static bool CheckParamers(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfTapeRecorder(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
-	///check the params
-	returnIfErrC(0,!_fname);
-	///
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///
 	returnIfErrC(0,!CheckParamers());
-	CheckParamers();
-	Process(helper.Debug());
+	///
+	Process(OmfMain::Globle().DebugMode());
 	///
 	return 0;
 }

@@ -177,18 +177,13 @@ static bool Check(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfAudPlay(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
 	returnIfErrC(0,!Check());
-	///init the omf module
-	OmfMain omf;
-	omf.Helper(helper);
-	///process
-	//omf.Command("show_classes",0,0);
-	Process(omf);
+	///
+	Process(OmfMain::Globle());
 	///
 	return 0;
 }

@@ -18,7 +18,7 @@ typedef void (*CbRegister)();
 #define ACTIVATE_APP(m) ACTIVATE(App##m)
 
 /*Activate command*/
-#define ACTIVATE_CMD(f) extern void* __register_cmd_##f;sum|=(unsigned)(void*)__register_cmd_##f;
+#define ACTIVATE_CMD(f) ACTIVATE(f)//extern void* __register_cmd_##f;sum|=(unsigned)(void*)__register_cmd_##f;
 
 #endif
 

@@ -39,20 +39,20 @@ static bool CreateRtspUrlMap(char* buff){
 	///h264 width,height,bitrate,framerate,gop
 	const char* vattern="%s={codec=h264,w=%d,h=%d,br=%d,fr=%d,gop=%d}";
 	///aac bitrate,bandwidth
-	const char* aattern="%s={codec=aac,rate=%d,ch=%d,br=%d,bw=%d}";
-	const char* pattern="%s={codec=h264,w=%d,h=%d,br=%d,fr=%d,gop=%d+codec=aac,rate=%d,ch=%d,br=%d,bw=%d}";
+	const char* aattern="%s={codec=aac,ch=%d,br=%d,bw=%d}";
+	const char* pattern="%s={codec=h264,w=%d,h=%d,br=%d,fr=%d,gop=%d+codec=aac,ch=%d,br=%d,bw=%d}";
 	char* ptr=buff;
 	/////////////////////////
-	ptr+=sprintf(ptr,pattern,"stream0",/*h264*/1920,1080,1024*128*8 ,24, 24, /*aac*/16000,1,38000,16000);*ptr++=',';
-	ptr+=sprintf(ptr,pattern,"stream1",/*h264*/1280, 720,1024*128*2 ,24, 24, /*aac*/16000,1,38000,16000);*ptr++=',';
-	ptr+=sprintf(ptr,pattern,"stream2",/*h264*/640 , 360,1024*128*1 ,24, 24, /*aac*/16000,1,38000,16000);*ptr++=',';
-	ptr+=sprintf(ptr,pattern,"fhd-aac",/*h264*/1920,1080,1024*128*8 ,24, 24, /*aac*/16000,1,38000,16000);*ptr++=',';
-	ptr+=sprintf(ptr,pattern,"hd-aac", /*h264*/1280, 720,1024*128*2 ,24, 24, /*aac*/16000,1,38000,16000);*ptr++=',';
-	ptr+=sprintf(ptr,pattern,"vga-aac",/*h264*/640 , 360,1024*128*1 ,24, 24, /*aac*/16000,1,38000,16000);*ptr++=',';
+	ptr+=sprintf(ptr,pattern,"stream0",/*h264*/1920,1080,1024*128*8 ,24, 24, /*aac*/1,38000,16000);*ptr++=',';
+	ptr+=sprintf(ptr,pattern,"stream1",/*h264*/1280, 720,1024*128*2 ,24, 24, /*aac*/1,38000,16000);*ptr++=',';
+	ptr+=sprintf(ptr,pattern,"stream2",/*h264*/640 , 360,1024*128*1 ,24, 24, /*aac*/1,38000,16000);*ptr++=',';
+	ptr+=sprintf(ptr,pattern,"fhd-aac",/*h264*/1920,1080,1024*128*8 ,24, 24, /*aac*/1,38000,16000);*ptr++=',';
+	ptr+=sprintf(ptr,pattern,"hd-aac", /*h264*/1280, 720,1024*128*2 ,24, 24, /*aac*/1,38000,16000);*ptr++=',';
+	ptr+=sprintf(ptr,pattern,"vga-aac",/*h264*/640 , 360,1024*128*1 ,24, 24, /*aac*/1,38000,16000);*ptr++=',';
 	ptr+=sprintf(ptr,vattern,"fhd",/*h264*/1920,1080,1024*128*8 ,24, 24);*ptr++=',';
 	ptr+=sprintf(ptr,vattern,"hd",/*h264*/1920,1080,1024*128*4 ,24, 24);*ptr++=',';
 	ptr+=sprintf(ptr,vattern,"vga",/*h264*/1920,1080,1024*128*1 ,24, 24);*ptr++=',';
-	ptr+=sprintf(ptr,aattern,"aac",/*aac*/16000,1,38000,16000);//*ptr++=',';
+	ptr+=sprintf(ptr,aattern,"aac",/*aac*/1,38000,16000);//*ptr++=',';
 	*ptr++=0;
 
 	return true;
@@ -67,21 +67,9 @@ static bool CreateRtspAuthMap(char* buff){
 
 int main(int argc, char *argv[]){
 	dbgNotePSL("omfRtspServer");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
-	///
-	OmfMain omf;
-	///show the modules loaded.
-	omf.ShowModules();
-	///disable all debug log.
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
-	///debug
-	omf.Debug(true);
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///
 	std::unique_ptr<char[]> urlmap{new char[1024*32]};
 	CreateRtspUrlMap(urlmap.get());

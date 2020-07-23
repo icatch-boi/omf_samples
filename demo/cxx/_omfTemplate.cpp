@@ -67,7 +67,8 @@ static bool MessageProcess(const char* msg0){
 	}
 	return true;
 }
-static bool Process(bool _dbg){
+static bool Process(){
+	bool _dbg=OmfMain::Globle().DebugMode();
 	///the Applicaion Layout string
 	auto layout =(std::string)
 		"type=ShmService,index=1,partner={"
@@ -110,21 +111,13 @@ static bool CheckParameters(){
 }
 ////////////////////////////////
 int main(int argc,char* argv[]){
-	///parse the input parameters with the parser table.
-	OmfHelper helper(_options0,argc,argv);
-	///--help,-H
-	returnIfTestC(0,!helper);
-	///output the parameters list
-	helper.Print();
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the parameters
 	returnIfErrC(0,!CheckParameters());
-	///create only one instance of OmfMain.
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
 	///
-	Process(helper.Debug());
+	Process();
 	///
 	return 0;
 }

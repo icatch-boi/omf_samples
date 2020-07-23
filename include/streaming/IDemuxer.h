@@ -12,7 +12,7 @@ namespace omf {
 				:public common::IStreamControl
 			{
 			public:
-				using ISource=common::IStreamOutput;
+				using ISource=common::IStreamSource;
 			public:
 				virtual bool Url(const char*) =0;
 				virtual const char* Url()const =0;

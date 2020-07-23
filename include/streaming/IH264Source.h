@@ -51,7 +51,7 @@ namespace omf {
 			 *  ForceKeyFrame(). call after start().\n
 			 */
 			class IH264Source
-				: virtual public common::IStreamOutput
+				: virtual public common::IStreamSource
 				, virtual public common::IBitRateControl
 				, virtual public common::IVideoSource
 				, virtual public common::ITrigger

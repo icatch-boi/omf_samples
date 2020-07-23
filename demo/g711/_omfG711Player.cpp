@@ -55,7 +55,8 @@ static bool MessageProcess(const char* msg0){
 	}
 	return true;
 }
-static bool Process(bool _dbg){
+static bool Process(){
+	auto _dbg=OmfMain::Globle().DebugMode();
 	auto layout = (std::string)
 		"type=Application,layout={"
 			"type=Pipeline,layout={"
@@ -110,22 +111,13 @@ static bool CheckParamers(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfG711Player(...)\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
-	///check the params
-	returnIfErrC(0,!_fname);
-	///
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///
 	returnIfErrC(0,!CheckParamers());
-	Process(helper.Debug());
+	///
+	Process();
 	///
 	return 0;
 }

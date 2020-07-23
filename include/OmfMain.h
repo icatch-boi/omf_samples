@@ -19,6 +19,15 @@ namespace omf {
 			 *
 			 */
 			~OmfMain();
+		private:
+			OmfMain(const OmfMain&) = delete;
+			OmfMain& operator=(const OmfMain&) = delete;
+		public:
+			static OmfMain& Globle();
+			static bool Initialize(const char* para=0);
+			static bool Initialize(OmfHelper::Item*opt,int argc,char **argv,const char* para=0);
+		protected:
+			bool _debugMode=false;
 		public:
 			/** the omf globel command interface.
 			 * @param cmd : the cmd string
@@ -91,6 +100,11 @@ namespace omf {
 			 * @return true/false
 			 */
 			bool Debug(bool en);
+			/**
+			 * get the debug mode;
+			 * @return true/false;
+			 */
+			bool DebugMode()const;
 			/** register SIGINT process function.
 			 * @param en :true/false
 			 * @return true/false

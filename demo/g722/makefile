@@ -1,17 +1,14 @@
 ALL =
-ALL+=omfRtspServer_
+ALL+=omfG722Recorder_
+ALL+=omfG722Player_
+##
+INCS +=
 ###
-CFLAGS +=
-CXXFLAGS +=
-###
-LIBS += -lliveMedia
-LIBS += -lgroupsock
-LIBS += -lUsageEnvironment
-LIBS += -lBasicUsageEnvironment
-###
-LIBS += -lpluginrtsp4
+LIBS += -lpluginav
+LIBS += -lpluginiofile
+LIBS += -lpluginwav
 LIBS += -lpluginpcm
-LIBS += -lplugindev
+LIBS += -lpluging722
 ###
 LIBS += -lomfapi
 LIBS += -lomfapicxx
@@ -21,11 +18,6 @@ LIBS += -lpluginapistreaming
 LIBS += -lpluginshmbase
 LIBS += -lpluginshm
 ###
-LIBS += -lpluginaac
-###
-LIBS += -lpluginpcm
-###
-LIBS += -lpluginav
 LIBS += -lpluginbase
 LIBS += -lfwcore
 LIBS += -lfwbase
@@ -34,7 +26,7 @@ LIBS += -lfwporting
 LIBS += -ldl
 LIBS += -ldbglinux
 ###
-INCS +=
+OBJS +=
 ###
 include ../makefile.tmpl
-
+	

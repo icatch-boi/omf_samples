@@ -90,19 +90,9 @@ static bool Process(int idx,int x,int y,int w,int h,unsigned color,int draw){
 }
 int main(int argc,char* argv[]) {
 	dbgNotePSL("omfZonesSet()\n");
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
-	///check the params
-	//...
-	///
-	OmfMain omf;
-	omf.ShowModules();
-	omf.Debug(helper.Debug());
-	if(helper.Log())omf.LogConfig(helper.Log());
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///
 	Process(_idx,_x,_y,_w,_h,_color,_draw);
 	///

@@ -38,6 +38,22 @@ static inline std::string operator+(const std::string&str,uint64 v){return str+t
 static inline std::string operator+(const std::string&str,bool   v){return str+(v?"true":"false");}
 template<class T=void>
 static inline std::string operator+(const std::string&str,T* v){return str+to_string(v);}
+///
+//static inline std::string& operator+=(std::string&str,char*  v){return str+=to_string(v);}
+//static inline std::string& operator+=(std::string&str,const char* v){return str+=to_string(v);}
+//static inline std::string& operator+=(std::string&str,const std::string& v){return str+=to_string(v);}
+//static inline std::string& operator+=(std::string&str,int8   v){return str+=to_string(v);}
+static inline std::string& operator+=(std::string&str,int16  v){return str+=to_string(v);}
+static inline std::string& operator+=(std::string&str,int32  v){return str+=to_string(v);}
+static inline std::string& operator+=(std::string&str,int64  v){return str+=to_string(v);}
+static inline std::string& operator+=(std::string&str,uint8  v){return str+=to_string(v);}
+static inline std::string& operator+=(std::string&str,uint16 v){return str+=to_string(v);}
+static inline std::string& operator+=(std::string&str,uint32 v){return str+=to_string(v);}
+static inline std::string& operator+=(std::string&str,uint64 v){return str+=to_string(v);}
+static inline std::string& operator+=(std::string&str,bool   v){return str+=(v?"true":"false");}
+template<class T=void>
+static inline std::string& operator+=( std::string&str,T* v){return str+=to_string(v);}
+
 
 static inline unsigned atou(const char*s){return strtoul(s,0,0);}
 

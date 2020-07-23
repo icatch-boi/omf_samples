@@ -27,7 +27,7 @@ static int _gop = 15;
 /**aac**/
 static int _a_bitrate = 128;///KB
 static int _channel = 1;
-static int _samplerate = 16000;
+//static int _samplerate = 16000;
 /**rtmp**/
 static int _seconds = 3600;
 static const char* _url = "rtmp://192.168.0.147:1935/live/Vi37";
@@ -49,7 +49,7 @@ static OmfHelper::Item _options0[]{
 		{"goptype"	,'t'		, _goptype			,"gop type(iiii,ippp,ibbp) of h264 encoder."},
 		{"gop"		,'g'		, _gop				,"gop of h264 encoder."},
 		{"the aac paramers:"},
-		{"rate"		,'r'		, _samplerate		,"samplereate of pcm."},
+//		{"rate"		,'r'		, _samplerate		,"samplereate of pcm."},
 		{"abr"		,'a'		, _a_bitrate		,"set the audio bitrate(kb) to aac codec."},
 		{"channel"  ,'c'		, _channel			,"set the target channels to aac codec.0:follow the channels of pcm src,other is force to rechannels."},
 		{"the rtmp paramers:"},
@@ -72,30 +72,18 @@ static bool CreateRtmpUrlMap(char* buff){
 
 	sprintf(buff,"w=%d,h=%d,frmax=%d,frmin=%d,"
 			     "vbrmax=%d,vbrmin=%d,goptype=%s,gop=%d,"
-		         "rate=%d,abitrate=%d,channel=%d",
+		         "abitrate=%d,channel=%d",
 				 _width,_height,_framerate_max,_framerate_min,
 			     _v_bitrate_max,_v_bitrate_min,_goptype,_gop,
-			     _samplerate,_a_bitrate,_channel);
+			     _a_bitrate,_channel);
 
 	return true;
 }
 
 int main(int argc, char *argv[]){
-	///parse the input params
-	OmfHelper helper(_options0,argc,argv);
-	///--help
-	returnIfTestC(0,!helper);
-	///output the params list
-	helper.Print();
-	///init the omf module
-	OmfMain omf;
-	omf.Helper(helper);
-	///show the modules loaded.
-	//omf.ShowModules();
-	///disable all debug log.
-	//omf.LogConfig("all=true,err=true,note=true");
-	///debug
-	//omf.Debug(false);
+	///parse the input parameters with the parser table,
+	///and initialize omf system.
+	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///
 	std::unique_ptr<char[]> cfgmap{new char[1024*32]};
 	CreateRtmpUrlMap(cfgmap.get());

@@ -35,7 +35,7 @@ namespace omf {
 					virtual bool Get(std::string& attributes)=0;
 				};
 
-				class IStreamInput:public virtual IStreamControl {
+				class IStreamSink:public virtual IStreamControl {
 				public:
 					/**
 					 * check whether the push-operation is supported.
@@ -71,7 +71,7 @@ namespace omf {
 					virtual bool SetMediaInfo(const char*) = 0;
 				};
 
-				class IStreamOutput:public virtual IStreamControl {
+				class IStreamSource:public virtual IStreamControl {
 				public:
 					/**
 					 * check whether the pull-operation is supported.
