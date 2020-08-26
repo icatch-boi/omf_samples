@@ -19,7 +19,7 @@ static int _x = 0;//48;
 static int _y = 0;//48;
 static unsigned _color = 0;//0x00ff0000;
 static unsigned _bgcolor = 0;
-static const char* _pattern = 0;//"%04d-%02d-%02d %02d-%02d-%02d";
+static const char* _pattern = "%04d-%02d-%02d %02d-%02d-%02d";
 static int _draw = -1;
 ////////////////////////////////////////////
 static bool _exit = false;

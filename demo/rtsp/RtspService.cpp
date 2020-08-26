@@ -2,12 +2,11 @@
 #include "OmfDbg.h"
 #include "OmfAttrSet.h"
 #include "BasicUsageEnvironment.hh"
-
+#include "porting.h"
+///
 #undef dbgEntryTest
 #define dbgEntryTest(s) dbgEntryPink(s)
 ///
-extern void vfp_enable();
-extern void vfp_disable();
 using namespace omf::rtsp;
 using namespace omf::api;
 

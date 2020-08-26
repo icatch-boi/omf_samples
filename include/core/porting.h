@@ -18,7 +18,6 @@ EXTERNC void dsp_enable(void);
 EXTERNC void dsp_disable(void);
 EXTERNC void cmdExec(char *cmd);
 ///
-EXTERNC long long _lseek64(int fd, long long offset, int pos);
 EXTERNC int fileConcate(void* srcFd,void* dstFd, int opt);
 EXTERNC unsigned int GetClusterSize(char *diskname);
 ///
@@ -34,5 +33,7 @@ EXTERNC void callStack(void);
 EXTERNC void osDeadMediaDumpSet(void (*fp)(void));
 ///
 EXTERNC void getLocalTime(char*);
+///
+EXTERNC void cxxPoolsInfo();
 
 #endif  /* _PORTING_H_ */

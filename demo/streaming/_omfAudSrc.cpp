@@ -26,6 +26,7 @@ static const char* _codec=0;
 static bool _aec=0;
 static const char* _aecpara="level=2,ansmode=3";
 static int _rate = 16000;
+static bool _dumpFrm=false;
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
@@ -48,6 +49,7 @@ static OmfHelper::Item _options0[]{
 	{"\naec:"},
 	{"aec",'e', _aec		,"set the pcm aec enable"},
 	{"aecpara",'p', _aecpara	,"aec params.eg.. keys=webrtc,level=2,ansmode=3"},
+	{"dumpfrm"	,'F', [](){_dumpFrm=false;}	,"dump the frame."},
 	{},
 };
 ////////////////////////////////////////////
@@ -80,13 +82,15 @@ static bool ProcessPull(IAudioSource*src,FILE*fd){
 		if(!frm->data || !frm->size)
 			continue;
 		///
-		dbgTestPSL(frm->index
-						   <<','<<frm->data
-						   <<','<<frm->size
-						   <<','<<frm->iskeyframe
-						   <<','<<frm->pts
-		);
-		dbgTestDL(frm->data,16);
+		if(_dumpFrm) {
+			dbgTestPSL(frm->index
+					           << ',' << frm->data
+					           << ',' << frm->size
+					           << ',' << frm->iskeyframe
+					           << ',' << frm->pts
+			);
+			dbgTestDL(frm->data, 16);
+		}
 		///write to file
 		if(fd)fwrite(frm->data,1,frm->size,fd);
 		///sleep & trigger
@@ -104,13 +108,15 @@ static bool ProcessPull(IAudioSource*src,FILE*fd){
 static bool ProcessPush(IAudioSource*src,FILE*fd){
 	//set push callback
 	src->RegisterOutputCallback([&fd](std::shared_ptr<IAudioSource::frame_t>&frm){
-		dbgTestPSL(frm->index
-						   <<','<<frm->data
-						   <<','<<frm->size
-						   <<','<<frm->iskeyframe
-						   <<','<<frm->pts
-		);
-		dbgTestDL(frm->data,16);
+		if(_dumpFrm) {
+			dbgTestPSL(frm->index
+					           << ',' << frm->data
+					           << ',' << frm->size
+					           << ',' << frm->iskeyframe
+					           << ',' << frm->pts
+			);
+			dbgTestDL(frm->data, 16);
+		}
 		///
 		if(_codec && !strcmp(_codec,"opus")){
 			uint32 framesize = frm->size;
@@ -137,7 +143,8 @@ static bool ProcessPush(IAudioSource*src,FILE*fd){
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
-static bool Process(bool _dbg){dbgTestPL();
+static bool Process(){dbgTestPL();
+	bool _dbg=OmfMain::Globle().DebugMode();
 	///////////////////////////////////////
 	//create a IAudioSource instance with keywords.
 	dbgTestPVL(_keywords);
@@ -192,7 +199,7 @@ int main(int argc,char* argv[]){
 	///check the params
 	returnIfErrC(0,!Check());
 	///process
-	Process(OmfMain::Globle().DebugMode());
+	Process();
 	///
 	return 0;
 }

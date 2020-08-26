@@ -22,7 +22,19 @@ static inline std::string to_string(const char*s){return s?s:"nullptr";}
 static inline std::string to_string(char*s){return s?s:"nullptr";}
 static inline std::string to_string(const std::string&s){return s;}
 template<class T>
-static inline std::string to_string(T*v){return (void*)v;}
+static inline std::string to_string(T*v){return to_string((void*)v);}
+//static inline std::string to_string(unsigned long long t) {return std::to_string(t);}
+//static inline std::string to_string(long long t)          {return std::to_string(t);}
+//static inline std::string to_string(unsigned int t)       {return std::to_string(t);}
+//static inline std::string to_string(int t)                {return std::to_string(t);}
+//static inline std::string to_string(unsigned long t)      {return std::to_string(t);}
+//static inline std::string to_string(long t)               {return std::to_string(t);}
+static inline std::string to_string(unsigned short t)       {return std::to_string(t);}
+static inline std::string to_string(short t)                {return std::to_string(t);}
+static inline std::string to_string(unsigned char t)        {return std::to_string(t);}
+static inline std::string to_string(char t)                 {return std::to_string(t);}
+static inline std::string to_string(bool t)                 {return t?"true":"false";}
+
 
 static inline std::string operator+(const std::string&str,char*  v){return str+to_string(v);}
 static inline std::string operator+(const std::string&str,const char* v){return str+to_string(v);}

@@ -16,7 +16,8 @@ namespace omf {
 			public:
 				virtual bool Url(const char*) =0;
 				virtual const char* Url()const =0;
-
+				virtual void Live(bool) = 0;
+				virtual bool Live() = 0;
 			public:
 				virtual bool RegisterOutputCallback(std::function<void(ISource*)>)=0;
 				virtual std::vector<ISource*> Outputs()const=0;

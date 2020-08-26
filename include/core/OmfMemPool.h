@@ -9,6 +9,7 @@ namespace omf{
 		public:
 			virtual ~OmfMemPool();
 		public:
+			virtual const char* PoolName()const;
 			virtual int MaxSize() const;
 		public:
 			virtual void* Alloc(int size)=0;
@@ -20,7 +21,7 @@ namespace omf{
 			virtual bool Free(const char*name)=0;
 			virtual bool Free(unsigned key)=0;
 		public:
-			static OmfMemPool* const Globle(const char*keywords);
+			static OmfMemPool* const Globle(const char*keywords=0);
 			static OmfMemPool* const ShmPool();
 			static OmfMemPool* const BigPool();
 		};

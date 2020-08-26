@@ -44,7 +44,7 @@ add_subdirectory(demo)
 
 ###release
 file(GLOB FILE_LIST ${CMAKE_CURRENT_SOURCE_DIR}/Omf*.h)
-install(FILES ${FILE_LIST} DESTINATION ${CMAKE_INSTALL_PREFIX_INC}/)
+install(FILES ${FILE_LIST} DESTINATION ${CMAKE_INSTALL_PREFIX_INC}/misc)
 ###release demo
 file(GLOB FILE_LIST ${CMAKE_CURRENT_SOURCE_DIR}/*.*)
 set(FILE_LIST ${FILE_LIST} makefile)

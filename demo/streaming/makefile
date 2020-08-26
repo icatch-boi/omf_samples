@@ -19,24 +19,18 @@ INCS += -I.
 LIBS += -lpluginaac
 LIBS += -lpluging711
 LIBS += -lpluging722
+###
+LIBS += -lpluginapistreaming
 LIBS += -lpluginpcm
 LIBS += -lplugindev
-###
 LIBS += -lpluginiofile
 LIBS += -lpluginav
+LIBS += -lpluginshm
+LIBS += -lpluginbase
 ###
 LIBS += -lomfapi
 LIBS += -lomfapicxx
 LIBS += -lomfapistreaming
-LIBS += -lpluginapistreaming
-###
-LIBS += -lpluginshmbase
-LIBS += -lpluginshm
-###
-LIBS += -lpluginbase
-LIBS += -lfwcore
-LIBS += -lfwbase
-LIBS += -lfwporting
 ###
 LIBS += -ldl
 LIBS += -ldbglinux

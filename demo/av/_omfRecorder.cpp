@@ -99,6 +99,13 @@ static bool MessageProcess(const char* msg0){
 		case Hash("recordStop"):
 			FileListAdd(ap.Get("url"));
 			break;
+		case Hash("fileClose"):
+			printf("msg fileClose \n");
+			auto url = ap.Get("url");
+			uint64 durMs;
+			ap.Get("duration",durMs);
+			auto filename = ap.Get("filename");
+			break;
 		default:
 			dbgTestPSL("unknow message:"<<msg);
 			break;

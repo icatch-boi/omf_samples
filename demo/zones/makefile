@@ -11,9 +11,6 @@ LIBS += -lomfapicxx
 ###
 LIBS += -lpluginshmbase
 ###
-LIBS += -lfwbase
-LIBS += -lfwporting
-###
 LIBS += -ldl
 LIBS += -ldbglinux
 ###

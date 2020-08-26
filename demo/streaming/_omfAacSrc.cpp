@@ -21,8 +21,8 @@ using namespace omf::api::streaming::common;
 ////////////////////////////////////////////////////////////
 static const char* _fname=0;
 static int _seconds=30;
-static const char* _keywords="dualos";
-static const char* _mic = "dualos";
+static const char* _keywords="dualos-push";
+//static const char* _mic = "dualos";
 static int _bitrate=128;///KB
 static int _channels=0;
 static int _triggerInterval=100;//seconds
@@ -51,7 +51,7 @@ static OmfHelper::Item _options0[]{
 	{"prerec"   ,'r', _prerecIdx,"set preRecord vbrc index and enable preRecord."},
 	{"\nmisc:"},
 	{"dumpfrm"	,'F', [](){_dumpFrm=false;}	,"dump the frame."},
-	{"mic"		,'m', _mic	,"select the mic with the keywords.Usually use the default values."},
+	//{"mic"		,'m', _mic	,"select the mic with the keywords.Usually use the default values."},
 	{"keywords",'k', _keywords	,"select the IAacSource with keywords.Usually use the default values."},
 	{},
 };
@@ -152,7 +152,8 @@ static bool SetParams(IAacSource*src){
 	if(!paras.empty())src->Set(paras.c_str()+1);
 	return true;
 }
-static bool Process(bool _dbg){
+static bool Process(){
+	bool _dbg=OmfMain::Globle().DebugMode();
 	///////////////////////////////////////
 	//create a AacSource instance with keywords.
 	std::string keywords=_keywords;
@@ -217,7 +218,7 @@ int main(int argc,char* argv[]){
 	///check the params
 	returnIfErrC(0,!Check());
 	///process
-	Process(OmfMain::Globle().DebugMode());
+	Process();
 	///
 	return 0;
 }
