@@ -53,7 +53,7 @@ static bool MessageProcess(const char* msg0){
 		case Hash("HumanDetect"):
 		{
 			const char* data = (ap.Get("info"));
-			dbgErrPSL(data);
+			dbgNotePSL(data);
 
 		}
 			break;
