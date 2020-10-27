@@ -47,6 +47,8 @@ namespace omf {
 				 * @return the new IPcmSource instance.
 				 */
 				static IPcmSource *CreateNew(const char *keywords);
+				static IPcmSource* CreateNewFromConfig(const char *config);
+				static IPcmSource* CreateNewFromFile(const char *file);
 			public:
 				/**
 				 * get the IPcmSource capabilities list.
@@ -54,7 +56,6 @@ namespace omf {
 				 * @return the capabilities list.
 				 */
 				static std::vector<PcmMediaInfo> GetCapabilities(const char*keywords);
-
 			protected:
 				/**
 				 * @note this source is fixed codec:AAC, this api is invalid.

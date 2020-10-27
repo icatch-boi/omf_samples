@@ -12,6 +12,8 @@ INCS += -I.
 LIBS += -lomfapicxx
 LIBS += -lomfapi
 ###
+LIBS += -lpluginshmbase
+###
 LIBS += -ldl
 LIBS += -ldbglinux
 ###

@@ -24,22 +24,28 @@ static int _seconds=30;
 static const char* _keywords="dualos";
 static const char* _codec=0;
 static bool _aec=0;
-static const char* _aecpara="level=2,ansmode=3";
+static const char* _aecpara="keys=webrtc,level=2,samples=1600";
+static bool _ans=0;
+static const char* _anspara="keys=webrtc,ansmode=3,samples=1600";
 static int _rate = 16000;
 static bool _dumpFrm=false;
 ////////////////////////////////////////////
 static bool _exit = false;
+static bool _opus= false;
 ////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
 	{"omfAudSrc(...): \n"
 	 "This demo shows how to get audio streaming from OMF using IAudioSource interface.\n"
 	 "  omfAudSrc -n test.pcm -d 30 -r 16000\n"
-	 "  omfAudSrc -n test.pcm -d 30 -e 1 -p level=2,ansmode=3\n"
+	 "  omfAudSrc -n test.pcm -d 30 -r 16000 -e 1 -N 1\n"
 	 "  omfAudSrc -n test.aac -d 30 -c aac:br=128000\n"
 	 "  omfAudSrc -n test.alaw -d 30 -c alaw\n"
 	 "  omfAudSrc -n test.ulaw -d 30 -c ulaw\n"
 	 "  omfAudSrc -n test.g722 -d 30 -c g722\n"
      "	omfAudSrc -n test.opus  -d 10 -c opus\n"
+	 "  omfAudSrc -n test.pcm -d 30 -e 1 -p keys=webrtc,level=2,samples=1600\n"
+	 "  omfAudSrc -n test.pcm -d 30 -N 1 -s keys=webrtc,ansmode=3,samples=1600\n"
+	 "  omfAudSrc -n test.pcm -d 30 -e 1 -p keys=webrtc,level=2,samples=1600 -N 1 -s keys=webrtc,ansmode=3,samples=1600\n"
 	},
 	{"fname",'n', _fname		,"record filename(*.pcm)."},
 	{"duration",'d', _seconds	,"process execute duration(*s)."},
@@ -48,7 +54,10 @@ static OmfHelper::Item _options0[]{
 	{"samplerate",'r', _rate		,"set the audio samplerate:eg.. aac:rate=16000"},
 	{"\naec:"},
 	{"aec",'e', _aec		,"set the pcm aec enable"},
-	{"aecpara",'p', _aecpara	,"aec params.eg.. keys=webrtc,level=2,ansmode=3"},
+	{"aecpara",'p', _aecpara	,"aec params.eg.. keys=webrtc,level=2,samples=1600"},
+	{"\nans:"},
+	{"ans",'N', _ans		,"set the pcm ans enable"},
+	{"anspara",'s', _anspara	,"ans params.eg.. keys=webrtc,ansmode=3,samples=1600"},
 	{"dumpfrm"	,'F', [](){_dumpFrm=false;}	,"dump the frame."},
 	{},
 };
@@ -118,11 +127,10 @@ static bool ProcessPush(IAudioSource*src,FILE*fd){
 			dbgTestDL(frm->data, 16);
 		}
 		///
-		if(_codec && !strcmp(_codec,"opus")){
+		if(_opus ||_codec && !strcmp(_codec,"opus")){
 			uint32 framesize = frm->size;
 			if(fd)fwrite(&framesize,1,4,fd);
 		}
-
 		if(fd)fwrite(frm->data,1,frm->size,fd);
 		return true;
 	});
@@ -155,6 +163,7 @@ static bool Process(){dbgTestPL();
 	src->SetSampleRate(_rate);
 
 	src->SetAEC(_aec,_aecpara);
+	src->SetANS(_ans,_anspara);
 
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
@@ -188,6 +197,16 @@ static bool Process(){dbgTestPL();
 }
 ////////////////////////////////////////////
 static bool Check(){
+	auto url = std::string("file://")+_fname;
+	OmfAttrSet ap(url);
+	returnIfErrC(false,!ap);
+	auto ext = ap.Get("ext");
+	returnIfErrC(false,!ext);
+	switch(::Hash(ext)){
+		case ::Hash("opus"):	
+			_opus = true;
+			break;
+	}
 	return true;
 }
 ////////////////////////////////

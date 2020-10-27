@@ -9,10 +9,10 @@ CXXFLAGS += -D_FILE_OFFSET_BITS=64
 CXXFLAGS += -DLOCALE_NOT_USED
 CXXFLAGS += -DREAD_FROM_FILES_SYNCHRONOUSLY
 ###
-INCS += -I${INCS_PATH}/BasicUsageEnvironment/include
-INCS += -I${INCS_PATH}/groupsock/include
-INCS += -I${INCS_PATH}/UsageEnvironment/include
-INCS += -I${INCS_PATH}/liveMedia/include
+INCS += -I${INCS_PATH}/3th/BasicUsageEnvironment/include
+INCS += -I${INCS_PATH}/3th/groupsock/include
+INCS += -I${INCS_PATH}/3th/UsageEnvironment/include
+INCS += -I${INCS_PATH}/3th/liveMedia/include
 ###
 LIBS += -lliveMedia
 LIBS += -lgroupsock

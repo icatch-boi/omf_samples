@@ -14,17 +14,20 @@ using namespace omf;
 using namespace omf::api;
 using namespace omf::chrono;
 ////////////////////////////////////////////
-static int _seconds=3600*24*30;
+static const char* _msgSiteKeys="event";
+static int _prerec=0;
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
-	{"omfEventService(...): \n"
-	 "this demo is to run a event process service, that records video and auoio streaming to the file when the event is triggering.. eg..\n"
-	 "> omfEventService -d 3600\n"
-	},
-	{"duartion",'d', _seconds	,"set the service run duration(*s)."},
-	{},
+		{"omfEventService(...): \n"
+		 "this demo is to run a event process service, that records video and auoio streaming to the file when the event is triggering.. eg..\n"
+		 "> omfEventService -m event\n"
+		 "> omfEventService -m event -r 1\n"
+		},
+		{"msgSiteKeys"  ,'m', _msgSiteKeys	,"set the msg site keys."},
+		{"prerec"       ,'r', _prerec	    ,"enable PreRecord."},
+		{},
 };
 ////////////////////////////////////////////
 static bool MessageProcess(const char* msg0){
@@ -54,9 +57,7 @@ static bool MessageProcess(const char* msg0){
 static bool Process(){
 	bool _dbg = OmfMain::Globle().DebugMode();
 	auto layout = (std::string)
-		"type=RecordEventService,layout={"
-			"type=EventSharedMemoryObject,name=ShmEventTrigger,free=false"
-		"}"
+			"type=RecordEventService,msgkey="+_msgSiteKeys+",prerec="+_prerec
 	;
 	dbgTestPSL(layout);
 	OmfObject obj(layout);

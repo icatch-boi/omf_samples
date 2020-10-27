@@ -76,7 +76,9 @@ namespace omf{
 				 * @param keywords[in] the keywords for selecting a IPcmPlayer type.
 				 * @return the new IPcmSource instance.
 				 */
-				static IPcmPlayer *CreateNew(const char *);
+				static IPcmPlayer *CreateNew(const char *keywords);
+				static IPcmPlayer* CreateNewFromConfig(const char *config);
+				static IPcmPlayer* CreateNewFromFile(const char *file);
 			};
 		}
 	}

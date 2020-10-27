@@ -7,7 +7,7 @@
 #include <vector>
 #include "common/MediaInfo.h"
 #include "common/IStreamControl.h"
-#include "common/IYuvDevice.h"
+#include "common/IYuv.h"
 #include "common/IVideoSource.h"
 namespace omf {
 	namespace api {
@@ -39,17 +39,27 @@ namespace omf {
 			 *  GetYuvMediaInfo(). call after Open().\n
 			 */
 			class IYuvSource
-				: public virtual common::IStreamSource
-				, public virtual common::IYuvDevice
-				, public virtual common::IVideoSource
+				: public virtual common::IVideoSource
+				, public virtual common::IYuv
 			{
+			public:
+				using YuvMediaInfo=omf::api::streaming::common::YuvMediaInfo;
+			public:
+				/**
+				 * get the output YUV media info.
+				 * @return YUV media info.
+				 * @see YuvMediaInfo
+				 */
+				virtual YuvMediaInfo GetYuvMediaInfo() const =0;
 			public:
 				/**
 				 * create a new YuvSource instance. \n
 				 * @param keywords[in] the keywords for selecting a YuvSource type. \n
 				 * @return the new YuvSource instance. \n
 				 */
-				static IYuvSource *CreateNew(const char *);
+				static IYuvSource *CreateNew(const char *keywords);
+				static IYuvSource* CreateNewFromConfig(const char *config);
+				static IYuvSource* CreateNewFromFile(const char *file);
 			public:
 				/**
 				 * get the IPcmSource capabilities list.

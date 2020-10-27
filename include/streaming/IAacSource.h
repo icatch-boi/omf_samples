@@ -4,7 +4,7 @@
 
 #pragma once
 #include "IAudioSource.h"
-#include "common/IEncoder.h"
+
 namespace omf {
 	namespace api {
 		namespace streaming {
@@ -36,7 +36,6 @@ namespace omf {
 			 */
 			class IAacSource
 				: virtual public IAudioSource
-				, virtual public common::IEncoder
 			{
 			public:
 				using AacMediaInfo=omf::api::streaming::common::AacMediaInfo;
@@ -79,13 +78,15 @@ namespace omf {
 				 * @return the new IAacSource instance.
 				 */
 				static IAacSource *CreateNew(const char *keywords);
+				static IAacSource* CreateNewFromConfig(const char *config);
+				static IAacSource* CreateNewFromFile(const char *file);
 
-			protected:
+			//protected:
 				/**
 				 * @note this source is fixed codec:AAC, this api is invalid.
 				 * @return false
 				 */
-				using IAudioSource::SetCodec;
+				//using IAudioSource::SetCodec;
 			};
 		}
 	}

@@ -51,14 +51,19 @@ namespace omf {
 			 *  ForceKeyFrame(). call after start().\n
 			 */
 			class IH264Source
-				: virtual public common::IStreamSource
+				: virtual public common::IVideoSource
 				, virtual public common::IBitRateControl
-				, virtual public common::IVideoSource
-				, virtual public common::ITrigger
 				, virtual public common::IH264
 			{
 			public:
 				using H264MediaInfo=omf::api::streaming::common::H264MediaInfo;
+			public:
+				/**
+				 * get the output H264 media info.
+				 * @return H264 media info.
+				 * @see H264MediaInfo
+				 */
+				virtual H264MediaInfo GetH264MediaInfo() const =0;
 			public:
 				/**
 				 * create a new H264Souce instance.
@@ -66,6 +71,8 @@ namespace omf {
 				 * @return the new H264Souce instance.
 				 */
 				static IH264Source* CreateNew(const char *keywords);
+				static IH264Source* CreateNewFromConfig(const char *config);
+				static IH264Source* CreateNewFromFile(const char *file);
 			};
 		}
 	}

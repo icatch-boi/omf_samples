@@ -8,9 +8,8 @@ namespace omf {
 	namespace api {
 		namespace streaming {
 			namespace common {
-				class IYuvDevice:public virtual IVideo {
-				public:
-					using YuvMediaInfo=omf::api::streaming::common::YuvMediaInfo;
+				class IYuv:public virtual IVideo {
+
 				public:
 					/**
 					 * set the width of image.
@@ -43,14 +42,7 @@ namespace omf {
 					 * set the framerate.
 					 * @param frame per seconds.
 					 */
-					virtual void SetFrameRate(int fr)=0;
-				public:
-					/**
-					 * get the output YUV media info.
-					 * @return YUV media info.
-					 * @see YuvMediaInfo
-					 */
-					virtual common::YuvMediaInfo GetYuvMediaInfo() const =0;
+					//virtual void SetFrameRate(int fr)=0;
 
 				};
 			}

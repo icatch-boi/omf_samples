@@ -78,6 +78,7 @@ static bool Process(OmfMain&omf){
 	player->SetSampleRate(_rate);
 	player->SetChannels(_channels);
 	player->SetMediaInfo(_media);
+	player->EnableCodecOnLinux(true);
 	//open streaming
 	returnIfErrC(false,!player->ChangeUp(State::ready));
 	//get streaming parameters after Open().
@@ -116,6 +117,7 @@ static bool Process(OmfMain&omf){
 			buf_size = data_len = framesize;
 		}
 		data_len=fread(buf.get(),1,buf_size,fd);//printf("read file:%d\n",data_len);
+		//dbgErrPSL(Hex(ftello64(fd)));
 		if(data_len<=0){
 			dbgTestPSL("play end!");
 			break;
@@ -158,6 +160,7 @@ static bool CheckPacketSize(){
 			_packetSize = _rate*_channels*2/4;
 			break;
 		case ::Hash("opus"):
+			_packetDur = 20_ms;
 			_packetSize = _rate;
 			_opus = true;
 			break;
@@ -181,6 +184,7 @@ int main(int argc,char* argv[]){
 	///and initialize omf system.
 	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
+	//OmfMain::Globle().ShowClasses();
 	returnIfErrC(0,!Check());
 	///
 	Process(OmfMain::Globle());

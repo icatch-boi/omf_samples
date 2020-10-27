@@ -94,8 +94,16 @@ namespace omf {
 				typedef struct {
 					int rate;///< the sample rate.
 					int channels;///< the channels.
+					std::string codec;
 					std::string media;
 				} AudioMediaInfo;
+
+				typedef struct {
+					int width;///< the width.
+					int height;///< the height.
+					std::string codec;
+					std::string media;
+				} VideoMediaInfo;
 			}
 		}
 	}

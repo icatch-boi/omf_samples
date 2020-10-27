@@ -17,6 +17,10 @@ namespace omf {
 			std::chrono::steady_clock::time_point pts;
 			std::function<void()> free;
 			void*pkt;
+			void*creater;
+			unsigned slice;
+			const char* codec;
+			unsigned flags;
 		public:
 			/**
 			 * @brief run the free callback when deconstruct.

@@ -12,6 +12,7 @@ LIBS += -lpluging722
 LIBS += -lpluginshm
 LIBS += -lpluginapistreaming
 LIBS += -lpluginshmbase
+LIBS += -lpluginbase
 ### api
 LIBS += -lomfapi
 LIBS += -lomfapicxx

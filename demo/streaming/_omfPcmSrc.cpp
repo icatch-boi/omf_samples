@@ -24,8 +24,10 @@ static int _seconds=30;
 static const char* _keywords="dualos";
 static const char* _mic = "dualos";
 static int _triggerInterval=100;//seconds
-static int _aec = 0;
-static const char* _aecpara="level=2,ansmode=3";
+static bool _aec=0;
+static const char* _aecpara="keys=webrtc,level=2,samples=1600";
+static bool _ans=0;
+static const char* _anspara="keys=webrtc,ansmode=3,samples=1600";
 static int _rate = 16000;
 ////////////////////////////////////////////
 static bool _exit = false;
@@ -34,7 +36,10 @@ static OmfHelper::Item _options0[]{
 	{"omfPcmSrc(...): \n"
 	 "This demo shows how to get PCM streaming from OMF using IPcmSource interface.\n"
 	 "  omfPcmSrc -n test.pcm -d 30\n"
-	 "  omfPcmSrc -n test.pcm -d 30 -e 1 -p level=2,ansmode=3\n"
+	 "  omfPcmSrc -n test.pcm -d 30 -e 1 -N 1\n"
+	 "  omfPcmSrc -n test.pcm -d 30 -e 1 -p keys=webrtc,level=2,samples=1600\n"
+	 "  omfPcmSrc -n test.pcm -d 30 -N 1 -s keys=webrtc,ansmode=3,samples=1600\n"
+	 "  omfPcmSrc -n test.pcm -d 30 -e 1 -p keys=webrtc,level=2,samples=1600 -N 1 -s keys=webrtc,ansmode=3,samples=1600\n"
 	},
 	{"fname",'n', _fname		,"record filename(*.pcm)."},
 	{"duration",'d', _seconds	,"process execute duration(*s)."},
@@ -42,8 +47,11 @@ static OmfHelper::Item _options0[]{
 	{"keywords",'k', _keywords	,"select the IPcmSource with keywords.Usually use the default values."},
 	{"samplerate",'r', _rate	,"set the audio samplerate:eg.. rate=16000"},
 	{"\naec:"},
-	{"aec"      ,'e', _aec	    ,"enable/disable aec."},
-	{"aecpara",'p', _aecpara	,"aec params.eg.. keys=webrtc,level=2,ansmode=3"},
+	{"aec",'e', _aec		,"set the pcm aec enable"},
+	{"aecpara",'p', _aecpara	,"aec params.eg.. keys=webrtc,level=2,samples=1600"},
+	{"\nans:"},
+	{"ans",'N', _ans		,"set the pcm ans enable"},
+	{"anspara",'s', _anspara	,"ans params.eg.. keys=webrtc,ansmode=3,samples=1600"},
 	{},
 };
 ////////////////////////////////////////////
@@ -138,6 +146,7 @@ static bool Process(bool _dbg){
 	//src->SelectMicrophone(_mic);//select the MIC.
 	src->SetSampleRate(_rate);//set the samplerate.
 	src->SetAEC(_aec,_aecpara);
+	src->SetAEC(_ans,_anspara);
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
 	//get streaming parameters after Open().

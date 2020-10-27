@@ -27,7 +27,8 @@ static int _width=1920;
 static int _height=1080;
 static int _framerate=30;
 static int _qp=90;//0~100
-static int _triggerInterval=100;//seconds
+static int _triggerInterval=0;//seconds
+static int _prerecIdx=0;	///enable/disable preRecord
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
@@ -43,6 +44,7 @@ static OmfHelper::Item _options0[]{
 	{"w"		,'w', _width	,"set the width for yuv source."},
 	{"h"		,'h', _height	,"set the height for yuv source."},
 	{"fr"		,'f', _framerate,"set the framerate for yuv source."},
+	{"prerec"   ,'r', _prerecIdx,"set preRecord vbrc index and enable preRecord."},
 	{"the jpeg paramers:"},
 	{"qp"	,'q', _qp	,"set the QP(0~100) to JPEG codec."},
 	{"misc:"},
@@ -97,7 +99,7 @@ static bool ProcessPull(IJpegSource*src,FILE*fd){
 		if(fd)fwrite(frm->data,1,frm->size,fd);
 		///sleep & trigger
 		auto interval = 10_ms;
-		if(src->IsSupportSingleFrameTrigger()) {
+		if(_triggerInterval&&src->IsSupportSingleFrameTrigger()) {
 			interval = Seconds(_triggerInterval);
 			src->Trigger();
 		}
@@ -128,7 +130,7 @@ static bool ProcessPush(IJpegSource*src,FILE*fd){
 	while(!_exit && Now()<end) {
 		///sleep & trigger
 		auto interval = 10_ms;
-		if(src->IsSupportSingleFrameTrigger()) {
+		if(_triggerInterval&&src->IsSupportSingleFrameTrigger()) {
 			interval = Seconds(_triggerInterval);
 			src->Trigger();
 		}
@@ -142,8 +144,14 @@ static bool Process(){
 	bool _dbg=OmfMain::Globle().DebugMode();
 	///////////////////////////////////////
 	//create a JpegSource instance with keywords.
-	dbgTestPVL(_keywords);
-	std::unique_ptr<IJpegSource> src(IJpegSource::CreateNew(_keywords));
+	std::string keywords;
+	if(_prerecIdx)keywords=std::string("prerec");
+	if(_keywords) {
+		keywords += "-";
+		keywords += _keywords;
+	}
+	dbgTestPVL(keywords);
+	std::unique_ptr<IJpegSource> src(IJpegSource::CreateNew(keywords.c_str()));
 	returnIfErrC(false,!src);
 	//set yuv srouce parameters
 	src->SelectSensor(_sensorID);//select the sensor0.
@@ -151,6 +159,8 @@ static bool Process(){
 	src->SetHeight(_height);
 	//set BitRateControl
 	src->SetQP(_qp);
+	//set prerecord
+	src->SetPreRecordGroup(_prerecIdx);
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
 	//get streaming parameters after Open().

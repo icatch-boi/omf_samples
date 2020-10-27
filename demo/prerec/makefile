@@ -1,7 +1,5 @@
 ALL =
 ALL+=omfEventService_
-ALL+=omfEventServiceTrigger_
-ALL+=omfPreRecord_
 ###
 CFLAGS +=
 CXXFLAGS +=
@@ -9,14 +7,13 @@ CXXFLAGS +=
 INCS += -I.
 ###
 LIBS += -lpluginiofile
-LIBS += -lpluginwav
 LIBS += -lpluginmp4
 LIBS += -lpluginav
-LIBS += -lpluginpcm
 LIBS += -lpluginprerec
 LIBS += -lpluginapistreaming
 LIBS += -lpluginshm
 LIBS += -lpluginbase
+LIBS += -lplugindev
 ###
 LIBS += -lomfapi
 LIBS += -lomfapicxx

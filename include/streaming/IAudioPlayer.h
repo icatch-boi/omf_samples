@@ -77,13 +77,21 @@ namespace omf{
 				 * @see PcmMediaInfo
 				 */
 				virtual AudioMediaInfo GetAudioMediaInfo() const =0;
+					/**
+				 * enable  codec on linux.
+				 * @return true.
+				 * 
+				 */
+				virtual bool EnableCodecOnLinux(bool en) =0;
 			public:///createNew
 				/**
 				 * @brief create a new IPcmPlayer instance.
 				 * @param keywords[in] the keywords for selecting a IPcmPlayer type.
 				 * @return the new IPcmSource instance.
 				 */
-				static IAudioPlayer *CreateNew(const char *);
+				static IAudioPlayer *CreateNew(const char *keywords);
+				static IAudioPlayer* CreateNewFromConfig(const char *config);
+				static IAudioPlayer* CreateNewFromFile(const char *file);
 			};
 		}
 	}

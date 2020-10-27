@@ -15,23 +15,33 @@ using namespace omf::api;
 using namespace omf::chrono;
 ////////////////////////////////////////////
 static const char* _fname=0;
-static const char* _codec="h264";
-static int _seconds=30;
+static int _seconds=0;
+static int _rate=0;
+static int _channels=0;
+static char* _codec = 0;
+static int _comp=1;
+static int _frameDur_ms = 20;
+static int _vbr=1;
+static int _bitrate=-1000;
 ////////////////////////////////////////////
 static bool _exit = false;
+std::string _muxer;
+std::string _encoder; 
 ////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
-	{"omfTapeRecorder(...): \n"
-	 "record the sounds to a file(*.wav/*.pcm/*.aac). eg..\n"
-	 "  omfPreRecord -D1\n"
-	 "  omfPreRecord -D1 -c h264\n"
-	 "  omfPreRecord -D1 -c aac\n"
-	 "  omfPreRecord -d10 -D 1\n"
-	 "  omfPreRecord -n test.h264 -d10\n"
+	{"omfOggMuxer(...): \n"
+	 "record the sounds to a file(*.opus)\n"
+	 "> omfOggMuxer -n test. -d 10 -r 16000 -c 1opus -p 1 -v 1 -b 16000 -f 100\n"
+     "> https://www.yuque.com/tinycloud/linux/oi570z\n"
 	},
 	{"fname"	,'n', _fname 		,"set the file name."},
 	{"duration",'d', _seconds		,"set the record duration(*s)."},
-	{"codec",'c', _codec			,"select the streaming codec."},
+	{"rate",'r', _rate				,"set the sample rate of audio."},
+	{"ch",'c', _channels			,"set the channels of audio."},
+	{"comp",'p', _comp			,"set the comp of audio."},
+	{"framedurms",'f', _frameDur_ms			,"set the opus encode frame duration"},
+	{"vbr",'v', _vbr			,"enable vbr"},
+	{"bitrate",'b', _bitrate	,"set the bitrate(kb) to opus codec."},
 	{},
 };
 ////////////////////////////////////////////
@@ -58,16 +68,21 @@ static bool MessageProcess(const char* msg0){
 	return true;
 }
 static bool Process(bool _dbg){
-	auto sink=(std::string)"+FakeSink:name=sink,dbg="+_dbg+",live=false";
-	if(_fname)sink=(std::string)"+IOSink:name=sink,dbg="+true+",url=file://"+_fname+",only1st=true";
 	auto layout = (std::string)
 		"type=Application,layout={"
 			"type=Pipeline,layout={"
 				"ShmSource:connect={"
-					"type=Pipeline,name=plPreRecord"+_codec+
-				"},sendmsg={preRecOutput={oper=AfterStart,send={forward}},preRecOutputDisable={oper=BeforeStop,send={forward}}}"
-				"+PlayUntil:duration="+_seconds+"s"
-				+sink+
+					"type=pipeline,name=plPcmSrc,layout={"
+						"mic:name=mic"
+						"+RingSink:name=asink,max=16"
+					"}"
+				"}"
+				"+RecordControler:name=rc,duration="+_seconds+"s"
+				"+PcmFilter:ch="+_channels+",rate="+_rate+
+				"+FifoFilter:name=vfifo0,max=8"
+				"+OpusAudEncoder:name=opusEnc,comp="+_comp+",duration="+_frameDur_ms+"ms"+",vbr="+_vbr+",bitrate="+_bitrate+
+				//"+FifoFilter:name=vfifo1,max=8"
+				"+ogg-muxer:name=muxer,url=file://"+_fname+",dbg="+_dbg+
 			"}"
 		"}"
 	;
@@ -84,12 +99,10 @@ static bool Process(bool _dbg){
 	returnIfErrC(false,!obj.StatusUp("null"));
 	return true;
 }
-static bool CheckParamers(){
-	return true;
-}
+
 ////////////////////////////////
 int main(int argc,char* argv[]){
-	dbgNotePSL("omfPreRecord(...)\n");
+	dbgNotePSL("omfOpusEnc(...)\n");
 	///parse the input parameters with the parser table,
 	///and initialize omf system.
 	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));

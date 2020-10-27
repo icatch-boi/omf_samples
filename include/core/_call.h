@@ -7,10 +7,13 @@
 namespace omf{
 	class ExitCall{
 	public:
+		ExitCall(){}
 		template<class F>
 		ExitCall(F f):_func(f){}
 		~ExitCall(){if(_func)_func();}
 		void Reset(){_func= nullptr;}
+		template<class F>
+		void Reset(const F& f){_func= f;}
 	protected:
 		std::function<void()> _func;
 	};

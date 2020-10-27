@@ -8,6 +8,7 @@
 #include "OmfDbg.h"
 #include "OmfAttrSet.h"
 #include "OmfHelper.h"
+#include "OmfBitRateStatistics.h"
 #include "IH264Source.h"
 ////////////////////////////////////////////
 #undef dbgEntryTest
@@ -21,7 +22,7 @@ using namespace omf::api::streaming::common;
 ////////////////////////////////////////////////////////////
 static const char* _fname=0;
 static int _seconds=30;//seconds
-static const char* _keywords="dualos-vbrc-pull";
+static const char* _keywords="dualos-pull";
 static int _sensorID = 0;
 static int _width=1920;
 static int _height=1080;
@@ -37,8 +38,12 @@ static bool _showBrc=false;
 static const char* _h264Param=0;    ///the h264 other params;
 static int _cache=0;    ///the vlc cache size
 static int _prerecIdx=0;	///enable/disable preRecord
+static int _sharedIdx=0;
 ///
 static bool _blocking=false;
+///
+static const char* _config=0;
+static const char* _fileConfig=0;
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
@@ -47,11 +52,16 @@ static OmfHelper::Item _options0[]{
 	 "This demo shows how to get H264 streaming from OMF using IH264Source interface. \n"
      "  omfH264Src -d5 -w1920 -h1080 -f30 -b 128 -t ippp -g30 -k vbrc -F \n"
 	 "  omfH264Src -d5 -w1920 -h1080 -f30 -b 5000 -t ippp -g30 -C 256 -F -n test2048.h264\n"
+	 "  omfH264Src -d5 -w1920 -h1080 -f30 -b 5000 -t ippp -g30 -C 256 -F -a1 -n test2048.h264\n"
+	 "  omfH264Src -d5 -a 1\n"
 	 "  omfH264Src -d5 -r 1\n"
+	 "  omfH264Src -d5 -r1 -k \"vbrc-vfrc\" -f10 -b2000 \n"   ///receive prerec streaming & reset prerec params.
 	 "  omfH264Src -n vbrcpull.h264 -d30 -w1920 -h1080 -f30 -b 128 -t ippp -g30 \n"
 	 "  omfH264Src -n vbrcpush.h264 -d30 -w1080 -h720 -k dualos-vbrc-push \n"
 	 "  omfH264Src -n cbrcpush.h264 -d30 -w1920 -h1080 -k dualos-cbrc -w1920 -h1080 -f30 \n"
 	 "  omfH264Src -n vbrcPushTrig.h264 -d30 -w1920 -h1080 -k dualos-vbrc-push-trigger -i 1000 \n"
+     "  omfH264Src -l ./config1.txt \n"   ///load configure file config1.txt
+     "  omfH264Src -o keywords=push-vbrc-vfrc,fr=10,br=500000,gop=60 \n"   ///load configure string
 	},
 	{"fname"	,'n', _fname	,"record filename(*.h264)."},
 	{"duration"	,'d', _seconds	,"record duration(*s)."},
@@ -67,6 +77,9 @@ static OmfHelper::Item _options0[]{
 	{"h264"	    ,'c', _h264Param,"the other h264 codec params."},
 	{"cache"	,'C', _cache    ,"the vlc cache size,default is no cache."},
 	{"prerec"   ,'r', _prerecIdx,"set preRecord vbrc index and enable preRecord."},
+	{"shared"   ,'a', _sharedIdx,"set shared h264 encoder group."},
+	{"load"     ,'l', _fileConfig,"loading configure file."},
+	{"config"   ,'o', _config   ,"set configure streaming."},
 	{"misc:"},
 	{"dumpfrm"	,'F', [](){_dumpFrm=false;}	,"disable dump the frame."},
 	{"interval"	,'i', _triggerInterval	,"the interval(ms) per trigger. Only used for IsSupportSingleFrameTrigger()."},
@@ -124,6 +137,7 @@ static bool MessageProcess(const char* msg0){
 	return true;
 }
 static TimePoint _tpEnd(-1_s);
+static OmfBitRateStatistics _brs{2_s};
 static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line){
 	if(!frm->data || !frm->size)
 		return false;
@@ -139,12 +153,15 @@ static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line){
 	if(fd)fwrite(frm->data,1,frm->size,fd);
 	///
 	if(_dumpFrm) {
-		dbgTestPS(line << '#' << frm->index
-				       << ',' << frm->pts
+		_brs.PushFrame(frm->pts,frm->size);
+		dbgTestPS(line << '#' << frm->pkt<< ',' << frm->index
+				       << ',' << frm->pts<< '/' << Now()
 		               << ',' << frm->data
 		               << ',' << frm->size
 		               << ',' << frm->iskeyframe
-		               << ','
+		               << ',' << _brs.GetFrameRate()<<"fps"
+				       << '/' << _brs.GetBitRate()/1000<<"kbps"
+						<<','
 		);
 		dbgTestDL(frm->data, 16);
 	}
@@ -197,24 +214,53 @@ static bool SetParams(IH264Source*src){
 		paras+=_h264Param;
 		paras+="}";
 	}
-	if(_cache){
-		paras+=",cache=";
-		paras+=_cache;//dbgTestPVL(_cache);dbgTestPVL(paras);
-	}
-	if(_prerecIdx){
-		paras+=",prerec=";
-		paras+=_prerecIdx;
-	}
+	//if(_cache){
+	//	paras+=",cache=";
+	//	paras+=_cache;//dbgTestPVL(_cache);dbgTestPVL(paras);
+	//}
 	dbgTestPVL(paras);
 	if(!paras.empty())src->Set(paras.c_str()+1);
+	return true;
+}
+static bool ProcessParams(IH264Source*src){
+	if(_config){
+		src->FromConfig(_config);
+		return true;
+	}
+
+	if(_fileConfig) {
+		src->LoadConfig(_fileConfig);
+		return true;
+	}
+	//set yuv srouce parameters
+	src->SelectSensor(_sensorID);//select the sensor0.
+	src->SetWidth(_width);
+	src->SetHeight(_height);
+	//set h264 encoder parameters
+	src->SetGop(_gop);
+	src->SetGopType(_goptype);
+	//set BitRateControl
+	if(src->IsSupportBitRateControl())src->SetBitRate(_bitrate*1000);
+	if(src->IsSupportPreRecord())src->SetPreRecordGroup(_prerecIdx);
+	if(src->IsSupportSharedEncoder())src->SetSharedEncoderGroup(_sharedIdx);
+	if(src->IsSupportedCache())src->SetCache(_cache);
+	if(_fluency)src->SetFluency(_fluency);
+	if(_framerate)src->SetFrameRate(_framerate);
+	///streaming params set
+	SetParams(src);
 	return true;
 }
 static bool Process(){
 	bool _dbg=OmfMain::Globle().DebugMode();
 	///////////////////////////////////////
 	//create a h264Source instance with keywords.
-	std::string keywords=_keywords;
-	if(_prerecIdx)keywords="prerec-"+keywords;
+	std::string keywords;
+	if(_prerecIdx)keywords=std::string("prerec");
+	else if(_sharedIdx)keywords=std::string("shared");
+	if(_keywords) {
+		keywords += "-";
+		keywords += _keywords;
+	}
 	dbgTestPVL(keywords);
 	std::unique_ptr<IH264Source> src(IH264Source::CreateNew(keywords.c_str()));
 	returnIfErrC(false,!src);
@@ -228,19 +274,8 @@ static bool Process(){
 		auto brc=src->GetBrcMode();
 		dbgTestPSL("current brc mode:"<<brc.mode<<','<<brc.note);
 	}
-	//set yuv srouce parameters
-	src->SelectSensor(_sensorID);//select the sensor0.
-	src->SetWidth(_width);
-	src->SetHeight(_height);
-	//set h264 encoder parameters
-	src->SetGop(_gop);
-	src->SetGopType(_goptype);
-	//set BitRateControl
-	src->SetBitRate(_bitrate*1000);
-	if(_fluency)src->SetFluency(_fluency);
-	if(_framerate)src->SetFrameRate(_framerate);
-	///streaming params set
-	SetParams(src.get());
+	///
+	returnIfErrC(false,!ProcessParams(src.get()));
 	//open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
 	//get streaming parameters after Open().

@@ -22,6 +22,8 @@ LIBS += -lpluginpcm
 LIBS += -lpluginaac
 LIBS += -lplugindev
 ###
+LIBS += -lz
+###
 LIBS += -ldl
 LIBS += -ldbglinux
 ###

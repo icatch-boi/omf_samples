@@ -1,6 +1,6 @@
 #pragma once
 #include "_typedef.h"
-
+#include <string>
 namespace omf{
 	class File{//:public object {
 	public:
@@ -25,6 +25,7 @@ namespace omf{
 	public:
 		//using object::Name;
 		//virtual bool Name(const char* name);
+		operator bool(){return _fd && !_err;}
 		const char* Error() const;
 		uint32 Write(const void* buf, uint32 size);
 		uint32 Read(void* buf, uint32 size = 0x7fffffff);
@@ -47,6 +48,8 @@ namespace omf{
 		static uint32 GetFileId(void* fd);
 		static uint32 Write(const char* fn, const void* data, uint32 size);
 		static uint32 Read(const char* fn, void* data, uint32 size);
+		static uint32 Read(const char* fn, void*& data);
+		static std::string LoadString(const char* fn);
 		static bool Rename(const char* fnold, const char* fnnew);
 		static bool Delete(const char* fn);
 		static uint32 AttrSet(const char* pathname, const char* pnewName, int64 attr, uint32 option);

@@ -33,10 +33,10 @@ static int _seconds = 3600;
 static const char* _url = "rtmp://192.168.0.147:1935/live/Vi37";
 //////////////////////////////////////
 static OmfHelper::Item _options0[]{
-		{"OmfRtmpServer(...): \n"
+		{"OmfRtmpClient(...): \n"
 		 "This demo shows how to push rtmp steam to server. \n"
-		 "> OmfRtmpServer -d30 -w1920 -h1080 -f30 -b 128 -t ippp -g30 \n"
-		 "> OmfRtmpServer -d30 -w1280 -h720  -f30 -b 128 -t ippp -g30\n"
+		 "> OmfRtmpClient -d30 -w1920 -h1080 -f30 -b 128 -t ippp -g30 \n"
+		 "> OmfRtmpClient -d30 -w1280 -h720  -f30 -b 128 -t ippp -g30\n"
 		},
 		{"the yuv paramers:"},
 		{"w"		,'w'		, _width			,"width of image."},

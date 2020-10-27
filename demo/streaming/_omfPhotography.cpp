@@ -29,6 +29,8 @@ static int _height=1080;
 static int _qp=90;
 static int _snapCount=1;
 static int _snapInterval=1;//seconds
+static int _prerecIdx=0;	///enable/disable preRecord
+static int _triggerInterval=0;
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
@@ -44,6 +46,7 @@ static OmfHelper::Item _options0[]{
 	{"frtc"		,'r', _frtcpattern	,"file pattern with rtc.(SNAP_%04u-%02u-%02u_%02u-%02u-%02u.jpg)."},
 	{"count"	,'c', _snapCount	,"snap count."},
 	{"interval"	,'i', _snapInterval	,"the interval(seconds) per snap."},
+	{"prerec"   ,'R', _prerecIdx,"set preRecord vbrc index and enable preRecord."},
 	{"the yuv paramers:"},
 	{"sid"		,'s', _sensorID	,"select the sensor with the id."},
 	{"w"		,'w', _width	,"set the width for yuv source."},
@@ -107,22 +110,36 @@ static std::string createUrl(){
 		return std::string("file://")+createFileNameRtc();
 	return "test.jpg";
 }
+static void ProcessTrigger(IPhotography*src){dbgTestPL();
+	while(!_exit){
+		if(src->IsSupportSingleFrameTrigger()) {
+			if(src->CurrentState()==IPhotography::State::play)
+				src->Trigger();
+			std::this_thread::sleep_for(MilliSeconds(_triggerInterval));
+		}
+
+	}
+}
 static bool Process(bool _dbg){
 	///////////////////////////////////////
+	std::string keywords;
+	if(_prerecIdx)keywords=std::string("prerec");
 	//create a IPhotography instance with keywords.
-	dbgTestPVL(_keywords);
-	std::unique_ptr<IPhotography> src(IPhotography::CreateNew(_keywords));
+	if(_keywords) {
+		keywords += "-";
+		keywords += _keywords;
+	}
+	dbgTestPVL(keywords);
+	std::unique_ptr<IPhotography> src(IPhotography::CreateNew(keywords.c_str()));
 	returnIfErrC(false,!src);
 	//set yuv srouce parameters
 	src->SelectSensor(_sensorID);//select the sensor0.
 	src->SetWidth(_width);
 	src->SetHeight(_height);
+	//set prerecord
+	src->SetPreRecordGroup(_prerecIdx);
 	//register streaming callback
 	src->RegisterMessageCallback(&MessageProcess);
-
-	//open streaming
-	//returnIfErrC(false,!src->ChangeUp(State::ready));
-
 	//start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
 

@@ -5,13 +5,18 @@
 #pragma once
 
 #include "IVideo.h"
+#include "IStreamControl.h"
+#include "IEncoder.h"
 namespace omf {
 	namespace api {
 		namespace streaming {
 			namespace common {
 				class IVideoSource
-					:public virtual IVideo
+					:public virtual IStreamSource
+					,public virtual IVideo
 				{
+				public:
+					using VideoMediaInfo=omf::api::streaming::common::VideoMediaInfo;
 				public:
 					/**
 					 * Select the sensor with ID.

@@ -91,8 +91,8 @@ static bool Process(bool _dbg){
 	//ProcessSpeaker(player.get());
 	//////////////////////////////////
 	//streaming......
-	auto duration = 1000_ms;//ms
-	int buf_size=_rate*_channels*2;
+	auto duration = 100_ms;//ms
+	int buf_size=_rate*_channels*2*toMs(duration)/1000;
 	std::unique_ptr<char[]> buf(new char[buf_size]);//malloc(buf_size);
 	TimePoint tp=Now();
 	dbgTestPVL(buf_size);

@@ -9,7 +9,7 @@ namespace omf {
 	namespace api {
 		namespace streaming {
 			class IDemuxer
-				:public common::IStreamControl
+				:public virtual common::IStreamControl
 			{
 			public:
 				using ISource=common::IStreamSource;
@@ -28,7 +28,9 @@ namespace omf {
 				 * @param keywords[in] the keywords for selecting a OmfDemuxer type. \n
 				 * @return the new OmfDemuxer instance. \n
 				 */
-				static IDemuxer* CreateNew(const char *);
+				static IDemuxer* CreateNew(const char *keywords);
+				static IDemuxer* CreateNewFromConfig(const char *config);
+				static IDemuxer* CreateNewFromFile(const char *file);
 			};
 		}
 	}

@@ -33,6 +33,14 @@ namespace omf {
 					 */
 					virtual bool Set(const char*attributes)=0;
 					virtual bool Get(std::string& attributes)=0;
+					virtual bool LoadConfig(const char*filename)=0;
+					virtual bool FromConfig(const char*params)=0;
+				public:
+					virtual bool IsSupportedBridgePipeline()const=0;
+					virtual bool SetBridgePipeline(const char*plname)=0;
+				public:
+					virtual bool IsSupportedCache()const=0;
+					virtual bool SetCache(int)=0;
 				};
 
 				class IStreamSink:public virtual IStreamControl {

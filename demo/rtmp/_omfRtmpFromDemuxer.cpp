@@ -35,9 +35,9 @@ static const char* _keywords = "dualos-pull";
 static const char* _url = "rtmp://192.168.0.147:1935/live/Vi37";
 ////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
-		{"omfDemuxer(...): \n"
+		{"omfRtmpFromDemuxer(...): \n"
 		 "This demo shows how to demux the file using IDemuxer interface.\n"
-		 "  omfDemuxer -n test.mp4 -u rtmp://x.x.x.x/ \n"
+		 "  omfRtmpFromDemuxer -n test.mp4 -u rtmp://x.x.x.x/ \n"
 		},
 		{"fname",'n', _fname		,"demux filename(*.mp4)."},
 		{"url"	,'u', _url			,"rtmp server url."},

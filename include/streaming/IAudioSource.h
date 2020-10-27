@@ -8,6 +8,7 @@
 #include "common/IAudio.h"
 #include "common/MediaInfo.h"
 #include "common/IStreamControl.h"
+#include "common/IEncoder.h"
 #include <vector>
 namespace omf {
 	namespace api {
@@ -37,6 +38,7 @@ namespace omf {
 			class IAudioSource
 				: virtual public common::IStreamSource
 				, virtual public common::IAudio
+				, virtual public common::IEncoder
 			{
 			public:
 				using AudioMediaInfo=omf::api::streaming::common::AudioMediaInfo;
@@ -55,12 +57,6 @@ namespace omf {
 				 * @return the selected Microphone pointer
 				 */
 				virtual IMicrophone* Microphone() = 0;
-
-				/**
-				 * set the codec paramers
-				 * @return true/false
-				 */
-				virtual bool SetCodec(const char*)=0;
 
 			public:
 				/**
@@ -103,6 +99,8 @@ namespace omf {
 				 * @return the new IPcmSource instance.
 				 */
 				static IAudioSource *CreateNew(const char *keywords);
+				static IAudioSource* CreateNewFromConfig(const char *config);
+				static IAudioSource* CreateNewFromFile(const char *file);
 			public:
 				/**
  * get the IPcmSource capabilities list.

@@ -10,6 +10,7 @@ ALL+=omfPcmPlay_
 ALL+=omfAudSrc_
 ALL+=omfAudPlay_
 ALL+=omfDemuxer_
+ALL+=omfPhotography_
 ###
 CFLAGS +=
 CXXFLAGS +=
@@ -27,6 +28,13 @@ LIBS += -lpluginiofile
 LIBS += -lpluginav
 LIBS += -lpluginshm
 LIBS += -lpluginbase
+###
+LIBS += -lpluginmp4
+LIBS += -lpluginwav
+LIBS += -lpluginaac
+LIBS += -lpluginopus
+LIBS += -lopus
+
 ###
 LIBS += -lomfapi
 LIBS += -lomfapicxx

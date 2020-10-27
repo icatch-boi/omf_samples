@@ -50,10 +50,8 @@ namespace omf {
 			 *  ForceKeyFrame(). call after start().\n
 			 */
 			class IJpegSource
-				: virtual public common::IStreamSource
+				: virtual public common::IVideoSource
 				, virtual public common::IBitRateControl
-				, virtual public common::IVideoSource
-				, virtual public common::ITrigger
 			{
 			public:
 				using JpegMediaInfo=omf::api::streaming::common::JpegMediaInfo;
@@ -71,6 +69,8 @@ namespace omf {
 				 * @return the new JpegSouce instance.
 				 */
 				static IJpegSource* CreateNew(const char *keywords);
+				static IJpegSource* CreateNewFromConfig(const char *config);
+				static IJpegSource* CreateNewFromFile(const char *file);
 			};
 		}
 	}

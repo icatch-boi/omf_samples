@@ -6,6 +6,7 @@
 
 #include "common/IStreamControl.h"
 #include "common/IVideoSource.h"
+#include "common/IEncoder.h"
 
 namespace omf {
 	namespace api {
@@ -40,6 +41,7 @@ namespace omf {
 			class IPhotography
 				: public virtual common::IStreamControl
 				, public virtual common::IVideoSource
+				, public virtual common::IEncoder
 			{
 			public:
 				/**
@@ -86,8 +88,9 @@ namespace omf {
 				 * @param keywords[in] the keywords for selecting a YuvSource type. \n
 				 * @return the new YuvSource instance. \n
 				 */
-				static IPhotography *CreateNew(const char *);
-
+				static IPhotography *CreateNew(const char *keywords);
+				static IPhotography* CreateNewFromConfig(const char *config);
+				static IPhotography* CreateNewFromFile(const char *file);
 			};
 		}
 	}

@@ -19,7 +19,8 @@ GXX ?= ${PREFIX}g++
 GSTRIP ?= ${PREFIX}strip
 ###
 CFLAGS ?= -mcpu=cortex-a7 -mabi=aapcs -mfloat-abi=hard -mlittle-endian -mno-unaligned-access -pthread -rdynamic -fPIC -flax-vector-conversions -mfpu=neon-vfpv4 -Os -Wno-error=pointer-sign -Wno-error=char-subscripts -Wno-error=unused-but-set-variable -Wno-error=unused-function -funwind-tables -ffunction-sections
-CXXFLAGS ?= ${CFLAGS} -std=c++11 -fpermissive -fexceptions -Woverloaded-virtual -Wreturn-type -pthread
+CXXFLAGS ?=
+CXXFLAGS0 := ${CFLAGS} -std=c++11 -fpermissive -fexceptions -Woverloaded-virtual -Wreturn-type -pthread
 LDFLAGS ?=
 ###
 INCS += -I.
@@ -39,11 +40,11 @@ LDFLAGS0 := -Wl,--no-as-needed,--copy-dt-needed-entries
 ###
 %.o:%.cpp
 	@echo "compile cxx files..."
-	$(GXX) $(INCS) $(CXXFLAGS) -c $^ -o $@
+	$(GXX) $(INCS) $(CXXFLAGS) $(CXXFLAGS0) -c $^ -o $@
 
 %.o:%.cc
 	@echo "compile cxx files..."
-	$(GXX) $(INCS) $(CXXFLAGS) -c $^ -o $@
+	$(GXX) $(INCS) $(CXXFLAGS) $(CXXFLAGS0) -c $^ -o $@
 
 %.o:%.c
 	@echo "compile c files...."
@@ -51,15 +52,15 @@ LDFLAGS0 := -Wl,--no-as-needed,--copy-dt-needed-entries
 
 %_:_%.o ${OBJS_}
 	@echo $@
-	$(GXX) $(INCS) $(CXXFLAGS) $^ $(LDFLAGS) $(LDFLAGS0) -L${LIBS_PATH} $($@LIBS) $(LIBS) -o $@
+	$(GXX) $(INCS) $(CXXFLAGS) $(CXXFLAGS0) $^ $(LDFLAGS) $(LDFLAGS0) -L${LIBS_PATH} $($@LIBS) $(LIBS) -o $@
 
 %.so:$(OBJS)
 	@echo $@
-	$(GXX) $(INCS) $(CXXFLAGS) $^ $(LDFLAGS) -shared -o $@
+	$(GXX) $(INCS) $(CXXFLAGS) $(CXXFLAGS0) $^ $(LDFLAGS) -shared -o $@
 
 %.a:$(OBJS)
 	@echo $@
-	$(GXX) $(INCS) $(CXXFLAGS) $^ -o $@
+	$(GXX) $(INCS) $(CXXFLAGS) $(CXXFLAGS0) $^ -o $@
 
 ###	
 clean:

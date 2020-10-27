@@ -38,6 +38,9 @@ set(LIBRARY_DEPEND_LIBS
 		BasicUsageEnvironment
 		)
 regLibrary()
+add_dependencies(${LIBRARY}
+		3th_live555
+		)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(demo)
