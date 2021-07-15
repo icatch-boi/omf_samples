@@ -42,14 +42,12 @@ EXTERNC void* omfCreate(const char *serialize);
 
 /** create a appliction
  * @param cfgs appliction's serialize param,
- * 			ex: pv:h264-0,br=1000000+aac-1,br=128000
  * @return the appliction pointer,0 is fail
  **/
 EXTERNC void* omfCreateApp(const char *serialize);
 
 /** create a appliction
  * @param cfgs appliction's serialize param,
- * 			ex: pv:h264-0,br=1000000+aac-1,br=128000
  * @return the appliction pointer,0 is fail
  **/
 EXTERNC void* omfCreateAttrSet(const char *serialize);

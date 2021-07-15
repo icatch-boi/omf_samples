@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <string>
 namespace omf {
 	class OmfMsgSiteUser {
 	public:///send
@@ -16,6 +17,10 @@ namespace omf {
 		 * @return true/false
 		 */
 		static bool Send(const char* name, const void *data, int size);
+		static bool Send(const char* name, const std::string&);
+		static bool Send(const char* name, const char*);
+		static bool Send(const std::string&);
+		static bool Send(const char*);
 	public:
 		/**
 		 * the receive callback

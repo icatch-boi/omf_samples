@@ -1,5 +1,5 @@
 #pragma once
-#include "_string_base.h"
+#include "_string_func.h"
 #include <string>
 
 namespace omf{

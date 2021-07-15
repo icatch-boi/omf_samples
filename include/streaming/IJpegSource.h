@@ -3,11 +3,8 @@
 //
 
 #pragma once
-#include "common/IStreamControl.h"
-#include "common/IBitRateControl.h"
-#include "common/MediaInfo.h"
+#include "common/IEncoder.h"
 #include "common/IVideoSource.h"
-#include "common/ITrigger.h"
 namespace omf {
 	namespace api {
 		namespace streaming {
@@ -51,7 +48,7 @@ namespace omf {
 			 */
 			class IJpegSource
 				: virtual public common::IVideoSource
-				, virtual public common::IBitRateControl
+				, virtual public common::IEncoder
 			{
 			public:
 				using JpegMediaInfo=omf::api::streaming::common::JpegMediaInfo;

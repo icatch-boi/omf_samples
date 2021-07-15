@@ -29,16 +29,16 @@ static OmfHelper::Item _options0[]{
 		 "This demo is used to show how to use OmfMemPool to alloc or free shared memory.\n"
 		 "The memory allocated in this process will be released automatically after the process ends.\n"
 		},
-		{"size"		,'s', _size ,"set the shared memory size."},
-		{"key"		,'k', _key ,"set the shared memory key."},
-		{"name"		,'n', _name ,"set the shared memory name."},
-		{"free"		,'f', _free ,"set the shared memory name."},
-		{"receive message"
+		{"\nreceive message"
 		 "> omfMemPool -s 1024   		 ####alloc shm with size \n"
 		 "> omfMemPool -s 1024 -k 32666 ####alloc shm with size and key.  \n"
 		 "> omfMemPool -s 1024 -n hahah ####alloc shm with size and name.  \n"
 		 "> omfMemPool -s 1024 -f 1 ####alloc shm with size and release memory manual.  \n"
-  		 },
+		},
+		{"size"		,'s', _size ,"set the shared memory size."},
+		{"key"		,'k', _key ,"set the shared memory key."},
+		{"name"		,'n', _name ,"set the shared memory name."},
+		{"free"		,'f', _free ,"set the shared memory name."},
 		{},
 };
 ////////////////////////////////////////////

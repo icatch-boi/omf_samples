@@ -25,6 +25,7 @@ std::string _decoder;
 static OmfHelper::Item _options0[]{
 	{"omfG722Player(...): \n"
 	 "play the audio file(*.g722). eg..\n"
+  	 "[api]https://www.yuque.com/docs/share/80c2f6ff-79a7-4fb6-98a4-635ef52c3ba4? \n"
 	 "> omfG722Player -n test.g722 -r 16000 -c 1 \n"
 	},
 	{"fname"	,'n', _fname 		,"set the file name."},

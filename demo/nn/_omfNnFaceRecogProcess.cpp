@@ -105,7 +105,7 @@ int main(int argc, char *argv[]){
 
 	OmfAttrSet apout(output);
 	//memset(paramstr,0,512);
-	void* ptr = nullptr;
+	char* ptr = nullptr;
 	apout.Get("ptr",ptr);
 	dbgErrPSL(ptr);
 	sprintf(ptr,"draw=%d,color=%d",_drawEn,_color);

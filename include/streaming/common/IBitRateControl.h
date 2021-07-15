@@ -3,56 +3,34 @@
 //
 #pragma once
 
-#include "IEncoder.h"
+#include "OmfBRCMode.h"
 #include <vector>
 
 namespace omf {
 	namespace api {
 		namespace streaming {
 			namespace common {
-				class IBitRateControl:public virtual IEncoder {
+				class IBitRateControl {
 				public:
-					typedef struct{const char* mode;const char* note;}mode_t;
-					virtual bool SetBrcMode(const char*)=0;
-					virtual std::vector<mode_t> GetBrcModes()const = 0;
-					virtual mode_t GetBrcMode()const = 0;
-				public:
-					virtual bool IsSupportFrameRateControl()const = 0;
-					virtual bool IsSupportFrameRateRange()const = 0;
+					virtual std::vector<BRCMode> GetSupportedBRCModes()const = 0;
+					virtual bool IsSupportBRCMode(BRCMode)const=0;
+					virtual BRCMode GetCurrentBRCMode()const = 0;
+					virtual bool SetBRCMode(BRCMode)=0;
 
-					/**
-					 * set the maximum FR(frame rate).
-					 * @param fr [in]the maximum
-					 * @note supported BitRateControl:\n
-					 * 	 	MFRC:\n
-					 * @see BitRateControl
-					 */
-					virtual bool SetFrameRate(int fr)=0;
-
-					/**
-					 * set the minimum frame rate.
-					 * @param min [in]the minimum
-					 * @note supported BitRateControl:\n
-					 * 	 	DBRC:\n
-					 * 	 	ABRC:\n
-					 * @see BitRateControl
-					 */
-					virtual bool SetFrameRateMinimum(int min)=0;
-
-					/**
-					 * set the maximum frame rate.
-					 * @param max [in]the maximum
-					 * @note supported BitRateControl:\n
-					 * 	 	DBRC:\n
-					 * 	 	ABRC:\n
-					 * @see BitRateControl
-					 */
-					virtual bool SetFrameRateMaximum(int max)=0;
-
-					virtual bool SetFluency(int flue)=0;
 				public:
 					virtual bool IsSupportBitRateControl()const = 0;
 					virtual bool IsSupportBitRateRange()const = 0;
+
+					/**
+				 * set the target bit rate for codec.
+				 * @param br[in] bit per seconds.
+				 * @note supported BitRateControl:\n
+				 * 		CBRC:\n
+				 * 		MBRC:\n
+				 * 		DBRC:\n
+				 * @see BitRateControl
+				 */
+					virtual bool SetBitRate(int br)=0;
 
 					/**
 					 * set the minimum bit rate(BR).
@@ -110,12 +88,6 @@ namespace omf {
 					virtual bool SetQPMaximum(int max)=0;
 
 				public:
-					/**
-					 * get current frame number per seconds.
-					 * @return fr.
-					 */
-					virtual int GetCurrentFrameRate() const = 0;
-
 					/**
 					 * get current bit per seconds.
 					 * @return br.

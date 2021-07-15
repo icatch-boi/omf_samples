@@ -4,6 +4,7 @@ ALL+=omfFaceDetect_
 ALL+=omfFaceRecognise_
 ALL+=omfNnHumanProcess_
 ALL+=omfNnProcess_
+ALL+=omfNnIcatosDemo_
 ###
 CFLAGS +=
 CXXFLAGS +=

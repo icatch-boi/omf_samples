@@ -31,22 +31,22 @@ static OmfHelper::Item _options0[]{
 		{"demoMsgSite(...): \n"
 		 "This demo is used to show how to use IMsgSite to send or receive messages.\n"
 		},
-		{"srcID"		,'i', _srcID ,"set the message source id."},
-		{"receive message"
+		{"\nreceive message"
 		 "> demoMsgSite    	 		####receive message with local site ID.  \n"
 		 "> demoMsgSite -c    		####receive message with local site ID by callback \n"
 		 "> demoMsgSite -t 10   	####receive 10# message.  \n"
 		 "> demoMsgSite -c -t 10    ####receive 10# message by callback \n"
   		 },
-		{"cb"		,'c', [](){_cb=true;}, 	 "receive with register callback."},
-		{"send message."
+		{"\nsend message."
 		 "> demoMsgSite -s -t 10 -m \"message context\"  		####send 10# message  \n"
 		 "> demoMsgSite -s -i 20 -t 10 -m \"message context\"  	####send 10# message from 20# user \n"
-   		},
-		{"send"		,'s', [](){_send=true;}, "send message."},
-		{"msgID"	,'t', _msgID ,"set the message ID."},
-		{"msg"		,'m', _msg ,"set the message body."},
-		{"flags"	,'f', _flags ,"set the message flags."},
+		},
+		{"srcID"	,'i'	, _srcID 	,"set the message source id."},
+		{"cb"		,'c'	, [](){_cb=true;}	, 	 "receive with register callback."},
+		{"send"		,'s'	, [](){_send=true;}	, "send message."},
+		{"msgID"	,'t'	, _msgID 	,"set the message ID."},
+		{"msg"		,'m'	, _msg 		,"set the message body."},
+		{"flags"	,'f'	, _flags 	,"set the message flags."},
 		{},
 };
 ////////////////////////////////////////////

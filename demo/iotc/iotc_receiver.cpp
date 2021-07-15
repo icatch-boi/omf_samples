@@ -242,7 +242,7 @@ static IotErrNo_e IotDataReceive(void *pBuf, UINT32 bufSize, UINT32 *pBytesRecv,
 	}
 	while(gRxLoop) {
 		memset(pBuffer, 0, bufferSize);
-		int bytesRecv = 0;
+		uint32_t bytesRecv = 0;
 		if(IOT_ERRNO_SUCCESS == IotDataReceive(pBuffer, bufferSize, &bytesRecv, 0xFFFFFFFF)) {
 			IotIOEvt(pBuffer, bytesRecv, 100);
 		}

@@ -4,11 +4,16 @@ ALL+=omfRtspServer_
 CFLAGS +=
 CXXFLAGS +=
 ###
+LIBS += -lliveMedia
+LIBS += -lgroupsock
+LIBS += -lUsageEnvironment
+LIBS += -lBasicUsageEnvironment
+###
 LIBS += -lpluginrtsp4
 ###
-LIBS += -lpluginpcm
-LIBS += -lpluginav
-LIBS += -lplugindev
+#LIBS += -lpluginpcm
+#LIBS += -lpluginav
+#LIBS += -lplugindev
 ###
 LIBS += -lomfapi
 LIBS += -lomfapicxx

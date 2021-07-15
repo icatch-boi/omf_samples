@@ -15,7 +15,7 @@ namespace omf {
 			 * register a callback to process the current streaming message.
 			 * @param func the callback funnction
 			 */
-			virtual void RegisterMessageCallback(const FuncMessage &func)=0;
+			virtual bool RegisterMessageCallback(const FuncMessage &func)=0;
 
 			/**
 			 * send a message to current streaming.

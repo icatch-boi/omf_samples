@@ -3,11 +3,8 @@
 //
 
 #pragma once
-#include "common/IStreamControl.h"
-#include "common/IBitRateControl.h"
-#include "common/MediaInfo.h"
+#include "common/IEncoder.h"
 #include "common/IVideoSource.h"
-#include "common/ITrigger.h"
 #include "common/IH264.h"
 namespace omf {
 	namespace api {
@@ -21,7 +18,7 @@ namespace omf {
 			 * Firstly,create an instance.\n
 			 * 	CreateNew(const char *keywords).\n
 			 * Secondly,set the parameters.\n
-			 * 	YUV source: \n
+			 * 	Video source: \n
 			 *  	SelectSensor(int id) \n
 			 *  	SetWidth(int w) \n
 			 *  	SetHeight(int h) \n
@@ -29,11 +26,7 @@ namespace omf {
 			 * 		SetGop(int gop)\n
 			 * 		SetGopType(const char* type)\n
 			 * 	BitRate Control:\n
-			 * 		IsSupportConstantBitRateControl()\n
-			 *		IsSupportManualBitRateControl()\n
-			 *		IsSupportAdaptBitRateControl()\n
-			 *		IsSupportAdaptBitRateControl()\n
-			 *		IsSupportManualFrameRateControl()\n
+			 * 	FrameRate Control:\n
 			 * Thirdly,	register streaming callbck.\n
 			 * 	RegisterMessageCallback(const FuncMessage &func)\n
 			 * 	RegisterOutputCallback(const IStreamEntry::FuncFrame &func)\n
@@ -52,7 +45,7 @@ namespace omf {
 			 */
 			class IH264Source
 				: virtual public common::IVideoSource
-				, virtual public common::IBitRateControl
+				, virtual public common::IEncoder
 				, virtual public common::IH264
 			{
 			public:

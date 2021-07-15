@@ -22,9 +22,9 @@ static OmfHelper::Item _options0[]{
 		 "> omfMicrophone -v 30\n"
 		 "> omfMicrophone -m 1\n"
 		},
-		{"vol"	,'v', _vol	,"change the volume."},
-		{"mute"	,'m', _mute	,"set or clear mute."},
-		{"info"	,'s', _info	,"display the drive info."},
+		{"vol"		,'v'	, _vol		,"change the volume."},
+		{"mute"		,'m'	, _mute		,"set or clear mute."},
+		{"info"		,'s'	, _info		,"display the drive info."},
 		{},
 };
 static IMicrophone* GetMicrophone() {

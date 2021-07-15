@@ -26,9 +26,9 @@ std::string _encoder;
 static OmfHelper::Item _options0[]{
 	{"omfTapeRecorder(...): \n"
 	 "record the sounds to a file(*.wav/*.pcm/*.aac). eg..\n"
-	 "> omfTapeRecorder -n test.wav -d10\n"
-	 "> omfTapeRecorder -n test.aac -d10\n"
-	 "> omfTapeRecorder -n test.pcm -r 16000 -c 1 -d10\n"
+	 "> omfAudioRecorder -n test.wav -d10\n"
+	 "> omfAudioRecorder -n test.aac -d10\n"
+	 "> omfAudioRecorder -n test.pcm -r 16000 -c 1 -d10\n"
 	},
 	{"fname"	,'n', _fname 		,"set the file name."},
 	{"duration",'d', _seconds		,"set the record duration(*s)."},

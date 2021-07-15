@@ -15,7 +15,7 @@ namespace omf {
 					 * set the GOP(Group Of Pictures).
 					 * @param v [in] the GOP numbers.
 					 */
-					virtual void SetGop(int v)=0;
+					virtual bool SetGop(int v)=0;
 					/**
 					 * set the coded frame sequence structure.
 					 * @param v [in] the coded frame sequence structure string.\n
@@ -23,7 +23,7 @@ namespace omf {
 					 * 		"IPPP": I P P ... I P P ...\n
 					 * 		"IBBP": I B B P B B P ... I B B P ...\n
 					 */
-					virtual void SetGopType(const char *type)=0;
+					virtual bool SetGopType(const char *type)=0;
 				};
 			}
 		}

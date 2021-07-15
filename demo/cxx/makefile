@@ -1,5 +1,7 @@
 ALL =
 ALL+=omfTemplate_
+ALL+=omfCmd_
+ALL+=omfMsg_
 ##
 INCS +=
 ###

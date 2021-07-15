@@ -25,6 +25,7 @@ std::string _decoder;
 static OmfHelper::Item _options0[]{
 	{"omfG711Player(...): \n"
 	 "play the audio file(*.wav). eg..\n"
+  	 "[api]https://www.yuque.com/docs/share/a5fa6d09-f562-41b2-9934-27b2e1af5c42? \n"
 	 "> omfG711Player -n test.wav \n"
 	},
 	{"fname"	,'n', _fname 		,"set the file name."},

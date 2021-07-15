@@ -13,13 +13,13 @@ namespace omf {
 					 * set the width of image.
 					 * @param w [in]the width \n
 					 */
-					virtual void SetWidth(int w)=0;
+					virtual bool SetWidth(int w)=0;
 
 					/**
 					 * set the height of image.
 					 * @param h [in]the height \n
 					 */
-					virtual void SetHeight(int h)=0;
+					virtual bool SetHeight(int h)=0;
 
 				public:
 					/**

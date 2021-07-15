@@ -24,7 +24,7 @@ static const char* _msg = 0;
 static OmfHelper::Item _options0[]{
 		{"omfMsgSend(...): \n"
 		 "This demo is used to show how to use OmfMsgSiteUser to send messages.\n"
-		 "  omfMsgSend -n \"AAA\" -m \"message context\"  ####send msg with the name \"AAA\"  \n"
+		 "> omfMsgSend -n \"AAA\" -m \"message context\"  ####send msg with the name \"AAA\"  \n"
    		},
 		{"msg"	,'m', _msg, "msg body."},
 		{"name"	,'n', _name ,"msg name."},

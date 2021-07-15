@@ -3,6 +3,7 @@ ALL+=omfRecorder_
 ALL+=omfAudioRecorder_
 ALL+=omfAudioPlayer_
 ALL+=omfMultiStream_
+ALL+=omfNnRecorder_
 ##
 INCS +=
 ###

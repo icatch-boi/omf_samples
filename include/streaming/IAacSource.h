@@ -48,7 +48,7 @@ namespace omf {
 				 * 		"LC" :Low Complexity\n
 				 * 		"SSR" :Scalable Sampling Rate profile\n
 				 */
-				virtual void SetProfile(const char *profile) = 0;
+				virtual bool SetProfile(const char *profile) = 0;
 
 				/**
 				 * @brief set the target output channels of aac codec.
@@ -56,14 +56,14 @@ namespace omf {
 				 * 		default: 0 ,follow the pcm channels.
 				 * 		if(TargetChannels()!=Channels()), this model will run rechannels.
 				 */
-				virtual void SetTargetChannels(int ch) = 0;
+				virtual bool SetTargetChannels(int ch) = 0;
 
 				/**
 				 * set bandwidth.
 				 * @param bw [0~24000] \n
 				 * 		default: 0 ,not limit bandwidth.\n
 				 */
-				virtual void SetBandWidth(int bw) = 0;
+				virtual bool SetBandWidth(int bw) = 0;
 			public:
 				/**
 				 * get the output aac media info.

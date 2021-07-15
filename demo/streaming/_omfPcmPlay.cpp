@@ -31,12 +31,13 @@ static bool _exit = false;
 static OmfHelper::Item _options0[]{
 		{"omfPcmPlay(...): \n"
 		 "This demo shows how to play PCM streaming using IPcmPlayer interface.\n"
+   		 "[api]https://www.yuque.com/docs/share/189f7455-b5a2-4bee-aaf4-7f7184152be3? \n"
 		 "> omfPcmPlay -n test.pcm -r 16000 -c 1\n"
 		},
-		{"fname",'n', _fname		,"play filename(*.aac)."},
-		{"keywords",'k', _keywords	,"select the IPcmPlayer with keywords.Usually use the default values."},
-		{"rate",'r', _rate			,"the input audio sample rate."},
-		{"ch",'c', _channels		,"the input audio channels."},
+		{"fname"	,'n'	, _fname		,"play filename(*.aac)."},
+		{"keywords"	,'k'	, _keywords		,"select the IPcmPlayer with keywords.Usually use the default values."},
+		{"rate"		,'r'	, _rate			,"the input audio sample rate."},
+		{"ch"		,'c'	, _channels		,"the input audio channels."},
 		{},
 };
 ////////////////////////////////////////////
@@ -60,17 +61,20 @@ static bool MessageProcess(const char* msg0){
 }
 static bool Process(bool _dbg){
 	///////////////////////////////////////
-	//create a IPcmPlayer instance with keywords.
+	///create a IPcmPlayer instance with keywords.
 	dbgTestPVL(_keywords);
 	std::unique_ptr<IPcmPlayer> player(IPcmPlayer::CreateNew(_keywords));
 	returnIfErrC(false,!player);
-	//set pcm player parameters
-	player->SetSampleRate(_rate);
-	player->SetChannels(_channels);
+	///set pcm player parameters
+	returnIfErrC(false,!_rate);
+	returnIfErrC(false,!player->SetSampleRate(_rate));
 
-	//open streaming
+	returnIfErrC(false,!_channels);
+	returnIfErrC(false,!player->SetChannels(_channels));
+
+	///open streaming
 	returnIfErrC(false,!player->ChangeUp(State::ready));
-	//get streaming parameters after Open().
+	///get streaming parameters after Open().
 	auto info = player->GetPcmMediaInfo();
 	dbgTestPVL(info.rate);
 	dbgTestPVL(info.channels);
@@ -87,10 +91,11 @@ static bool Process(bool _dbg){
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////
-	//volume......
+	///volume......
 	//ProcessSpeaker(player.get());
+	//player->Speaker()->Volume(50);
 	//////////////////////////////////
-	//streaming......
+	///streaming......
 	auto duration = 100_ms;//ms
 	int buf_size=_rate*_channels*2*toMs(duration)/1000;
 	std::unique_ptr<char[]> buf(new char[buf_size]);//malloc(buf_size);
@@ -109,7 +114,7 @@ static bool Process(bool _dbg){
 		}
 		dbgTestPVL(data_len);
 		///fill data
-		returnIfErrCS(false,!player->IsSupportedPushFrame(),"this dev is not supported push frame!");
+		returnIfErrCS(false,!player->IsSupportPushFrame(),"this dev is not support push frame!");
 		std::shared_ptr<frame_t> frm{new frame_t{0,buf.get(),data_len,true,tp,nullptr}};
 		returnIfErrC(false,!player->PushFrame(frm));
 		///

@@ -18,7 +18,7 @@ static const char* _fname=0;
 static int _seconds=30;
 static int _rate=0;
 static int _channels=0;
-static char* _codec = "alaw";
+static const char* _codec = "alaw";
 ////////////////////////////////////////////
 static bool _exit = false;
 std::string _muxer;
@@ -27,14 +27,15 @@ std::string _encoder;
 static OmfHelper::Item _options0[]{
 	{"omfG711Recorder(...): \n"
 	 "record the sounds to a file(*.wav)\n"
+  	 "[api]https://www.yuque.com/docs/share/8b59f725-567a-49e8-be12-af37eced5ec8? \n"
 	 "> omfG711Recorder -n test.wav -d 10 -r 16000 -c 1 -m alaw\n"
 	 "> omfG711Recorder -n test.wav -d 10 -r 16000 -c 1 -m ulaw \n"
 	},
-	{"fname"	,'n', _fname 		,"set the file name."},
-	{"duration",'d', _seconds		,"set the record duration(*s)."},
-	{"rate",'r', _rate				,"set the sample rate of audio."},
-	{"ch",'c', _channels			,"set the channels of audio."},
-	{"code",'m', _codec			,"set the codec of audio."},
+	{"fname"	,'n'	, _fname 		,"set the file name."},
+	{"duration"	,'d'	, _seconds		,"set the record duration(*s)."},
+	{"rate"		,'r'	, _rate			,"set the sample rate of audio."},
+	{"ch"		,'c'	, _channels		,"set the channels of audio."},
+	{"code"		,'m'	, _codec		,"set the codec of audio."},
 	{},
 };
 ////////////////////////////////////////////

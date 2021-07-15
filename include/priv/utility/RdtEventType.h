@@ -1,0 +1,23 @@
+//
+// Created by yb.leng on 2020/3/9.
+//
+
+#pragma once
+enum {
+	RDT_EVENT_PIR_STATUS                = 0xDF00 ,
+	RDT_EVENT_RING                      = 0xDF01 ,
+	RDT_EVENT_WIFI_SIGNAL              	= 0xDF02 ,
+	RDT_EVENT_BATTERY_LEVEL             = 0xDF03 ,
+	RDT_EVENT_NEW_FILES                 = 0xDF04 ,
+	RDT_EVENT_CARD_REMAINDER_CAPACITY   = 0xDF05 ,
+	RDT_EVENT_PV_THUMBNAILL_UPDATE      = 0xDF06 ,
+	RDT_EVENT_BATTERY_CHARGE 			= 0xDF07 ,
+	RDT_EVENT_PWR_OFF   				= 0xDF08 ,
+	RDT_EVENT_TALK_SPEED_VALUE_TEST		= 0xDF09 ,
+	RDT_EVENT_LOCAL_PLAYBACK			= 0xDF0A ,
+	RDT_EVENT_FW_DOWNLOADED_SIZE		= 0xDF0B ,
+	RDT_EVENT_FACE_ADD_RET				= 0xDF0D ,
+};
+enum {
+	HOST_EVENT_ALIVE_CHK				= 0xDA00 ,
+};

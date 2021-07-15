@@ -35,29 +35,29 @@ static const char* _url = "rtmp://192.168.0.147:1935/live/Vi37";
 static OmfHelper::Item _options0[]{
 		{"OmfRtmpClient(...): \n"
 		 "This demo shows how to push rtmp steam to server. \n"
-		 "> OmfRtmpClient -d30 -w1920 -h1080 -f30 -b 128 -t ippp -g30 \n"
-		 "> OmfRtmpClient -d30 -w1280 -h720  -f30 -b 128 -t ippp -g30\n"
+   		 "[api]https://www.yuque.com/docs/share/2abc108a-aba9-4070-83a2-2751121f0038? \n"
+		 "> omfRtmpClient -d30 -w1920 -h1080 -f30 -b 128 -t ippp -g30 \n"
+		 "> omfRtmpClient -d30 -w1280 -h720  -f30 -b 128 -t ippp -g30 \n"
 		},
-		{"the yuv paramers:"},
+		{"\nthe yuv paramers:"},
 		{"w"		,'w'		, _width			,"width of image."},
 		{"h"		,'h'		, _height			,"height of image."},
 		{"frmax"	,'F'		, _framerate_max	,"frame max number per seconds."},
 		{"frmin"	,'f'		, _framerate_min	,"frame min number per seconds."},
-		{"the h264 paramers:"},
+		{"\nthe h264 paramers:"},
 		{"vbrmax"	,'B'		, _v_bitrate_max	,"bitrate(kb) max of h264 encoder."},
 		{"vbrmin"	,'b'		, _v_bitrate_min	,"bitrate(kb) min of h264 encoder."},
 		{"goptype"	,'t'		, _goptype			,"gop type(iiii,ippp,ibbp) of h264 encoder."},
 		{"gop"		,'g'		, _gop				,"gop of h264 encoder."},
-		{"the aac paramers:"},
-//		{"rate"		,'r'		, _samplerate		,"samplereate of pcm."},
+		{"\nthe aac paramers:"},
 		{"abr"		,'a'		, _a_bitrate		,"set the audio bitrate(kb) to aac codec."},
 		{"channel"  ,'c'		, _channel			,"set the target channels to aac codec.0:follow the channels of pcm src,other is force to rechannels."},
-		{"the rtmp paramers:"},
+		{"\nthe rtmp paramers:"},
 		{"duration"	,'d'		, _seconds			,"rtmp stream duration(*s)."},
 		{"url"		,'u'		, _url				,"rtmp server url."},
 		{},
 };
-static bool RtmpServer(const char* cfgmap,const char* url) {//dbgSkyPL();
+static bool RtmpClient(const char* cfgmap,const char* url) {//dbgSkyPL();
 	dbgTestPVL(cfgmap);
 	std::unique_ptr<OmfRtmpClient> rtmp{OmfRtmpClient::CreateNew(cfgmap,url)};
 	returnIfErrC(false,!rtmp.get());
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]){
 	std::unique_ptr<char[]> cfgmap{new char[1024*32]};
 	CreateRtmpUrlMap(cfgmap.get());
 
-	RtmpServer(cfgmap.get(),_url);
+	RtmpClient(cfgmap.get(),_url);
 
 
 	return 0;

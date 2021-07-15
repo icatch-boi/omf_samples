@@ -27,13 +27,14 @@ std::string _encoder;
 static OmfHelper::Item _options0[]{
 	{"omfG722Recorder(...): \n"
 	 "record the sounds to a file(*.wav)\n"
+  	 "[api]https://www.yuque.com/docs/share/a45c9342-85df-4dd0-953c-31dcc5be9324? \n"
 	 "> omfG722Recorder -n test.g722 -d 10 -r 16000 -c 1 -m g722\n"
 	},
-	{"fname"	,'n', _fname 		,"set the file name."},
-	{"duration",'d', _seconds		,"set the record duration(*s)."},
-	{"rate",'r', _rate				,"set the sample rate of audio."},
-	{"ch",'c', _channels			,"set the channels of audio."},
-	{"code",'m', _codec			,"set the codec of audio."},
+	{"fname"	,'n'	, _fname 		,"set the file name."},
+	{"duration"	,'d'	, _seconds		,"set the record duration(*s)."},
+	{"rate"		,'r'	, _rate			,"set the sample rate of audio."},
+	{"ch"		,'c'	, _channels		,"set the channels of audio."},
+	{"code"		,'m'	, _codec		,"set the codec of audio."},
 	{},
 };
 ////////////////////////////////////////////

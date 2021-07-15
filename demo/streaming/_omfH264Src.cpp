@@ -22,18 +22,25 @@ using namespace omf::api::streaming::common;
 ////////////////////////////////////////////////////////////
 static const char* _fname=0;
 static int _seconds=30;//seconds
-static const char* _keywords="dualos-pull";
+static const char* _keywords="dualos-vbrc-vfrc-pull";
 static int _sensorID = 0;
 static int _width=1920;
 static int _height=1080;
-static int _framerate=0;
+static int _framerate=30;
+static int _fr_min=0;
+static int _fr_max=0;
 static int _bitrate=2000;///kb
+static int _br_min=0;
+static int _br_max=0;
 static const char* _goptype = "ippp";
 static int _gop = 15;
 static int _triggerInterval=0;//ms
 static bool _dumpFrm=true;
 static int _fluency=0;
 static bool _showBrc=false;
+static const char* _bitRateCtrl="vbrc";
+static const char* _frameRateCtrl="vfrc";
+static const char* _ioMode="pull";
 ///
 static const char* _h264Param=0;    ///the h264 other params;
 static int _cache=0;    ///the vlc cache size
@@ -50,66 +57,62 @@ static bool _exit = false;
 static OmfHelper::Item _options0[]{
 	{"omfH264Src(...): \n"
 	 "This demo shows how to get H264 streaming from OMF using IH264Source interface. \n"
-     "  omfH264Src -d5 -w1920 -h1080 -f30 -b 128 -t ippp -g30 -k vbrc -F \n"
-	 "  omfH264Src -d5 -w1920 -h1080 -f30 -b 5000 -t ippp -g30 -C 256 -F -n test2048.h264\n"
-	 "  omfH264Src -d5 -w1920 -h1080 -f30 -b 5000 -t ippp -g30 -C 256 -F -a1 -n test2048.h264\n"
-	 "  omfH264Src -d5 -a 1\n"
-	 "  omfH264Src -d5 -r 1\n"
-	 "  omfH264Src -d5 -r1 -k \"vbrc-vfrc\" -f10 -b2000 \n"   ///receive prerec streaming & reset prerec params.
-	 "  omfH264Src -n vbrcpull.h264 -d30 -w1920 -h1080 -f30 -b 128 -t ippp -g30 \n"
-	 "  omfH264Src -n vbrcpush.h264 -d30 -w1080 -h720 -k dualos-vbrc-push \n"
-	 "  omfH264Src -n cbrcpush.h264 -d30 -w1920 -h1080 -k dualos-cbrc -w1920 -h1080 -f30 \n"
-	 "  omfH264Src -n vbrcPushTrig.h264 -d30 -w1920 -h1080 -k dualos-vbrc-push-trigger -i 1000 \n"
-     "  omfH264Src -l ./config1.txt \n"   ///load configure file config1.txt
-     "  omfH264Src -o keywords=push-vbrc-vfrc,fr=10,br=500000,gop=60 \n"   ///load configure string
+     "[api]https://www.yuque.com/docs/share/bb23e87e-fc96-41a4-b20b-ebe33fed6163  \n"
+	 "> omfH264Src -d5 -w1920 -h1080 --vfrc -f30 --vbrc -b128 -t ippp -g30 --pull -F \n"
+     "> omfH264Src -d5 -w1920 -h1080 -f30 -b 128 -t ippp -g30 -k vbrc -F \n"
+	 "> omfH264Src -d5 -w1920 -h1080 -f30 -b 5000 -t ippp -g30 -C 256 -F -n test2048.h264\n"
+	 "> omfH264Src -d5 -w1920 -h1080 -f30 -b 5000 -t ippp -g30 -C 256 -F -a1 -n test2048.h264\n"
+	 "> omfH264Src -d5 -a 1\n"
+	 "> omfH264Src -d5 -r 1\n"
+	 "> omfH264Src -d5 -r1 -k \"vbrc-vfrc\" -f10 -b2000 \n"   ///receive prerec streaming & reset prerec params.
+	 "> omfH264Src -n vbrcpull.h264 -d30 -w1920 -h1080 -f30 -b 128 -t ippp -g30 \n"
+	 "> omfH264Src -n vbrcpush.h264 -d30 -w1080 -h720 -k dualos-vbrc-push \n"
+	 "> omfH264Src -n cbrcpush.h264 -d30 -w1920 -h1080 -k dualos-cbrc -w1920 -h1080 -f30 \n"
+	 "> omfH264Src -n vbrcPushTrig.h264 -d30 -w1920 -h1080 -k dualos-vbrc-push-trigger -i 1000 \n"
+     "> omfH264Src -l ./config1.txt \n"   ///load configure file config1.txt
+     "> omfH264Src -o keywords=push-vbrc-vfrc,fr=10,br=500000,gop=60 \n"   ///load configure string
 	},
-	{"fname"	,'n', _fname	,"record filename(*.h264)."},
-	{"duration"	,'d', _seconds	,"record duration(*s)."},
-	{"the yuv paramers:"},
-	{"sid"		,'s', _sensorID	,"select the sensor with the id."},
-	{"w"		,'w', _width	,"width of image."},
-	{"h"		,'h', _height	,"height of image."},
-	{"fr"		,'f', _framerate,"frame number per seconds."},
-	{"the h264 paramers:"},
-	{"bitrate"	,'b', _bitrate	,"bitrate(kb) of h264 encoder."},
-	{"goptype"	,'t', _goptype	,"gop type(iiii,ippp,ibbp) of h264 encoder."},
-	{"gop"		,'g', _gop		,"gop of h264 encoder."},
-	{"h264"	    ,'c', _h264Param,"the other h264 codec params."},
-	{"cache"	,'C', _cache    ,"the vlc cache size,default is no cache."},
-	{"prerec"   ,'r', _prerecIdx,"set preRecord vbrc index and enable preRecord."},
-	{"shared"   ,'a', _sharedIdx,"set shared h264 encoder group."},
-	{"load"     ,'l', _fileConfig,"loading configure file."},
-	{"config"   ,'o', _config   ,"set configure streaming."},
-	{"misc:"},
-	{"dumpfrm"	,'F', [](){_dumpFrm=false;}	,"disable dump the frame."},
-	{"interval"	,'i', _triggerInterval	,"the interval(ms) per trigger. Only used for IsSupportSingleFrameTrigger()."},
-	{"blockfrm"	,'B', [](){_blocking=true;}	,"blocking to process frame."},
-	{"bit rate control:"},
-	{"showBrc"	,'S', [](){_showBrc=1;}	,"show the h264 source bitrate control modes."},
-	{"fluency"	,'e', _fluency	,"[-7,7]the fluency for streaming."},
-	{"keywords"	,'k', _keywords	,"select the IH264Source with keywords:"
-							  	"\n <module>-<brc>-<output>-<tigger>,eg.."
-		 						"\n dualos-cbrc"
-		 						"\n dualos-cbrc-pull"
-								"\n dualos-cbrc-push"
-		 						"\n dualos-cbrc-pull-trig"
-		 						"\n dualos-cbrc-push-trig"
-								"\n dualos-vbrc"
-								"\n dualos-vbrc-pull"
-								"\n dualos-vbrc-push"
-								"\n dualos-vbrc-pull-trig"
-								"\n dualos-vbrc-push-trig"
-								"\n dualos-dbrc"
-								"\n dualos-dbrc-pull"
-								"\n dualos-dbrc-push"
-								"\n dualos-dbrc-pull-trig"
-								"\n dualos-dbrc-push-trig"
-								"\n dualos-abrc"
-								"\n dualos-abrc-pull"
-								"\n dualos-abrc-push"
-								"\n dualos-abrc-pull-trig"
-								"\n dualos-abrc-push-trig"
-   },
+	{"fname"		,'n'	, _fname		,"record filename(*.h264)."},
+	{"duration"		,'d'	, _seconds		,"record duration(*s)."},
+	{"\nthe yuv paramers:"},
+	{"sid"			,'s'	, _sensorID		,"select the sensor with the id."},
+	{"w"			,'w'	, _width		,"width of image."},
+	{"h"			,'h'	, _height		,"height of image."},
+	{"fr"			,'f'	, _framerate	,"frame number per seconds,need support framerate control."},
+	{"frmin"				, _fr_min		,"min frame number per seconds,need support framerate range."},
+	{"frmax"				, _fr_max		,"max frame number per seconds,need support framerate range."},
+	{"\nthe h264 paramers:"},
+	{"bitrate"		,'b'	, _bitrate		,"bitrate(kb) of h264 encoder,need support bitrate control."},
+	{"brmin"				, _br_min		,"min bitrate(kb) of h264 encoder,need support bitrate range."},
+	{"brmax"				, _br_max		,"max bitrate(kb) of h264 encoder,need support bitrate range.."},
+	{"goptype"		,'t'	, _goptype		,"gop type(iiii,ippp,ibbp) of h264 encoder."},
+	{"gop"			,'g'	, _gop			,"gop of h264 encoder."},
+	{"h264"	    	,'c'	, _h264Param	,"the other h264 codec params."},
+	{"cache"		,'C'	, _cache    	,"the vlc cache size,default is no cache."},
+	{"prerec"   	,'r'	, _prerecIdx	,"set preRecord vbrc index and enable preRecord."},
+	{"shared"   	,'a'	, _sharedIdx	,"set shared h264 encoder group."},
+	{"brc"       			, _bitRateCtrl	,"set h264 encoder brc mode:mbrc,cbrc,vbrc,abrc"},
+	{"mbrc"         		, [](){_bitRateCtrl="mbrc";}	,"set h264 encoder brc mode:mbrc"},
+	{"cbrc"         		, [](){_bitRateCtrl="cbrc";}	,"set h264 encoder brc mode:cbrc"},
+	{"vbrc"         		, [](){_bitRateCtrl="vbrc";}	,"set h264 encoder brc mode:vbrc"},
+	{"abrc"         		, [](){_bitRateCtrl="abrc";}	,"set h264 encoder brc mode:abrc"},
+	{"\nfrc"          		, _frameRateCtrl				,"set h264 encoder frc mode:vfrc,afrc,trig"},
+	{"mfrc"        			, [](){_frameRateCtrl="trig";}	,"set h264 encoder frc mode:trig"},
+	{"cfrc"         		, [](){_frameRateCtrl="cfrc";}	,"set h264 encoder frc mode:cfrc"},
+	{"vfrc"         		, [](){_frameRateCtrl="vfrc";}	,"set h264 encoder frc mode:vfrc"},
+	{"afrc"         		, [](){_frameRateCtrl="afrc";}	,"set h264 encoder frc mode:afrc"},
+	{"\nio"           		, _ioMode   					,"set frame output mode:pull,push."},
+	{"pull"         		, [](){_ioMode="pull";}			,"set frame output mode:pull"},
+	{"push"         		, [](){_ioMode="push";}			,"set frame output mode:push"},
+	{"load"     	,'l'	, _fileConfig					,"loading configure file."},
+	{"config"   	,'o'	, _config   					,"set configure streaming."},
+	{"\nmisc:"},
+	{"dumpfrm"		,'F'	, [](){_dumpFrm=false;}			,"disable dump the frame."},
+	{"interval"		,'i'	, _triggerInterval				,"the interval(ms) per trigger. Only used for IsSupportSingleFrameTrigger()."},
+	{"blockfrm"		,'B'	, [](){_blocking=true;}			,"blocking to process frame."},
+	{"\nbit rate control:"},
+	{"showBrc"		,'S'	, [](){_showBrc=1;}				,"show the h264 source bitrate control modes."},
+	{"fluency"		,'e'	, _fluency						,"[-7,7]the fluency for streaming."},
 	{},
 };
 ////////////////////////////////////////////
@@ -179,73 +182,112 @@ static void ProcessTrigger(IH264Source*src){dbgTestPL();
 	}
 }
 static bool ProcessPull(IH264Source*src,FILE*fd){dbgTestPL();
-	//start streaming
+	///start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
-	//streaming....
+	///streaming....
 	while(!_exit) {
 		auto frm = src->PullFrame(false);
 		if(frm)
 			ProcessFrame(frm,fd,__LINE__);
 		std::this_thread::sleep_for(10_ms);
 	}
-	//stop streaming
+	///stop streaming
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
 static bool ProcessPush(IH264Source*src,FILE*fd){dbgTestPL();
-	//set push callback
+	///set push callback
 	src->RegisterOutputCallback([&fd](std::shared_ptr<IH264Source::frame_t>&frm){
 		return ProcessFrame(frm,fd,__LINE__);
 	});
-	//start streaming
+	///start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
-	//streaming...
+	///streaming...
 	while(!_exit) {
 		std::this_thread::sleep_for(10_ms);
 	}
-	//stop streaming
+	///stop streaming
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
 static bool SetParams(IH264Source*src){
 	std::string paras;
-	if(_h264Param){
-		paras=",h264={";
-		paras+=_h264Param;
-		paras+="}";
-	}
-	//if(_cache){
-	//	paras+=",cache=";
-	//	paras+=_cache;//dbgTestPVL(_cache);dbgTestPVL(paras);
-	//}
 	dbgTestPVL(paras);
 	if(!paras.empty())src->Set(paras.c_str()+1);
 	return true;
 }
 static bool ProcessParams(IH264Source*src){
 	if(_config){
-		src->FromConfig(_config);
-		return true;
+		return src->FromConfig(_config);
 	}
 
 	if(_fileConfig) {
-		src->LoadConfig(_fileConfig);
-		return true;
+		return src->LoadConfig(_fileConfig);
 	}
-	//set yuv srouce parameters
-	src->SelectSensor(_sensorID);//select the sensor0.
-	src->SetWidth(_width);
-	src->SetHeight(_height);
-	//set h264 encoder parameters
-	src->SetGop(_gop);
-	src->SetGopType(_goptype);
-	//set BitRateControl
-	if(src->IsSupportBitRateControl())src->SetBitRate(_bitrate*1000);
-	if(src->IsSupportPreRecord())src->SetPreRecordGroup(_prerecIdx);
-	if(src->IsSupportSharedEncoder())src->SetSharedEncoderGroup(_sharedIdx);
-	if(src->IsSupportedCache())src->SetCache(_cache);
-	if(_fluency)src->SetFluency(_fluency);
-	if(_framerate)src->SetFrameRate(_framerate);
+	///set yuv srouce parameters
+	returnIfErrC(false, !src->SelectSensor(_sensorID));//select the sensor0.
+	if(_width){
+		returnIfErrC(false, !src->SetWidth(_width));
+	}
+	if(_height){
+		returnIfErrC(false, !src->SetHeight(_height));
+	}
+
+	///set h264 encoder parameters
+	if(_gop){
+		returnIfErrC(false, !src->SetGop(_gop));
+	}
+	if(_goptype){
+		returnIfErrC(false, !src->SetGopType(_goptype));
+	}
+	///set BitRateControl
+	if(_bitRateCtrl){
+		OmfBRCMode brc(_bitRateCtrl);
+		returnIfErrCS(false,!brc,"unknown brcmode:"<<_bitRateCtrl);
+		returnIfErrC(false,!src->IsSupportBRCMode(brc));
+		returnIfErrC(false,!src->SetBRCMode(brc));
+	}
+	if(src->IsSupportBitRateControl()&&_bitrate){
+		returnIfErrC(false,!src->SetBitRate(_bitrate*1000));
+	}else if(src->IsSupportBitRateRange()){
+		if(_br_min) returnIfErrC(false,!src->SetBitRateMinimum(_br_min*1000));
+		if(_br_max) returnIfErrC(false,!src->SetBitRateMaximum(_br_max*1000));
+	}
+	///set FrameRateControl
+	if(_frameRateCtrl){
+		OmfFRCMode frc(_frameRateCtrl);
+		returnIfErrCS(false,!frc,"unknown frcmode:"<<_frameRateCtrl);
+		returnIfErrC(false,!src->IsSupportFRCMode(frc));
+		returnIfErrC(false,!src->SetFRCMode(frc));
+	}
+	if(src->IsSupportFrameRateControl()&&_framerate){
+		returnIfErrC(false,!src->SetFrameRate(_framerate));
+	}else if(src->IsSupportFrameRateRange()){
+		if(_fr_min) returnIfErrC(false,!src->SetFrameRateMinimum(_fr_min));
+		if(_fr_max) returnIfErrC(false,!src->SetFrameRateMaximum(_fr_max));
+	}
+	///set IoMode:push or pull
+	if(_ioMode){
+		OmfIOMode io(_ioMode);
+		returnIfErrCS(false,!io,"unknowniomode:"<<_ioMode);
+		returnIfErrC(false,!src->IsSupportIOMode(io));
+		returnIfErrC(false,!src->SetFrameIOMode(io));
+	}
+	if(_h264Param){
+		returnIfErrC(false,!src->SetCodec(_h264Param));
+	}
+	if(src->IsSupportPreRecord()){
+		returnIfErrC(false,!src->SetPreRecordGroup(_prerecIdx));
+	}
+	if(src->IsSupportSharedEncoder()){
+		returnIfErrC(false,!src->SetSharedEncoderGroup(_sharedIdx));
+	}
+	if(src->IsSupportCache()){
+		returnIfErrC(false,!src->SetCache(_cache));
+	}
+	if(_fluency){
+		returnIfErrC(false,!src->SetFluency(_fluency));
+	}
 	///streaming params set
 	SetParams(src);
 	return true;
@@ -253,26 +295,27 @@ static bool ProcessParams(IH264Source*src){
 static bool Process(){
 	bool _dbg=OmfMain::Globle().DebugMode();
 	///////////////////////////////////////
-	//create a h264Source instance with keywords.
-	std::string keywords;
-	if(_prerecIdx)keywords=std::string("prerec");
-	else if(_sharedIdx)keywords=std::string("shared");
-	if(_keywords) {
-		keywords += "-";
-		keywords += _keywords;
-	}
-	dbgTestPVL(keywords);
-	std::unique_ptr<IH264Source> src(IH264Source::CreateNew(keywords.c_str()));
+	///create a h264Source instance with keywords.
+	std::unique_ptr<IH264Source> src(IH264Source::CreateNew(_keywords));
 	returnIfErrC(false,!src);
 	src->RegisterMessageCallback(&MessageProcess);
 	///
 	if(_showBrc){
-		auto brcs=src->GetBrcModes();
+		dbgTestPSL("support brcs:");
+		auto brcs=src->GetSupportedBRCModes();
 		for(auto&brc:brcs){
-			dbgTestPSL(brc.mode<<','<<brc.note);
+			dbgTestPSL(to_string(brc));
 		}
-		auto brc=src->GetBrcMode();
-		dbgTestPSL("current brc mode:"<<brc.mode<<','<<brc.note);
+		auto brc=src->GetCurrentBitRate();
+		dbgTestPSL("current brc mode:"<<brc);
+
+		dbgTestPSL("support frcs:");
+		auto frcs=src->GetSupportedFRCModes();
+		for(auto&frc:frcs){
+			dbgTestPSL(to_string(frc));
+		}
+		auto frc=src->GetCurrentFrameRate();
+		dbgTestPSL("current frc mode:"<<frc);
 	}
 	///
 	returnIfErrC(false,!ProcessParams(src.get()));
@@ -316,9 +359,9 @@ static bool Process(){
 		thread.reset(new std::thread(&ProcessTrigger,src.get()));
 	}
 	///process frame
-	if(src->IsSupportedPullFrame()){
+	if(src->IsSupportPullFrame()){
 		returnIfErrC(false,!ProcessPull(src.get(),fd));
-	}else if(src->IsSupportedOutputFrameCallback()){
+	}else if(src->IsSupportOutputFrameCallback()){
 		returnIfErrC(false,!ProcessPush(src.get(),fd));
 	}else{
 		dbgErrPSL("null support output mode.");

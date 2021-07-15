@@ -20,8 +20,9 @@ static const char* _maps=0;
 static OmfHelper::Item _options0[]{
 		{"omfRtspServer(...): \n"
 		 "this demo is to start a RTSP server. \n"
-            "omfRtspServer \n"
-		    "omfRtspServer -m \"1536x1536={codec=h264,w=1536,h=1536,br=1000000,fr=30,gop=30+codec=aac,ch=1,br=128000,bw=16000},720x720={codec=h264,w=720,h=720,br=500000,fr=30,gop=30+codec=aac,ch=1,br=128000,bw=16000}\"\n"
+   		 "[api]https://www.yuque.com/docs/share/9f20e2d4-f66e-48f7-8bad-6d00acbd925a? \n"
+         "> omfRtspServer \n"
+		 "> omfRtspServer -m \"1536x1536={codec=h264,w=1536,h=1536,br=1000000,fr=30,gop=30+codec=aac,ch=1,br=128000,bw=16000},720x720={codec=h264,w=720,h=720,br=500000,fr=30,gop=30+codec=aac,ch=1,br=128000,bw=16000}\"\n"
 		},
 		{"maps",'m', _maps		,"add key-url pairs to maps ."},
 		{},

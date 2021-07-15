@@ -15,7 +15,7 @@ namespace omf {
 					 * 		default: 48000 \n
 					 * 		region: 48000,44100,32000,16000,8000 \n
 					 */
-					virtual void SetSampleRate(int rate)=0;
+					virtual bool SetSampleRate(int rate)=0;
 
 					/**
 					 * set the channels.
@@ -23,7 +23,7 @@ namespace omf {
 					 * 		default: 2 \n
 					 * 		region: 1,2 \n
 					 */
-					virtual void SetChannels(int ch)=0;
+					virtual bool SetChannels(int ch)=0;
 				};
 			}
 		}

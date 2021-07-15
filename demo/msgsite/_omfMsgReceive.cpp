@@ -23,7 +23,7 @@ static const char* _name=0;
 static OmfHelper::Item _options0[]{
 		{"omfMsgReceive(...): \n"
 		 "This demo is used to show how to use OmfMsgSiteUser to receive messages.\n"
-		 "  omfMsgReceive -n AAA   		####receive msg with the name \"AAA\".  \n"
+		 "> omfMsgReceive -n AAA   		####receive msg with the name \"AAA\".  \n"
   		 },
 		{"name"	,'n', _name 		,"msg name."},
 		{},

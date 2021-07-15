@@ -23,29 +23,32 @@ static const char* _fname=0;
 static int _seconds=30;
 static const char* _keywords="dualos-push";
 static int _rate = 0;
-static int _channels = 0;
+static int _channels = 1;
 static const char* _media=0;
 static int _triggerInterval=100;//seconds
 static int _packetSize = 0;
 static bool _opus= false;
 static Duration _packetDur = _duration_zero;
+static bool _codecLinux = true;
 ////////////////////////////////////////////
 static bool _exit = false;
 ////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
 		{"omfAudPlay(...): \n"
 		 "This demo shows how to play audio streaming using IAudioPlayer interface.\n"
-		 "  omfAudPlay -n test.pcm -r 16000 -c 1 -m codec=pcm\n"
-		 "  omfAudPlay -n test.alaw -r 16000 -c 1 -m codec=alaw\n"
-		 "  omfAudPlay -n test.ulaw -r 16000 -c 1 -m codec=ulaw\n"
-		 "  omfAudPlay -n test.g722 -r 16000 -c 1 -m codec=g722\n"
-   		 "	omfAudPlay -n test.opus  -r 16000 -c 1 -m codec=opus\n"
+   		 "[api]https://www.yuque.com/docs/share/7ac991b0-1044-498a-902e-276a43287c36? \n"
+		 "> omfAudPlay -n test.pcm -r 16000 -c 1 -m codec=pcm\n"
+		 "> omfAudPlay -n test.alaw -r 16000 -c 1 -m codec=alaw\n"
+		 "> omfAudPlay -n test.ulaw -r 16000 -c 1 -m codec=ulaw\n"
+		 "> omfAudPlay -n test.g722 -r 16000 -c 1 -m codec=g722\n"
+   		 ">	omfAudPlay -n test.opus  -r 16000 -c 1 -m codec=opus\n"
 		},
-		{"fname",'n', _fname		,"play filename(*.aac)."},
-		{"keywords",'k', _keywords	,"select the IAudioPlayer with keywords.Usually use the default values."},
-		{"rate",'r', _rate			,"the input audio sample rate."},
-		{"ch",'c', _channels		,"the input audio channels."},
-		{"media",'m', _media		,"the input audio media info,such as \"g711:rate=48000,ch=1\"."},
+		{"fname"	,'n'	, _fname		,"play filename(*.aac)."},
+		{"keywords"	,'k'	, _keywords		,"select the IAudioPlayer with keywords.Usually use the default values."},
+		{"rate"		,'r'	, _rate			,"the input audio sample rate."},
+		{"ch"		,'c'	, _channels		,"the input audio channels."},
+		{"opus"		,'o'	, _opus			,"the input audio is opus."},
+		{"media"	,'m'	, _media		,"the input audio media info,such as \"g711:rate=48000,ch=1\"."},
 		{},
 };
 ////////////////////////////////////////////
@@ -67,21 +70,31 @@ static bool MessageProcess(const char* msg0){
 	}
 	return true;
 }
+static bool ProcessParams(IAudioPlayer*player){
+	///must set rate and channel to player
+	returnIfErrC(false,!_rate);
+	returnIfErrC(false,!player->SetSampleRate(_rate));
 
+	returnIfErrC(false,!_channels);
+	returnIfErrC(false,!player->SetChannels(_channels));
+
+	if(_media){
+		returnIfErrC(false,!player->SetMediaInfo(_media));
+	}
+	returnIfErrC(false,!player->EnableCodecOnLinux(_codecLinux));
+	return true;
+}
 static bool Process(OmfMain&omf){
 	///////////////////////////////////////
-	//create a IAudioPlayer instance with keywords.
+	///create a IAudioPlayer instance with keywords.
 	dbgTestPVL(_keywords);
 	std::unique_ptr<IAudioPlayer> player(IAudioPlayer::CreateNew(_keywords));
 	returnIfErrC(false,!player);
-	//set audio player parameters
-	player->SetSampleRate(_rate);
-	player->SetChannels(_channels);
-	player->SetMediaInfo(_media);
-	player->EnableCodecOnLinux(true);
-	//open streaming
+	///set audio player parameters
+	returnIfErrC(false,!ProcessParams(player.get()));
+	///open streaming
 	returnIfErrC(false,!player->ChangeUp(State::ready));
-	//get streaming parameters after Open().
+	///get streaming parameters after Open().
 	auto info = player->GetAudioMediaInfo();
 	dbgTestPVL(info.rate);
 	dbgTestPVL(info.channels);
@@ -95,7 +108,7 @@ static bool Process(OmfMain&omf){
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////
-	//streaming......
+	///streaming......
 	auto duration = _packetDur;//ms
 	int buf_size= _packetSize;
 	std::unique_ptr<char[]> buf(new char[buf_size]);//malloc(buf_size);
@@ -124,12 +137,11 @@ static bool Process(OmfMain&omf){
 		}
 		dbgTestPVL(data_len);
 		///fill data
-		returnIfErrCS(false,!player->IsSupportedPushFrame(),"this dev is not supported push frame!");
+		returnIfErrCS(false,!player->IsSupportPushFrame(),"this dev is not supported push frame!");
 		std::shared_ptr<frame_t> frm{new frame_t{0,buf.get(),data_len,true,tp,nullptr}};
 		returnIfErrC(false,!player->PushFrame(frm,true));
 		///
 		tp+=duration;
-		//std::this_thread::sleep_until(tp);
 		std::this_thread::sleep_for(10_ms);
 	}
 	////////////////////////////////////////////////////////
@@ -184,7 +196,6 @@ int main(int argc,char* argv[]){
 	///and initialize omf system.
 	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params
-	//OmfMain::Globle().ShowClasses();
 	returnIfErrC(0,!Check());
 	///
 	Process(OmfMain::Globle());

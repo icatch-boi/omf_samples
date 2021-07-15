@@ -4,9 +4,11 @@
 #pragma once
 
 #include "_object_base.h"
+#include "_typedef.h"
 #include "OmfFrame.h"
 #include "OmfMessage.h"
 #include "OmfState.h"
+#include "OmfIOMode.h"
 #include <string>
 #include <functional>
 #include <chrono>
@@ -36,11 +38,14 @@ namespace omf {
 					virtual bool LoadConfig(const char*filename)=0;
 					virtual bool FromConfig(const char*params)=0;
 				public:
-					virtual bool IsSupportedBridgePipeline()const=0;
+					virtual bool IsSupportBridgePipeline()const=0;
 					virtual bool SetBridgePipeline(const char*plname)=0;
 				public:
-					virtual bool IsSupportedCache()const=0;
+					virtual bool IsSupportCache()const=0;
 					virtual bool SetCache(int)=0;
+				public:
+					virtual bool IsSupportIOMode(IOMode)const=0;
+					virtual bool SetFrameIOMode(IOMode)=0;
 				};
 
 				class IStreamSink:public virtual IStreamControl {
@@ -49,12 +54,12 @@ namespace omf {
 					 * check whether the push-operation is supported.
 					 * @return true/false
 					 */
-					virtual bool IsSupportedPushFrame()const =0;
+					virtual bool IsSupportPushFrame()const =0;
 					/**
 					 * check whether the register-input-callback operation is supported.
 					 * @return true/false
 					 */
-					virtual bool IsSupportedInputFrameCallback()const = 0;
+					virtual bool IsSupportInputFrameCallback()const = 0;
 				public:
 					/**
 					 * push a frame to current streaming
@@ -85,12 +90,12 @@ namespace omf {
 					 * check whether the pull-operation is supported.
 					 * @return true/false
 					 */
-					virtual bool IsSupportedPullFrame()const =0;
+					virtual bool IsSupportPullFrame()const =0;
 					/**
 					 * check whether the register-output-callback operation is supported.
 					 * @return true/false
 					 */
-					virtual bool IsSupportedOutputFrameCallback()const = 0;
+					virtual bool IsSupportOutputFrameCallback()const = 0;
 				public:
 					/**
 					 * pull a frame from current streaming
@@ -113,6 +118,16 @@ namespace omf {
 					 * @return the output media infomation string.
 					 */
 					virtual std::string GetMediaInfo()const = 0;
+
+				public:
+					/**
+					 * enable monitor of streaming
+					 * @param en
+					 * 			0：[default]diasble
+					 * 			1: enable
+					 * @return true/false
+					 */
+					virtual bool Monitor(bool en)=0;
 				};
 			}
 		}

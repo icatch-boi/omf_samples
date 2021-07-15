@@ -37,7 +37,7 @@ static const char* _url = "rtmp://192.168.0.147:1935/live/Vi37";
 static OmfHelper::Item _options0[]{
 		{"omfRtmpFromDemuxer(...): \n"
 		 "This demo shows how to demux the file using IDemuxer interface.\n"
-		 "  omfRtmpFromDemuxer -n test.mp4 -u rtmp://x.x.x.x/ \n"
+		 "> omfRtmpFromDemuxer -n test.mp4 -u rtmp://x.x.x.x/ \n"
 		},
 		{"fname",'n', _fname		,"demux filename(*.mp4)."},
 		{"url"	,'u', _url			,"rtmp server url."},
@@ -133,11 +133,11 @@ static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line){
 }
 static bool Process(OmfMain&omf){
 	///////////////////////////////////////
-	//create a IDemuxer instance with keywords.
+	///create a IDemuxer instance with keywords.
 	dbgTestPVL(_keywords);
 	std::unique_ptr<IDemuxer> demux(IDemuxer::CreateNew(_keywords));
 	returnIfErrC(false,!demux);
-	//set audio player parameters
+	///set audio player parameters
 	demux->RegisterMessageCallback(&MessageProcess);
 	demux->Url(((std::string)"file://"+_fname).c_str());
 

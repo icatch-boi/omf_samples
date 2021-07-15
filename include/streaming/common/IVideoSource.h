@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include "MediaInfo.h"
 #include "IVideo.h"
 #include "IStreamControl.h"
+#include "IFrameRateControl.h"
 #include "IEncoder.h"
 namespace omf {
 	namespace api {
@@ -14,6 +16,7 @@ namespace omf {
 				class IVideoSource
 					:public virtual IStreamSource
 					,public virtual IVideo
+					,public virtual common::IFrameRateControl
 				{
 				public:
 					using VideoMediaInfo=omf::api::streaming::common::VideoMediaInfo;
@@ -24,7 +27,7 @@ namespace omf {
 					 * 		default: 0\n
 					 * 		v37 support: 0,1,2 \n
 					 */
-					virtual void SelectSensor(int id)=0;
+					virtual bool SelectSensor(int id)=0;
 				};
 			}
 		}

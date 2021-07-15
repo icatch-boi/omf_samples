@@ -34,10 +34,10 @@ static const char* _keywords = "dualos";
 static OmfHelper::Item _options0[]{
 		{"omfDemuxer(...): \n"
 		 "This demo shows how to demux the file using IDemuxer interface.\n"
-		 "  omfDemuxer -n test.mp4 \n"
+		 "> omfDemuxer -n test.mp4 \n"
 		},
-		{"fname",'n', _fname		,"demux filename(*.mp4)."},
-		{"save",'s', _save		,"save streaming(*.aac/*.h264)."},
+		{"fname"	,'n'	, _fname	,"demux filename(*.mp4)."},
+		{"save"		,'s'	, _save		,"save streaming(*.aac/*.h264)."},
 		{},
 };
 ////////////////////////////////////////////
@@ -130,19 +130,19 @@ static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line){
 }
 static bool Process(){
 	///////////////////////////////////////
-	//create a IDemuxer instance with keywords.
+	///create a IDemuxer instance with keywords.
 	dbgTestPVL(_keywords);
 	std::unique_ptr<IDemuxer> demux(IDemuxer::CreateNew(_keywords));
 	returnIfErrC(false,!demux);
-	//set audio player parameters
+	///set audio player parameters
 	demux->RegisterMessageCallback(&MessageProcess);
 	demux->Url(((std::string)"file://"+_fname).c_str());
-	//open streaming
+	///open streaming
 	returnIfErrC(false,!demux->ChangeUp(State::ready));
 	std::vector<FILE*> fds;
-	//get the output
+	///get the output
 	for(auto src:demux->Outputs()){
-		//
+		///
 		auto mediaiInfo = src->GetMediaInfo();
 		dbgTestPSL(mediaiInfo);
 		OmfAttrSet ap(mediaiInfo);
@@ -154,7 +154,7 @@ static bool Process(){
 			fd=fopen(fn.c_str(),"wb");
 			fds.push_back(fd);
 		}
-		//set push callback
+		///set push callback
 		src->RegisterOutputCallback([fd](ISource::Frame& frm){
 			return ProcessFrame(frm,fd,__LINE__);
 		});
@@ -182,7 +182,7 @@ static bool Check(){
 ////////////////////////////////
 int main(int argc,char* argv[]){
 	dbgNotePSL("omfDemuxer(...)\n");
-///parse the input parameters with the parser table,
+	///parse the input parameters with the parser table,
 	///and initialize omf system.
 	returnIfTestC(0,!OmfMain::Initialize(_options0,argc,argv));
 	///check the params

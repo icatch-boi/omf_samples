@@ -37,24 +37,25 @@ static bool _exit = false;
 static OmfHelper::Item _options0[]{
 	{"omfPhotography(...): \n"
 	 "This demo shows how to use the IPhotography interface to snap the image from OMF ,and save it as the JPG file.\n"
+  	 "[api]https://www.yuque.com/docs/share/656bc2e4-f08c-476a-ab13-0a08098648b2? \n"
 	 "> omfPhotography -x SNAP_%03u.jpg -c 30 -i 1 -w1920 -h1080 -q80\n"
 	 "> omfPhotography -c 30 -i 1 -w1920 -h1080 -q80\n"
 	 "> omfPhotography -n AAA.jpg -c 1 -w1920 -h1080 -q80\n"
 	},
-	{"fname"	,'n', _fname	,"filename(*.jpg)."},
-	{"findex"	,'x', _fidxpattern	,"file pattern with index.(SNAP%04u.jpg)."},
-	{"frtc"		,'r', _frtcpattern	,"file pattern with rtc.(SNAP_%04u-%02u-%02u_%02u-%02u-%02u.jpg)."},
-	{"count"	,'c', _snapCount	,"snap count."},
-	{"interval"	,'i', _snapInterval	,"the interval(seconds) per snap."},
-	{"prerec"   ,'R', _prerecIdx,"set preRecord vbrc index and enable preRecord."},
-	{"the yuv paramers:"},
-	{"sid"		,'s', _sensorID	,"select the sensor with the id."},
-	{"w"		,'w', _width	,"set the width for yuv source."},
-	{"h"		,'h', _height	,"set the height for yuv source."},
-	{"the jpeg paramers:"},
-	{"qp"		,'q', _qp	,"set the QP(0~100) to jpeg codec."},
-	{"misc:"},
-	{"keywords"	,'k', _keywords	,"select the IH264Source with keywords." },
+	{"fname"	,'n'	, _fname		,"filename(*.jpg)."},
+	{"findex"	,'x'	, _fidxpattern	,"file pattern with index.(SNAP%04u.jpg)."},
+	{"frtc"		,'r'	, _frtcpattern	,"file pattern with rtc.(SNAP_%04u-%02u-%02u_%02u-%02u-%02u.jpg)."},
+	{"count"	,'c'	, _snapCount	,"snap count."},
+	{"interval"	,'i'	, _snapInterval	,"the interval(seconds) per snap."},
+	{"prerec"   ,'R'	, _prerecIdx	,"set preRecord vbrc index and enable preRecord."},
+	{"\nthe yuv paramers:"},
+	{"sid"		,'s'	, _sensorID		,"select the sensor with the id."},
+	{"w"		,'w'	, _width		,"set the width for yuv source."},
+	{"h"		,'h'	, _height		,"set the height for yuv source."},
+	{"\nthe jpeg paramers:"},
+	{"qp"		,'q'	, _qp			,"set the QP(0~100) to jpeg codec."},
+	{"\nmisc:"},
+	{"keywords"	,'k'	, _keywords		,"select the IH264Source with keywords." },
 	{},
 };
 ////////////////////////////////////////////
@@ -120,27 +121,31 @@ static void ProcessTrigger(IPhotography*src){dbgTestPL();
 
 	}
 }
+static bool ProcessParams(IPhotography*src){
+	returnIfErrC(false,!src->SelectSensor(_sensorID));//select the sensor0.
+	if(_width){
+		returnIfErrC(false,!src->SetWidth(_width));
+	}
+	if(_height){
+		returnIfErrC(false,!src->SetHeight(_height));
+	}
+	///set prerecord
+	if(src->IsSupportPreRecord()){
+		returnIfErrC(false,!src->SetPreRecordGroup(_prerecIdx));
+	}
+	return true;
+}
 static bool Process(bool _dbg){
 	///////////////////////////////////////
-	std::string keywords;
-	if(_prerecIdx)keywords=std::string("prerec");
-	//create a IPhotography instance with keywords.
-	if(_keywords) {
-		keywords += "-";
-		keywords += _keywords;
-	}
-	dbgTestPVL(keywords);
-	std::unique_ptr<IPhotography> src(IPhotography::CreateNew(keywords.c_str()));
+	///create a IPhotography instance with keywords.
+	dbgTestPVL(_keywords);
+	std::unique_ptr<IPhotography> src(IPhotography::CreateNew(_keywords));
 	returnIfErrC(false,!src);
-	//set yuv srouce parameters
-	src->SelectSensor(_sensorID);//select the sensor0.
-	src->SetWidth(_width);
-	src->SetHeight(_height);
-	//set prerecord
-	src->SetPreRecordGroup(_prerecIdx);
-	//register streaming callback
+	///set yuv srouce parameters
+	returnIfErrC(false,!ProcessParams(src.get()));
+	///register streaming callback
 	src->RegisterMessageCallback(&MessageProcess);
-	//start streaming
+	///start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
 
 	auto count = _snapCount;
@@ -150,9 +155,9 @@ static bool Process(bool _dbg){
 		src->Snap(createUrl().c_str(),false);
 		std::this_thread::sleep_for(std::chrono::seconds(_snapInterval));
 	}
-	//stop streaming
+	///stop streaming
 	//returnIfErrC(false,!src->ChangeDown(State::ready));
-	//close streaming
+	///close streaming
 	returnIfErrC(false,!src->ChangeDown(State::null));
 	return true;
 }

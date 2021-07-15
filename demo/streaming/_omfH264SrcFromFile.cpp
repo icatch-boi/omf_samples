@@ -33,15 +33,15 @@ static bool _exit = false;
 static OmfHelper::Item _options0[]{
 	{"omfH264SrcFromFile(...): \n"
 	 "This demo shows how to get H264 streaming from OMF using config file. \n"
-     "  omfH264SrcFromFile -l ./_omfH264Src.cfg \n"   ///load configure file _omfH264Src.cfg
+     "> omfH264SrcFromFile -l ./_omfH264Src.cfg \n"   ///load configure file _omfH264Src.cfg
 	},
-	{"fname"	,'n', _fname	,"record filename(*.h264)."},
-	{"duration"	,'d', _seconds	,"record duration(*s)."},
-	{"load"     ,'l', _fileConfig,"loading configure file."},
-	{"misc:"},
-	{"dumpfrm"	,'F', [](){_dumpFrm=false;}	,"disable dump the frame."},
-	{"blockfrm"	,'B', [](){_blocking=true;}	,"blocking to process frame."},
-	{"showBrc"	,'S', [](){_showBrc=1;}	,"show the h264 source bitrate control modes."},
+	{"fname"	,'n'	, _fname		,"record filename(*.h264)."},
+	{"duration"	,'d'	, _seconds		,"record duration(*s)."},
+	{"load"     ,'l'	, _fileConfig	,"loading configure file."},
+	{"\nmisc:"},
+	{"dumpfrm"	,'F'	, [](){_dumpFrm=false;}	,"disable dump the frame."},
+	{"blockfrm"	,'B'	, [](){_blocking=true;}	,"blocking to process frame."},
+	{"showBrc"	,'S'	, [](){_showBrc=1;}		,"show the h264 source bitrate control modes."},
 	{},
 };
 ////////////////////////////////////////////
@@ -101,54 +101,63 @@ static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line){
 	return true;
 }
 static bool ProcessPull(IH264Source*src,FILE*fd){dbgTestPL();
-	//start streaming
+	///start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
-	//streaming....
+	///streaming....
 	while(!_exit) {
 		auto frm = src->PullFrame(false);
 		if(frm)
 			ProcessFrame(frm,fd,__LINE__);
 		std::this_thread::sleep_for(10_ms);
 	}
-	//stop streaming
+	///stop streaming
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
 static bool ProcessPush(IH264Source*src,FILE*fd){dbgTestPL();
-	//set push callback
+	///set push callback
 	src->RegisterOutputCallback([&fd](std::shared_ptr<IH264Source::frame_t>&frm){
 		return ProcessFrame(frm,fd,__LINE__);
 	});
-	//start streaming
+	///start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
-	//streaming...
+	///streaming...
 	while(!_exit) {
 		std::this_thread::sleep_for(10_ms);
 	}
-	//stop streaming
+	///stop streaming
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
 static bool Process(){
 	bool _dbg=OmfMain::Globle().DebugMode();
 	///////////////////////////////////////
-	//create a h264Source instance from config file.
+	///create a h264Source instance from config file.
 	dbgTestPVL(_fileConfig);
 	std::unique_ptr<IH264Source> src(IH264Source::CreateNewFromFile(_fileConfig));
 	returnIfErrC(false,!src);
 	src->RegisterMessageCallback(&MessageProcess);
 	///
 	if(_showBrc){
-		auto brcs=src->GetBrcModes();
+		dbgTestPSL("support brcs:");
+		auto brcs=src->GetSupportedBRCModes();
 		for(auto&brc:brcs){
-			dbgTestPSL(brc.mode<<','<<brc.note);
+			dbgTestPSL(to_string(brc));
 		}
-		auto brc=src->GetBrcMode();
-		dbgTestPSL("current brc mode:"<<brc.mode<<','<<brc.note);
+		auto brc=src->GetCurrentBitRate();
+		dbgTestPSL("current brc mode:"<<brc);
+
+		dbgTestPSL("support frcs:");
+		auto frcs=src->GetSupportedFRCModes();
+		for(auto&frc:frcs){
+			dbgTestPSL(to_string(frc));
+		}
+		auto frc=src->GetCurrentFrameRate();
+		dbgTestPSL("current frc mode:"<<frc);
 	}
-	//open streaming
+	///open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
-	//get streaming parameters after Open().
+	///get streaming parameters after Open().
 	auto info = src->GetH264MediaInfo();
 	dbgTestPVL(info.width);
 	dbgTestPVL(info.height);
@@ -181,9 +190,9 @@ static bool Process(){
 	///streaming......
 	_exit = false;
 	///process frame
-	if(src->IsSupportedPullFrame()){
+	if(src->IsSupportPullFrame()){
 		returnIfErrC(false,!ProcessPull(src.get(),fd));
-	}else if(src->IsSupportedOutputFrameCallback()){
+	}else if(src->IsSupportOutputFrameCallback()){
 		returnIfErrC(false,!ProcessPush(src.get(),fd));
 	}else{
 		dbgErrPSL("null support output mode.");

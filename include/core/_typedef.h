@@ -54,6 +54,7 @@ enum class Approximate:int {
 	nearest = 0,
 	next = 1,
 };
+
 typedef union {
 	uint32 u32;
 	uint16 u16;
@@ -95,7 +96,12 @@ typedef struct {
 	int offset;
 	int len;
 }OffsetSizePair;
-};
+typedef struct NameHashPair{
+	const char* name;
+	unsigned hash;
+	NameHashPair(const char*);
+}NameHashPair;
+}
 
 //////////////////////////////////////////////////
 

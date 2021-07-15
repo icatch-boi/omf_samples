@@ -28,37 +28,54 @@ static const char* _aecpara="keys=webrtc,level=2,samples=1600";
 static bool _ans=0;
 static const char* _anspara="keys=webrtc,ansmode=3,samples=1600";
 static int _rate = 16000;
-static bool _dumpFrm=false;
+static bool _dumpFrm=true;
+static const char* _ioMode="pull";
+static int _prerecIdx=0;	///enable/disable preRecord
+static int _cache=0;    ///the cache size
+///
+static const char* _config=0;
+static const char* _fileConfig=0;
 ////////////////////////////////////////////
 static bool _exit = false;
-static bool _opus= false;
+static bool _writeFrameSize= false;
 ////////////////////////////////////////////
 static OmfHelper::Item _options0[]{
 	{"omfAudSrc(...): \n"
 	 "This demo shows how to get audio streaming from OMF using IAudioSource interface.\n"
-	 "  omfAudSrc -n test.pcm -d 30 -r 16000\n"
-	 "  omfAudSrc -n test.pcm -d 30 -r 16000 -e 1 -N 1\n"
-	 "  omfAudSrc -n test.aac -d 30 -c aac:br=128000\n"
-	 "  omfAudSrc -n test.alaw -d 30 -c alaw\n"
-	 "  omfAudSrc -n test.ulaw -d 30 -c ulaw\n"
-	 "  omfAudSrc -n test.g722 -d 30 -c g722\n"
-     "	omfAudSrc -n test.opus  -d 10 -c opus\n"
-	 "  omfAudSrc -n test.pcm -d 30 -e 1 -p keys=webrtc,level=2,samples=1600\n"
-	 "  omfAudSrc -n test.pcm -d 30 -N 1 -s keys=webrtc,ansmode=3,samples=1600\n"
-	 "  omfAudSrc -n test.pcm -d 30 -e 1 -p keys=webrtc,level=2,samples=1600 -N 1 -s keys=webrtc,ansmode=3,samples=1600\n"
+  	 "[api]https://www.yuque.com/docs/share/0d4eb2ad-f3dc-4eca-ab3c-151a775f6ef6? \n"
+	 "> omfAudSrc -n test.pcm -d 30 -r 16000\n"
+	 "> omfAudSrc -n test.pcm -d 30 -r 16000 --pull\n"
+	 "> omfAudSrc -n test.pcm -d 30 -r 16000 --push\n"
+	 "> omfAudSrc -n test.pcm -d 30 -r 16000 -e 1 -N 1\n"
+	 "> omfAudSrc -n test.aac -d 30 -c aac:br=128000\n"
+	 "> omfAudSrc -n test.alaw -d 30 -c alaw\n"
+	 "> omfAudSrc -n test.ulaw -d 30 -c ulaw\n"
+	 "> omfAudSrc -n test.g722 -d 30 -c g722\n"
+     ">	omfAudSrc -n test.opus  -d 10 -c opus\n"
+	 "> omfAudSrc -n test.pcm -d 30 -e 1 -p keys=webrtc,level=2,samples=1600\n"
+	 "> omfAudSrc -n test.pcm -d 30 -N 1 -s keys=webrtc,ansmode=3,samples=1600\n"
+	 "> omfAudSrc -n test.pcm -d 30 -e 1 -p keys=webrtc,level=2,samples=1600 -N 1 -s keys=webrtc,ansmode=3,samples=1600\n"
 	},
-	{"fname",'n', _fname		,"record filename(*.pcm)."},
-	{"duration",'d', _seconds	,"process execute duration(*s)."},
-	{"keywords",'k', _keywords	,"select the IAudioSource with keywords.Usually use the default values."},
-	{"codec",'c', _codec		,"set the audio codec:eg.. aac:br=128000"},
-	{"samplerate",'r', _rate		,"set the audio samplerate:eg.. aac:rate=16000"},
+	{"fname"			,'n'	, _fname	,"record filename(*.pcm)."},
+	{"duration"			,'d'	, _seconds	,"process execute duration(*s)."},
+	{"keywords"			,'k'	, _keywords	,"select the IAudioSource with keywords.Usually use the default values."},
+	{"codec"			,'c'	, _codec	,"set the audio codec:eg.. aac:br=128000"},
+	{"samplerate"		,'r'	, _rate		,"set the audio samplerate:eg.. aac:rate=16000"},
+	{"prerec"   		,'R'	, _prerecIdx	,"set preRecord vbrc index and enable preRecord."},
+	{"cache"			,'C'	, _cache    	,"the vlc cache size,default is no cache."},
 	{"\naec:"},
-	{"aec",'e', _aec		,"set the pcm aec enable"},
-	{"aecpara",'p', _aecpara	,"aec params.eg.. keys=webrtc,level=2,samples=1600"},
+	{"aec"				,'e'	, _aec		,"set the pcm aec enable"},
+	{"aecpara"			,'p'	, _aecpara	,"aec params.eg.. keys=webrtc,level=2,samples=1600"},
 	{"\nans:"},
-	{"ans",'N', _ans		,"set the pcm ans enable"},
-	{"anspara",'s', _anspara	,"ans params.eg.. keys=webrtc,ansmode=3,samples=1600"},
-	{"dumpfrm"	,'F', [](){_dumpFrm=false;}	,"dump the frame."},
+	{"ans"				,'N'	, _ans		,"set the pcm ans enable"},
+	{"anspara"			,'s'	, _anspara	,"ans params.eg.. keys=webrtc,ansmode=3,samples=1600"},
+	{"\nio"       				, _ioMode   	,"set frame output mode:pull,push."},
+	{"pull"     				, [](){_ioMode="pull";},"set frame output mode:pull"},
+	{"push"     				, [](){_ioMode="push";},"set frame output mode:push"},
+	{"load"     		,'l'	, _fileConfig	,"loading configure file."},
+	{"config"   		,'o'	, _config   	,"set configure streaming."},
+	{"dumpfrm"			,'F'	, [](){_dumpFrm=false;}	,"dump the frame."},
+	{"WriteFrameSize"	,'S'	, [](){_writeFrameSize=true;}	,"write frame size before frame data."},
 	{},
 };
 ////////////////////////////////////////////
@@ -80,94 +97,113 @@ static bool MessageProcess(const char* msg0){
 	}
 	return true;
 }
+static TimePoint _tpEnd(_timepoint_min);
+static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line){
+	if(!frm->data || !frm->size)
+		return false;
+	///
+	if(_tpEnd==_timepoint_min){
+		_tpEnd=frm->pts+Seconds(_seconds);
+	}else if(frm->pts>_tpEnd){
+		///frame receive is enough, exit profram.
+		_exit = true;
+		return false;
+	}
+	///write to file
+	if(fd)fwrite(frm->data,1,frm->size,fd);
+	///
+	if(_dumpFrm) {
+		dbgTestPS(line << '#' << frm->pkt<< ',' << frm->index
+		               << ',' << frm->pts<< '/' << Now()
+		               << ',' << frm->data
+		               << ',' << frm->size
+		               << ',' << frm->iskeyframe
+		               << ','
+		);
+		dbgTestDL(frm->data, 8);
+	}
+	return true;
+}
 static bool ProcessPull(IAudioSource*src,FILE*fd){
-	//start streaming
+	///start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
-	//streaming....
+	///streaming....
 	auto end = Now()+Seconds(_seconds);
 	while(!_exit && Now()<end) {
 		std::shared_ptr<IAudioSource::frame_t> frm;
 		returnIfErrCS(false, !src->PullFrame(frm), "pull frame fail!");
-		if(!frm->data || !frm->size)
-			continue;
-		///
-		if(_dumpFrm) {
-			dbgTestPSL(frm->index
-					           << ',' << frm->data
-					           << ',' << frm->size
-					           << ',' << frm->iskeyframe
-					           << ',' << frm->pts
-			);
-			dbgTestDL(frm->data, 16);
-		}
-		///write to file
-		if(fd)fwrite(frm->data,1,frm->size,fd);
-		///sleep & trigger
-		auto interval = 10_ms;
-		//if(src->IsSupportSingleFrameTrigger()) {
-		//	interval = Seconds(_triggerInterval);
-		//	src->Trigger();
-		//}
-		std::this_thread::sleep_for(interval);
+		if(frm)
+			ProcessFrame(frm,fd,__LINE__);
+		std::this_thread::sleep_for(10_ms);
 	}
-	//stop streaming
+	///stop streaming
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
 static bool ProcessPush(IAudioSource*src,FILE*fd){
-	//set push callback
+	///set push callback
 	src->RegisterOutputCallback([&fd](std::shared_ptr<IAudioSource::frame_t>&frm){
-		if(_dumpFrm) {
-			dbgTestPSL(frm->index
-					           << ',' << frm->data
-					           << ',' << frm->size
-					           << ',' << frm->iskeyframe
-					           << ',' << frm->pts
-			);
-			dbgTestDL(frm->data, 16);
-		}
-		///
-		if(_opus ||_codec && !strcmp(_codec,"opus")){
-			uint32 framesize = frm->size;
-			if(fd)fwrite(&framesize,1,4,fd);
-		}
-		if(fd)fwrite(frm->data,1,frm->size,fd);
-		return true;
+		return ProcessFrame(frm,fd,__LINE__);
 	});
-	//start streaming
+	///start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
 	//streaming...
 	auto end = Now()+Seconds(_seconds);
 	while(!_exit && Now()<end) {
-		///sleep & trigger
-		auto interval = 10_ms;
-		//if(src->IsSupportSingleFrameTrigger()) {
-		//	interval = Seconds(_triggerInterval);
-		//	src->Trigger();
-		//}
-		std::this_thread::sleep_for(interval);
+		std::this_thread::sleep_for(10_ms);
 	}
-	//stop streaming
+	///stop streaming
 	returnIfErrC(false,!src->ChangeDown(State::ready));
+	return true;
+}
+static bool ProcessParams(IAudioSource*src){
+	if(_config){
+		return src->FromConfig(_config);
+	}
+
+	if(_fileConfig) {
+		return src->LoadConfig(_fileConfig);
+	}
+	if(_codec) {
+		returnIfErrC(false, !src->SetCodec(_codec));
+	}
+	if(_rate) {
+		returnIfErrC(false, !src->SetSampleRate(_rate));
+	}
+
+	if(src->IsSupportAEC()) {
+		returnIfErrC(false, !src->SetAEC(_aec, _aecpara));
+	}
+	if(src->IsSupportANS()) {
+		returnIfErrC(false, !src->SetANS(_ans, _anspara));
+	}
+	if(src->IsSupportPreRecord()){
+		returnIfErrC(false, !src->SetPreRecordGroup(_prerecIdx));
+	}
+	if(src->IsSupportCache()){
+		returnIfErrC(false, !src->SetCache(_cache));
+	}
+	///
+	if(_ioMode){
+		OmfIOMode io(_ioMode);
+		returnIfErrCS(false,!io,"unknowniomode:"<<_ioMode);
+		returnIfErrC(false,!src->IsSupportIOMode(io));
+		returnIfErrC(false,!src->SetFrameIOMode(io));
+	}
 	return true;
 }
 static bool Process(){dbgTestPL();
 	bool _dbg=OmfMain::Globle().DebugMode();
 	///////////////////////////////////////
-	//create a IAudioSource instance with keywords.
+	///create a IAudioSource instance with keywords.
 	dbgTestPVL(_keywords);
 	std::unique_ptr<IAudioSource> src(IAudioSource::CreateNew(_keywords));
 	returnIfErrC(false,!src);
-	//set audio srouce parameters
-	src->SetCodec(_codec);
-	src->SetSampleRate(_rate);
-
-	src->SetAEC(_aec,_aecpara);
-	src->SetANS(_ans,_anspara);
-
-	//open streaming
+	///set audio srouce parameters
+	returnIfErrC(false,!ProcessParams(src.get()));
+	///open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
-	//get streaming parameters after Open().
+	///get streaming parameters after Open().
 	auto info = src->GetAudioMediaInfo();
 	dbgTestPVL(info.rate);
 	dbgTestPVL(info.channels);
@@ -183,11 +219,10 @@ static bool Process(){dbgTestPL();
 	}
 	ExitCall ecfd([fd](){if(fd)fclose(fd);});
 	//////////////////////////////////
-	//streaming......
-	//ProcessMic(src.get());
-	if(src->IsSupportedPullFrame()){
+	///streaming......
+	if(src->IsSupportPullFrame()){
 		returnIfErrC(false,!ProcessPull(src.get(),fd));
-	}else if(src->IsSupportedOutputFrameCallback()){
+	}else if(src->IsSupportOutputFrameCallback()){
 		returnIfErrC(false,!ProcessPush(src.get(),fd));
 	}else{
 		dbgErrPSL("null support output mode.");
@@ -197,15 +232,13 @@ static bool Process(){dbgTestPL();
 }
 ////////////////////////////////////////////
 static bool Check(){
-	auto url = std::string("file://")+_fname;
-	OmfAttrSet ap(url);
-	returnIfErrC(false,!ap);
-	auto ext = ap.Get("ext");
-	returnIfErrC(false,!ext);
-	switch(::Hash(ext)){
-		case ::Hash("opus"):	
-			_opus = true;
-			break;
+	if(!_codec && _fname) {
+		auto url = std::string("file://") + _fname;
+		OmfAttrSet ap(url);
+		returnIfErrC(false, !ap);
+		auto ext = ap.Get("ext");
+		returnIfErrC(false, !ext);
+		_codec = _fname + strlen(_fname) - strlen(ext);
 	}
 	return true;
 }

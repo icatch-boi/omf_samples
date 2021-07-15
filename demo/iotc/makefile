@@ -1,6 +1,7 @@
 ALL =
 
 SRCS =
+SRCS += ipc_shm/ipc_shm.c
 SRCS += iotc_console.cpp
 SRCS += iotc_io.cpp
 SRCS += iotc_listen.cpp
@@ -50,6 +51,7 @@ LDFLAGS += -Wl,--no-as-needed,--copy-dt-needed-entries
 INCS += -I.
 INCS += -I${INCS_PATH}/
 INCS += -I${INCS_PATH}/iotc
+INCS += -I${INCS_PATH}/iotc/ipc_shm
 INCS += -I${INCS_PATH}/misc
 INCS += -I${INCS_PATH}/jansson
 ##

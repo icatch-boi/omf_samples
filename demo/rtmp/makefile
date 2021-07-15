@@ -18,9 +18,9 @@ LIBS += -lpluginwav
 LIBS += -lpluginiofile
 LIBS += -lpluginrtmp
 LIBS += -lpluginav
-LIBS += -lpluginpcm
-LIBS += -lpluginaac
-LIBS += -lplugindev
+#LIBS += -lpluginpcm
+#LIBS += -lpluginaac
+#LIBS += -lplugindev
 ###
 LIBS += -lz
 ###

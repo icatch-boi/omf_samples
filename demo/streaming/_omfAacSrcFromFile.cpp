@@ -32,14 +32,14 @@ static bool _exit = false;
 static OmfHelper::Item _options0[]{
 	{"omfAacSrcFromFile(...): \n"
 	 "This demo shows how to get Aac streaming from OMF using config file. \n"
-     "  omfAacSrcFromFile -l ./_omfAacSrc.cfg \n"   ///load configure file _omfAacSrc.cfg
+     "> omfAacSrcFromFile -l ./_omfAacSrc.cfg \n"   ///load configure file _omfAacSrc.cfg
 	},
-	{"fname"	,'n', _fname	,"record filename(*.aac)."},
-	{"duration"	,'d', _seconds	,"record duration(*s)."},
-	{"load"     ,'l', _fileConfig,"loading configure file."},
-	{"misc:"},
-	{"dumpfrm"	,'F', [](){_dumpFrm=false;}	,"disable dump the frame."},
-	{"blockfrm"	,'B', [](){_blocking=true;}	,"blocking to process frame."},
+	{"fname"	,'n'	, _fname	,"record filename(*.aac)."},
+	{"duration"	,'d'	, _seconds	,"record duration(*s)."},
+	{"load"     ,'l'	, _fileConfig,"loading configure file."},
+	{"\nmisc:"},
+	{"dumpfrm"	,'F'	, [](){_dumpFrm=false;}	,"disable dump the frame."},
+	{"blockfrm"	,'B'	, [](){_blocking=true;}	,"blocking to process frame."},
 	{},
 };
 ////////////////////////////////////////////
@@ -99,45 +99,45 @@ static bool ProcessFrame(std::shared_ptr<frame_t> frm,FILE*fd,int line){
 	return true;
 }
 static bool ProcessPull(IAacSource*src,FILE*fd){dbgTestPL();
-	//start streaming
+	///start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
-	//streaming....
+	///streaming....
 	while(!_exit) {
 		auto frm = src->PullFrame(false);
 		if(frm)
 			ProcessFrame(frm,fd,__LINE__);
 		std::this_thread::sleep_for(10_ms);
 	}
-	//stop streaming
+	///stop streaming
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
 static bool ProcessPush(IAacSource*src,FILE*fd){dbgTestPL();
-	//set push callback
+	///set push callback
 	src->RegisterOutputCallback([&fd](std::shared_ptr<IAacSource::frame_t>&frm){
 		return ProcessFrame(frm,fd,__LINE__);
 	});
-	//start streaming
+	///start streaming
 	returnIfErrC(false,!src->ChangeUp(State::play));
-	//streaming...
+	///streaming...
 	while(!_exit) {
 		std::this_thread::sleep_for(10_ms);
 	}
-	//stop streaming
+	///stop streaming
 	returnIfErrC(false,!src->ChangeDown(State::ready));
 	return true;
 }
 static bool Process(){
 	bool _dbg=OmfMain::Globle().DebugMode();
 	///////////////////////////////////////
-	//create a aacSource instance from config file.
+	///create a aacSource instance from config file.
 	dbgTestPVL(_fileConfig);
 	std::unique_ptr<IAacSource> src(IAacSource::CreateNewFromFile(_fileConfig));
 	returnIfErrC(false,!src);
 	src->RegisterMessageCallback(&MessageProcess);
-	//open streaming
+	///open streaming
 	returnIfErrC(false,!src->ChangeUp(State::ready));
-	//get streaming parameters after Open().
+	///get streaming parameters after Open().
 	auto info = src->GetAacMediaInfo();
 	dbgTestPVL(info.rate);
 	dbgTestPVL(info.channels);
@@ -162,9 +162,9 @@ static bool Process(){
 	///streaming......
 	_exit = false;
 	///process frame
-	if(src->IsSupportedPullFrame()){
+	if(src->IsSupportPullFrame()){
 		returnIfErrC(false,!ProcessPull(src.get(),fd));
-	}else if(src->IsSupportedOutputFrameCallback()){
+	}else if(src->IsSupportOutputFrameCallback()){
 		returnIfErrC(false,!ProcessPush(src.get(),fd));
 	}else{
 		dbgErrPSL("null support output mode.");

@@ -25,9 +25,9 @@ std::string _decoder;
 static OmfHelper::Item _options0[]{
 	{"omfTapeRecorder(...): \n"
 	 "play the audio file(*.wav/*.pcm/*.aac). eg..\n"
-	 "> omfTapePlayer -n test.wav\n"
-	 "> omfTapePlayer -n test.aac\n"
-	 "> omfTapePlayer -n test.pcm -r 16000 -c 1\n"
+	 "> omfAudioPlayer -n test.wav\n"
+	 "> omfAudioPlayer -n test.aac\n"
+	 "> omfAudioPlayer -n test.pcm -r 16000 -c 1\n"
 	},
 	{"fname"	,'n', _fname 		,"set the file name."},
 	{"rate"		,'r', _rate			,"set the sample rate of pcm."},

@@ -37,6 +37,8 @@ namespace omf {
 		const char* _log=0;
 		const char* _display=0;
 		///
+		char _uid=-1;
+		///
 		void init();
 		void AddDefault();
 	public:
@@ -147,6 +149,48 @@ namespace omf {
 						,to_string(t)
 						,descript
 					 	,[&t,longname](){std::cout<<longname<<'='<<to_string(t)<<std::endl;}
+				);
+			}
+			/**
+			 * the full constructer.
+			 * Use this constructor to indicate that this item takes a post parameter.
+			 * @param longname [in]:the full paramer name: --xxx
+			 * @param process [in]:the paramer process callback.
+			 * @param format [in]:the paramer type.
+			 * @param value [in]:the paramer default value.
+			 * @param description [in]:the paramer description.
+			 */
+			Item(const char*longname
+					,FuncProcess process
+					,const char*format
+					,const char*value
+					,const char* description = 0
+			);
+			/**
+			 * Use this constructor to indicate that this item does not have post parameters.
+			 * @param longname [in]:the full paramer name: --xxx
+			 * @param process [in]:the paramer process callback.
+			 * @param description [in]:the paramer description.
+			 */
+			Item(const char*longname
+					,FuncVoid process
+					,const char* description = 0
+			);
+			/**
+			 * the template constructer.
+			 * @tparam T :the paramer type
+			 * @param longname [in]:the full paramer name: --xxx
+			 * @param t [in]:the reference to the receive variable of the input parameter
+			 * @param descript [in]:the paramer description.
+			 */
+			template<class T>
+			Item(const char*longname,T&t,const char* descript=0){//dbgNotePVL(longname);dbgNotePVL(TypeName(typeid(T)));
+				init(longname,0
+						,[&t](char*s) {	from_string(s,t);}
+						,TypeName(typeid(T))
+						,to_string(t)
+						,descript
+						,[&t,longname](){std::cout<<longname<<'='<<to_string(t)<<std::endl;}
 				);
 			}
 		public:

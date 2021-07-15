@@ -1,16 +1,13 @@
 //
 // Created by jg.wang on 2019/7/11.
 //
-
-#include "MediaInfo.h"
-#include "ITrigger.h"
 #pragma once
+#include "IBitRateControl.h"
 namespace omf {
 	namespace api {
 		namespace streaming {
 			namespace common {
-				class IEncoder
-					: virtual public common::ITrigger
+				class IEncoder:public virtual IBitRateControl
 				{
 				public:
 					/**
@@ -18,17 +15,6 @@ namespace omf {
 					 * @return true/false
 					 */
 					virtual bool SetCodec(const char*)=0;
-
-					/**
-				 * set the target bit rate for codec.
-				 * @param br[in] bit per seconds.
-				 * @note supported BitRateControl:\n
-				 * 		CBRC:\n
-				 * 		MBRC:\n
-				 * 		DBRC:\n
-				 * @see BitRateControl
-				 */
-					virtual bool SetBitRate(int br)=0;
 
 					/**
 					 * is support PreRecord.
@@ -68,10 +54,11 @@ namespace omf {
 					 */
 					virtual bool SetSharedEncoderGroup(int group)=0;
 
+					virtual bool IsSupportForceKeyFrame()const=0;
 					/**
 					 * force h264 encoder to output the key frame.
 					 */
-					virtual void ForceKeyFrame()=0;
+					virtual bool ForceKeyFrame()=0;
 				};
 			}
 		}

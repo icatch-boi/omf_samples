@@ -20,7 +20,7 @@ using namespace omf::api;
 
 #define YUV_COLOR(y,u,v)   (((u)<<16)|((y)<<8)|(v))
 static const char* _msgName="HumanDetectResult";
-static char* _resFile = "A:\\RO_RES\\NN\\RES\\PERSONYOLOV2TINY.BIN";
+static const char* _resFile = "A:\\RO_RES\\NN\\RES\\PERSONYOLOV2TINY.BIN";
 static int _drawEn = 0;
 static int _color = YUV_COLOR(0xff, 0x00, 0x80);
 ////////////////////////////////////////////
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]){
 
 	OmfAttrSet apout(output);
 	//memset(paramstr,0,512);
-	void* ptr = nullptr;
+	char* ptr = nullptr;
 	apout.Get("ptr",ptr);
 	dbgErrPSL(ptr);
 	sprintf(ptr,"resfile=%s,draw=%d,color=%d",_resFile,_drawEn,_color);

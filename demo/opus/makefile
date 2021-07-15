@@ -1,13 +1,11 @@
 ALL =
-ALL+=omfOggMuxer_
+ALL+=omfOpusEncDec_
 ##
 INCS +=
 ###
 LIBS += -lpluginiofile
-LIBS += -lpluginav
+LIBS += -lpluginwav
 LIBS += -lpluginpcm
-LIBS += -lpluginogg
-LIBS += -logg
 LIBS += -lpluginopus
 LIBS += -lopus
 ###
@@ -15,6 +13,7 @@ LIBS += -lomfapi
 LIBS += -lomfapicxx
 LIBS += -lomfapistreaming
 LIBS += -lpluginapistreaming
+LIBS += -lpluginav
 ###
 LIBS += -lpluginshmbase
 LIBS += -lpluginshm
